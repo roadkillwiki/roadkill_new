@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marten" Version="3.0.1" />
+    <PackageReference Include="Marten" Version="3.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
-    <PackageReference Include="NEST" Version="6.3.1" />
-    <PackageReference Include="Scrutor" Version="3.0.1" />
+    <PackageReference Include="NEST" Version="6.4.0" />
+    <PackageReference Include="Scrutor" Version="3.0.2" />
   </ItemGroup>
 
 </Project>

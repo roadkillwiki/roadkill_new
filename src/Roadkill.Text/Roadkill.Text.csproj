@@ -5,14 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.9.10" />
-    <PackageReference Include="HtmlSanitizer" Version="4.0.187" />
-    <PackageReference Include="Lucene.Net" Version="4.8.0-beta00004" />
-    <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00004" />
-    <PackageReference Include="Lucene.Net.Memory" Version="4.8.0-beta00004" />
-    <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-beta00004" />
-    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00004" />
-    <PackageReference Include="MailKit" Version="2.0.6" />
+    <PackageReference Include="AngleSharp" Version="0.9.11" />
+    <PackageReference Include="HtmlSanitizer" Version="4.0.199" />
+    <PackageReference Include="MailKit" Version="2.1.0.1" />
     <PackageReference Include="Markdig" Version="0.15.4" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.1.3" />

@@ -58,7 +58,7 @@ namespace Roadkill.Api
 
 			services.AddOptions();
 			services.Configure<SmtpSettings>(Configuration.GetSection("Smtp"));
-			services.AddSwagger();
+			services.AddSwaggerDocument();
 			services.AddMvc();
 
 			var provider = services.BuildServiceProvider();
@@ -81,15 +81,7 @@ namespace Roadkill.Api
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
 			app.UseExceptionHandler("/error");
-			app.UseSwaggerUi3WithApiExplorer(settings =>
-			{
-				settings.PostProcess = document =>
-				{
-					document.Info.Version = "3.0";
-					document.Info.Title = "Roadkill API";
-					document.Info.Description = "Roadkill's RESTful API.";
-				};
-			});
+			app.UseSwaggerUi3();
 			app.UseStaticFiles();
 			app.UseAuthentication();
 			app.UseMvc();
