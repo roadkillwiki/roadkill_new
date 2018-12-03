@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Interfaces;
 using Roadkill.Api.Models;
@@ -10,7 +11,8 @@ using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("pageversions")]
+	[Authorize]
+	[Route("[controller]")]
 	public class PageVersionsController : Controller, IPageVersionsService
 	{
 		private readonly IPageVersionRepository _pageVersionRepository;

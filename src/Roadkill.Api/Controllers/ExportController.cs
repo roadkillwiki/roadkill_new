@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Interfaces;
 using Roadkill.Core.Models;
@@ -10,7 +11,8 @@ using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("export")]
+	[Authorize]
+	[Route("[controller]")]
 	public class ExportController : Controller, IExportService
 	{
 		private readonly IPageRepository _pageRepository;
@@ -21,7 +23,6 @@ namespace Roadkill.Api.Controllers
 		}
 
 		[HttpGet]
-		[Route(nameof(ExportPagesToXml))]
 		public async Task<string> ExportPagesToXml()
 		{
 			IEnumerable<Page> allPages = await _pageRepository.AllPages();

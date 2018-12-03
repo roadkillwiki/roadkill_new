@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("Error")]
+	[Route("[controller]")]
 	[SwaggerIgnore]
 	public class ErrorController : Controller
 	{

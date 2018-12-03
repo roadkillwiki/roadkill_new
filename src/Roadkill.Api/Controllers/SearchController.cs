@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nest;
 using Roadkill.Api.Interfaces;
@@ -10,6 +11,8 @@ using Roadkill.Core.Adapters;
 
 namespace Roadkill.Api.Controllers
 {
+	[Authorize]
+	[Route("[controller]")]
 	public class SearchController : Controller, ISearchService
 	{
 		private readonly IElasticSearchAdapter _searchAdapter;

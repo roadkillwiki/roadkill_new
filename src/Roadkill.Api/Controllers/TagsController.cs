@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Interfaces;
 using Roadkill.Api.Models;
@@ -10,7 +11,8 @@ using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("tags")]
+	[Authorize]
+	[Route("[controller]")]
 	public class TagsController : Controller, ITagsService
 	{
 		private readonly IPageRepository _pageRepository;

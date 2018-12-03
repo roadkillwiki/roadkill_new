@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MailKit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -8,7 +9,8 @@ using Roadkill.Core.Configuration;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("email")]
+	[Authorize]
+	[Route("[controller]")]
 	public class EmailController : Controller, IEmailService
 	{
 		private readonly IMailTransport _mailTransport;
@@ -20,6 +22,7 @@ namespace Roadkill.Api.Controllers
 			_settings = settings.Value;
 		}
 
+		[HttpPost]
 		public async Task Send(string from, string to, string subject, string body)
 		{
 			var message = new MimeMessage();

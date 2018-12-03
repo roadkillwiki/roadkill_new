@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Interfaces;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("files")]
+	[Authorize]
+	[Route("[controller]")]
 	public class FileController : Controller, IFileService
 	{
 		public FileController()

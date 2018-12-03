@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Interfaces;
 using Roadkill.Text;
@@ -7,7 +8,8 @@ using Roadkill.Text.TextMiddleware;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("markdown")]
+	[Authorize]
+	[Route("[controller]")]
 	public class MarkdownController : Controller, IMarkdownService
 	{
 		private readonly ITextMiddlewareBuilder _textMiddlewareBuilder;
@@ -19,6 +21,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpPost]
 		[Route(nameof(ConvertToHtml))]
+		[AllowAnonymous]
 		public Task<string> ConvertToHtml(string markDown)
 		{
 			PageHtml result = _textMiddlewareBuilder.Execute(markDown);
