@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MailKit" Version="2.0.6" />
     <PackageReference Include="Marten.AspNetIdentity" Version="1.0.23" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.5" />
@@ -26,6 +22,22 @@
     <ProjectReference Include="..\Roadkill.Core\Roadkill.Core.csproj" />
     <ProjectReference Include="..\Roadkill.Localisation\Roadkill.Localisation.csproj" />
     <ProjectReference Include="..\Roadkill.Text\Roadkill.Text.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\**" />
   </ItemGroup>
 
 </Project>
