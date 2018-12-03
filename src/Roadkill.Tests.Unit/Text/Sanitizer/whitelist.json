@@ -1,0 +1,4 @@
+{
+  "allowedElements": [ "blah", "test" ],
+  "allowedAttributes": [ "id", "class", "href" ]
+}

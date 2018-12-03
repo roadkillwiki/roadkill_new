@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Text\CustomTokens\badxml-file.json" />
+    <None Remove="Text\CustomTokens\customvariables.xml" />
+    <None Remove="Text\Sanitizer\dodgy-whitelist.json" />
+    <None Remove="Text\Sanitizer\whitelist.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Text\CustomTokens\badxml-file.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Text\CustomTokens\customvariables.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Text\Sanitizer\dodgy-whitelist.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Text\Sanitizer\whitelist.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Marten" Version="3.0.1" />
+    <PackageReference Include="Scrutor" Version="3.0.1" />
+    <PackageReference Include="AutoFixture" Version="4.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="Moq" Version="4.10.0" />
+    <PackageReference Include="Shouldly" Version="3.0.1" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.1.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta4-build3742" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Roadkill.Api\Roadkill.Api.csproj" />
+    <ProjectReference Include="..\Roadkill.Core\Roadkill.Core.csproj" />
+    <ProjectReference Include="..\Roadkill.Text\Roadkill.Text.csproj" />
+  </ItemGroup>
+
+</Project>
