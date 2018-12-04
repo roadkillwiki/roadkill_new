@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Roadkill.Core.Models;
+using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers
@@ -63,7 +61,7 @@ namespace Roadkill.Api.Controllers
                 {
                     roleClaim = new Claim(ClaimTypes.Role, "Editor");
                 }
-                else if (authenticateModel.Email == "admin@example.org") 
+                else if (authenticateModel.Email == "admin@example.org")
                 {
                     roleClaim = new Claim(ClaimTypes.Role, "Admin");
                 }
@@ -73,7 +71,7 @@ namespace Roadkill.Api.Controllers
                     new Claim(ClaimTypes.Name, user.Email),
                     roleClaim
                 };
-                
+
                 var key = Encoding.ASCII.GetBytes(DependencyInjection.JwtPassword);
                 var symmetricSecurityKey = new SymmetricSecurityKey(key);
 
@@ -103,7 +101,7 @@ namespace Roadkill.Api.Controllers
                 Email = "editor@example.org",
             };
             await _userManager.CreateAsync(editorUser, "password");
-            
+
             var adminUser = new RoadkillUser()
             {
                 UserName = "admin@example.org",

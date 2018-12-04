@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using Marten;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Xunit.Abstractions;
 
 namespace Roadkill.Tests.Integration.Repositories

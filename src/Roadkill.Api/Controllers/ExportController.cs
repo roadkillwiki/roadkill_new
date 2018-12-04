@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Interfaces;
-using Roadkill.Core.Models;
+using Roadkill.Api.Common.Services;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers

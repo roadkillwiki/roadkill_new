@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Roadkill.Api.Common\Roadkill.Api.Common.csproj" />
     <ProjectReference Include="..\Roadkill.Core\Roadkill.Core.csproj" />
     <ProjectReference Include="..\Roadkill.Localisation\Roadkill.Localisation.csproj" />
     <ProjectReference Include="..\Roadkill.Text\Roadkill.Text.csproj" />

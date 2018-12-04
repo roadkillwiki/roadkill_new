@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Interfaces;
+using Roadkill.Api.Common.Services;
 
 namespace Roadkill.Api.Controllers
 {

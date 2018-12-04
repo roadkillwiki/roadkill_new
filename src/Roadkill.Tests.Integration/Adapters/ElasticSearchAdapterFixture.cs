@@ -6,7 +6,7 @@ using AutoFixture;
 using Elasticsearch.Net;
 using Nest;
 using Roadkill.Core.Adapters;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Xunit.Abstractions;
 
 namespace Roadkill.Tests.Integration.Adapters

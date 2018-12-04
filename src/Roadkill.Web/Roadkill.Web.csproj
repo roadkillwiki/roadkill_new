@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Roadkill.ApiClient\Roadkill.ApiClient.csproj" />
+    <ProjectReference Include="..\Roadkill.Api.Client\Roadkill.Api.Client.csproj" />
     <ProjectReference Include="..\Roadkill.Localisation\Roadkill.Localisation.csproj" />
   </ItemGroup>
 

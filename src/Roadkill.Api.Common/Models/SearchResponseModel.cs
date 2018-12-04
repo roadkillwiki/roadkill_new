@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Roadkill.Api.Models
+namespace Roadkill.Api.Common.Models
 {
 	/// <summary>
 	/// Contains data for a single search result from a search query.

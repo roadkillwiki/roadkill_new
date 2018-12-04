@@ -1,8 +1,8 @@
 ﻿using Marten;
 using Microsoft.Extensions.DependencyInjection;
-using Roadkill.Core.Models;
 using Scrutor;
 using System;
+using Roadkill.Core.Entities;
 
 namespace Roadkill.Core
 {

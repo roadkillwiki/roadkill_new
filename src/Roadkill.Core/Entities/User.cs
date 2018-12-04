@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Roadkill.Core.Models
+namespace Roadkill.Core.Entities
 {
     public class User
     {

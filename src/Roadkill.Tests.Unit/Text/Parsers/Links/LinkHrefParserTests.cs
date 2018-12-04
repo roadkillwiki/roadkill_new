@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
+using Roadkill.Core.Entities;
 using Xunit;
-using Roadkill.Core.Models;
 using Roadkill.Core.Repositories;
 using Roadkill.Text;
 using Roadkill.Text.Parsers.Links;

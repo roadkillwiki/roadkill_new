@@ -1,6 +1,7 @@
-﻿using Roadkill.Core.Models;
+﻿using Roadkill.Api.Common.Models;
+using Roadkill.Core.Entities;
 
-namespace Roadkill.Api.Models
+namespace Roadkill.Api.ModelConverters
 {
 	public interface IPageVersionModelConverter
 	{

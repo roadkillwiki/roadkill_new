@@ -1,4 +1,4 @@
-﻿namespace Roadkill.Api.Models
+﻿namespace Roadkill.Api.Common.Models
 {
 	/// <summary>
 	/// Provides data for the tag cloud.

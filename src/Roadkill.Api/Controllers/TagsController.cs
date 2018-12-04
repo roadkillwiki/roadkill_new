@@ -4,9 +4,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Interfaces;
-using Roadkill.Api.Models;
-using Roadkill.Core.Models;
+using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Services;
+using Roadkill.Api.ModelConverters;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers

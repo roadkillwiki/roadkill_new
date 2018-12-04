@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using Marten;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;

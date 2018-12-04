@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Roadkill.Api.Models;
-using Roadkill.Core.Models;
+using Roadkill.Api.Common.Models;
 
-namespace Roadkill.Api.Interfaces
+namespace Roadkill.Api.Common.Services
 {
 	public interface ISearchService
 	{

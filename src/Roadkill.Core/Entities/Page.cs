@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Roadkill.Core.Models
+namespace Roadkill.Core.Entities
 {
 	public class Page
 	{

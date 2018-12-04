@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nest;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 
 namespace Roadkill.Core.Adapters
 {

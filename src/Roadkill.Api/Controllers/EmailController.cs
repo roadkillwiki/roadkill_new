@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using Roadkill.Api.Interfaces;
+using Roadkill.Api.Common.Services;
 using Roadkill.Core.Configuration;
 
 namespace Roadkill.Api.Controllers

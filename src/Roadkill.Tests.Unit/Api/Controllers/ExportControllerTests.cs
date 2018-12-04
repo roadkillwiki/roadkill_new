@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 using AutoFixture;
 using Moq;
 using Roadkill.Api.Controllers;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;

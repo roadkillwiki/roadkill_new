@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Interfaces;
-using Roadkill.Text;
+using Roadkill.Api.Common.Services;
 using Roadkill.Text.Models;
 using Roadkill.Text.TextMiddleware;
 

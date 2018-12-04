@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Roadkill.Core.Authorization;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;

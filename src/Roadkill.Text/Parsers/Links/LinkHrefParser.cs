@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 
 namespace Roadkill.Text.Parsers.Links

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Roadkill.Api.Interfaces
+namespace Roadkill.Api.Common.Services
 {
 	public interface IMarkdownService
 	{

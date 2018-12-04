@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Roadkill.Api.Models
+namespace Roadkill.Api.Common.Models
 {
 	public class SearchRequestModel
 	{

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Roadkill.Api.Models
+namespace Roadkill.Api.Common.Models
 {
 	// TODO: add base62 ID, as Id is Hilo
 	// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Roadkill.Api.Models;
-using Roadkill.Core.Models;
+using Roadkill.Api.Common.Models;
 
-namespace Roadkill.Api.Interfaces
+namespace Roadkill.Api.Common.Services
 {
 	public interface IUserService
 	{
@@ -20,11 +19,11 @@ namespace Roadkill.Api.Interfaces
 
 		Task<bool> DeleteUser(string email);
 
-		Task<User> GetUserById(Guid id, bool? isActivated = null);
+		Task<UserModel> GetUserById(Guid id, bool? isActivated = null);
 
-		Task<User> GetUser(string email, bool? isActivated = null);
+		Task<UserModel> GetUser(string email, bool? isActivated = null);
 
-		Task<User> GetUserByResetKey(string resetKey);
+		Task<UserModel> GetUserByResetKey(string resetKey);
 
 		Task<bool> IsAdmin(string cookieValue);
 
@@ -52,6 +51,6 @@ namespace Roadkill.Api.Interfaces
 
 		Task<string> GetLoggedInUserName();
 
-		Task<User> GetLoggedInUser(string cookieValue);
+		Task<UserModel> GetLoggedInUser(string cookieValue);
 	}
 }

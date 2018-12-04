@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Interfaces;
-using Roadkill.Api.Models;
-using Roadkill.Core.Models;
+using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Services;
+using Roadkill.Api.ModelConverters;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
@@ -30,7 +31,7 @@ namespace Roadkill.Api.Controllers
         public async Task<PageModel> Add([FromBody] PageModel model)
         {
             // TODO: fill createdon property
-            
+
             Page page = _pageModelConverter.ConvertToPage(model);
             if (page == null)
                 return null;

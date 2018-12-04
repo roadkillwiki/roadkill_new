@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using Marten;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;
