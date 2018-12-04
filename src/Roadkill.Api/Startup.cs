@@ -1,13 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using System.Net;
+using Hellang.Middleware.ProblemDetails;
+using Marten;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Roadkill.Core.Configuration;
 
 using ApiDependencyInjection = Roadkill.Api.DependencyInjection;
@@ -17,30 +20,41 @@ namespace Roadkill.Api
 {
 	public class Startup
 	{
-		public IConfigurationRoot Configuration { get; set; }
+	    private IConfigurationRoot _configuration { get; set; }
+	    private IHostingEnvironment _hostingEnvironment { get; set; }
+	    private readonly ILoggerFactory _loggerFactory;
 
-		public Startup(IHostingEnvironment env)
+		public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
+		    _loggerFactory = loggerFactory;
+		    _hostingEnvironment = env;
+
 			var builder = new ConfigurationBuilder();
 			builder
 				.SetBasePath(Path.Combine(env.ContentRootPath))
 				.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
 				.AddEnvironmentVariables();
 
-			Configuration = builder.Build();
+			_configuration = builder.Build();
 		}
 
-		public IServiceProvider ConfigureServices(IServiceCollection services)
+
+	    public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
+		    services.AddProblemDetails(x =>
+		    {
+		        x.IncludeExceptionDetails = context => _hostingEnvironment.IsDevelopment();
+		        x.Map<Exception>(ex => new ExceptionProblemDetails(ex, StatusCodes.Status500InternalServerError));
+		    });
 			services.AddLogging();
 
 			// Configuration
 			services.AddOptions();
-			services.Configure<SmtpSettings>(Configuration.GetSection("Smtp"));
-			
+			services.Configure<SmtpSettings>(_configuration.GetSection("Smtp"));
+
 			// Roadkill IoC
-			string connectionString = Configuration["ConnectionString"];
-			CoreDependencyInjection.ConfigureServices(services, connectionString);
+			string connectionString = _configuration["ConnectionString"];
+			CoreDependencyInjection.ConfigureServices(services, connectionString, _loggerFactory.CreateLogger("Startup"));
 			ApiDependencyInjection.ConfigureServices(services);
 
 			// Authentication (ASP.NET Identity)
@@ -59,11 +73,11 @@ namespace Roadkill.Api
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
-			app.UseExceptionHandler("/error");
 			app.UseSwagger();
 			app.UseSwaggerUi3();
 			app.UseStaticFiles();
 			app.UseAuthentication();
+		    app.UseProblemDetails();
 			app.UseMvc();
 		}
 	}

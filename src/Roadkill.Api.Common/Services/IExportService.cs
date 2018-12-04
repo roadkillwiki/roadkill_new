@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Refit;
 
 namespace Roadkill.Api.Common.Services
 {

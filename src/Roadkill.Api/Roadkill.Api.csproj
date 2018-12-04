@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="2.1.2" />
     <PackageReference Include="MailKit" Version="2.1.0.1" />
     <PackageReference Include="Marten.AspNetIdentity" Version="1.0.26" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.6" />

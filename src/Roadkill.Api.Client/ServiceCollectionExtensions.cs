@@ -7,7 +7,7 @@ namespace Roadkill.Api.Client
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRoadkillApi(this IServiceCollection services, string baseAddress, RefitSettings refitSettings = null)
+        public static IServiceCollection AddRoadkillApi(this IServiceCollection services, string baseAddress, RefitSettings refitSettings = null)
         {
             if (refitSettings == null)
                 refitSettings = new RefitSettings();

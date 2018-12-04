@@ -22,7 +22,8 @@ namespace Roadkill.Api.Controllers
 			_pageRepository = pageRepository;
 		}
 
-		[HttpGet]
+		[HttpPost]
+		[Route(nameof(ExportPagesToXml))]
 		public async Task<string> ExportPagesToXml()
 		{
 			IEnumerable<Page> allPages = await _pageRepository.AllPages();
@@ -36,21 +37,21 @@ namespace Roadkill.Api.Controllers
 			}
 		}
 
-		[HttpGet]
+		[HttpPost]
 		[Route(nameof(ExportPagesVersionsToXml))]
 		public async Task<string> ExportPagesVersionsToXml()
 		{
 			throw new System.NotImplementedException();
 		}
 
-		[HttpGet]
+		[HttpPost]
 		[Route(nameof(ExportAsSql))]
 		public async Task<string> ExportAsSql()
 		{
 			throw new System.NotImplementedException();
 		}
 
-		[HttpGet]
+		[HttpPost]
 		[Route(nameof(ExportAttachments))]
 		public async Task ExportAttachments()
 		{
