@@ -1,0 +1,23 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["run", "-d", "-p", "5432:5432", "--name", "roadkill-postgres", "postgres"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["exec", "roadkill-postgres", "psql -c 'CREATE DATABASE roadkill;' -U postgres"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["exec", "roadkill-postgres", "psql -c 'CREATE USER roadkill WITH PASSWORD roadkill;' -U postgres"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["exec", "roadkill-postgres", "psql -c 'ALTER USER roadkill WITH SUPERUSER;' -U postgres"]
+  - name: gcr.io/cloud-builders/dotnet
+    args: ["restore"]
+  - name: gcr.io/cloud-builders/dotnet
+    args: ["build", "-c", "Release"]
+  - name: ubuntu
+    args: ["bash", "pushd", "src/Roadkill.Tests.Unit"]
+  - name: gcr.io/cloud-builders/dotnet
+    args: ["test"]
+  - name: ubuntu
+    args: ["bash", "popd"]
+  - name: ubuntu
+    args: ["bash", "pushd", "src/Roadkill.Tests.Integration"]
+  - name: gcr.io/cloud-builders/dotnet
+    args: ["test"]
