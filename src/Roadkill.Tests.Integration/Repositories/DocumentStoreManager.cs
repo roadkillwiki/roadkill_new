@@ -23,12 +23,13 @@ namespace Roadkill.Tests.Integration.Repositories
 
 			if (_documentStores.ContainsKey(documentStoreSchemaName))
 			{
-				outputHelper.WriteLine("GetMartenDocumentStore: found doc store in cache {0}", documentStoreSchemaName);
+				outputHelper.WriteLine("DocumentStoreManager: found doc store in cache {0}", documentStoreSchemaName);
 				return _documentStores[documentStoreSchemaName];
 			}
 
 			IDocumentStore docStore = CreateDocumentStore(ConnectionString, documentStoreSchemaName, outputHelper);
 			_documentStores.AddOrUpdate(documentStoreSchemaName, docStore, (s, store) => store);
+		    outputHelper.WriteLine($"DocumentStoreManager: created doc store {documentStoreSchemaName} using {ConnectionString}");
 
 			return _documentStores[documentStoreSchemaName];
 		}

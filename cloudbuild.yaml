@@ -11,6 +11,10 @@ steps:
     name: gcr.io/cloud-builders/docker
     args: ['exec', 'roadkill-postgres', 'sleep', '5']
 
+  - id: 'docker-logs'
+    name: gcr.io/cloud-builders/docker
+    args: ['logs', 'roadkill-postgres']
+
   - id: 'psql-create-db'
     name: gcr.io/cloud-builders/docker
     args: ['exec', 'roadkill-postgres', 'psql', '-c', 'CREATE DATABASE roadkill;', '-U', 'postgres']
