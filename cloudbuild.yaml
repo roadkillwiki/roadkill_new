@@ -11,13 +11,9 @@ steps:
     args: ["restore"]
   - name: gcr.io/cloud-builders/dotnet
     args: ["build", "-c", "Release"]
-  - name: ubuntu
-    args: ["bash", "pushd", "src/Roadkill.Tests.Unit"]
   - name: gcr.io/cloud-builders/dotnet
     args: ["test"]
-  - name: ubuntu
-    args: ["bash", "popd"]
-  - name: ubuntu
-    args: ["bash", "pushd", "src/Roadkill.Tests.Integration"]
+    dir:  "src/Roadkill.Tests.Unit"
   - name: gcr.io/cloud-builders/dotnet
     args: ["test"]
+    dir:  "src/Roadkill.Tests.Integration"
