@@ -9,7 +9,7 @@ steps:
 
   - id: 'sleep'
     name: gcr.io/cloud-builders/docker
-    args: ['exec', 'sleep', '5']
+    args: ['exec', 'roadkill-postgres', 'sleep', '5']
 
   - id: 'psql-create-db'
     name: gcr.io/cloud-builders/docker
