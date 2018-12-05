@@ -11,7 +11,7 @@ namespace Roadkill.Tests.Integration.Repositories
 	public class DocumentStoreManager
 	{
 		private static readonly ConcurrentDictionary<string, IDocumentStore> _documentStores = new ConcurrentDictionary<string, IDocumentStore>();
-		public static string ConnectionString => "host=localhost;port=5432;database=roadkill;username=roadkill;password=roadkill;";
+		public static string ConnectionString => "host=roadkill-postgres;port=5432;database=roadkill;username=roadkill;password=roadkill;";
 
 		public static IDocumentStore GetMartenDocumentStore(Type testClassType, ITestOutputHelper outputHelper)
 		{
