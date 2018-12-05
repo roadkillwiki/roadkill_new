@@ -2,6 +2,9 @@ steps:
   - id: 'docker-run'
     name: gcr.io/cloud-builders/docker
     args: ['run', '-d', '-p', '5432:5432', '--name', 'roadkill-postgres', 'postgres']
+  - id: 'docker-ps'
+    name: gcr.io/cloud-builders/docker
+    args: ['ps', '-a']
   - id: 'psql-create-db'
     name: gcr.io/cloud-builders/docker
     args: ['exec', 'roadkill-postgres', 'psql', '-c', 'CREATE DATABASE roadkill;', '-U', 'postgres']
