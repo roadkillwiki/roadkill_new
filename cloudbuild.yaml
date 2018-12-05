@@ -26,14 +26,9 @@ steps:
     args: ['exec', 'roadkill-postgres', 'psql', '-c', 'ALTER USER roadkill WITH SUPERUSER;', '-U', 'postgres']
     waitFor: ['psql-create-user']
 
-  - id: 'dotnet-restore'
-    name: gcr.io/cloud-builders/dotnet
-    args: ['restore']
-
   - id: 'dotnet-build'
     name: gcr.io/cloud-builders/dotnet
     args: ['build', '-c', 'Release']
-    waitFor: ['dotnet-restore']
 
   - id: 'dotnet-t'
     name: gcr.io/cloud-builders/dotnet
