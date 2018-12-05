@@ -30,13 +30,14 @@ steps:
     name: gcr.io/cloud-builders/dotnet
     args: ['build', '-c', 'Release']
 
-  - id: 'dotnet-t'
+  - id: 'dotnet-test-unit'
     name: gcr.io/cloud-builders/dotnet
     args: ['test']
     dir:  'src/Roadkill.Tests.Unit'
     waitFor: ['dotnet-build']
 
-  - name: gcr.io/cloud-builders/dotnet
+  - id: 'dotnet-test-integration'
+    name: gcr.io/cloud-builders/dotnet
     args: ['test']
     dir:  'src/Roadkill.Tests.Integration'
     waitFor: ['dotnet-build']
