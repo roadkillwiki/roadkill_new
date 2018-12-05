@@ -1,21 +1,32 @@
 steps:
-  - name: gcr.io/cloud-builders/docker
+  - id: 'docker-run'
+    name: gcr.io/cloud-builders/docker
     args: ['run', '-d', '-p', '5432:5432', '--name', 'roadkill-postgres', 'postgres']
-  - name: gcr.io/cloud-builders/docker
-    args: ['ps', '-a',]
-  - name: gcr.io/cloud-builders/docker
+  - id: 'psql-create-db'
+    name: gcr.io/cloud-builders/docker
     args: ['exec', 'roadkill-postgres', 'psql', '-c', 'CREATE DATABASE roadkill;', '-U', 'postgres']
-  - name: gcr.io/cloud-builders/docker
-    args: ['exec', 'roadkill-postgres', 'psql', '-c', 'CREATE USER roadkill WITH PASSWORD roadkill;', '-U', 'postgres']
-  - name: gcr.io/cloud-builders/docker
+    waitFor: ['docker-run']
+  - id: 'psql-create-user'
+    name: gcr.io/cloud-builders/docker
+    args: ['exec', 'roadkill-postgres', 'psql', '-c', 'CREATE USER roadkill WITH PASSWORD ''roadkill'';', '-U', 'postgres']
+    waitFor: ['psql-create-db']
+  - id: 'psql-assign-role'
+    name: gcr.io/cloud-builders/docker
     args: ['exec', 'roadkill-postgres', 'psql', '-c', 'ALTER USER roadkill WITH SUPERUSER;', '-U', 'postgres']
-  - name: gcr.io/cloud-builders/dotnet
+    waitFor: ['psql-create-user']
+  - id: 'dotnet-restore'
+    name: gcr.io/cloud-builders/dotnet
     args: ['restore']
-  - name: gcr.io/cloud-builders/dotnet
+  - id: 'dotnet-build'
+    name: gcr.io/cloud-builders/dotnet
     args: ['build', '-c', 'Release']
-  - name: gcr.io/cloud-builders/dotnet
+    waitFor: ['dotnet-restore']
+  - id: 'dotnet-t'
+    name: gcr.io/cloud-builders/dotnet
     args: ['test']
     dir:  'src/Roadkill.Tests.Unit'
+    waitFor: ['dotnet-build']
   - name: gcr.io/cloud-builders/dotnet
     args: ['test']
     dir:  'src/Roadkill.Tests.Integration'
+    waitFor: ['dotnet-build']
