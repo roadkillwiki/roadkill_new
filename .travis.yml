@@ -1,0 +1,28 @@
+# https://docs.travis-ci.com/user/environment-variables/
+language: csharp
+dotnet: 2.0.0
+
+branches:
+  only:
+  - master
+
+services:
+  - docker
+  - postgresql
+
+addons:
+  postgresql: "9.5"
+
+before_script:
+  - psql -c "create database roadkill;" -U postgres
+  - psql -c "CREATE USER roadkill WITH PASSWORD 'roadkill';" -U postgres
+  - psql -c "ALTER USER roadkill WITH SUPERUSER;" -U postgres
+
+script:
+   - dotnet restore
+   - dotnet build -c Release  
+   - pushd src/Roadkill.Tests.Unit
+   - dotnet test
+   - popd
+   - pushd src/Roadkill.Tests.Integration
+   - dotnet test
