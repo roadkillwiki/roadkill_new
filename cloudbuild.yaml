@@ -8,8 +8,8 @@ steps:
     args: ['ps', '-a']
 
   - id: 'sleep'
-    name: ubuntu
-    args: ['bash', 'sleep', '10']
+    name: gcr.io/cloud-builders/docker
+    args: ['exec', 'sleep', '5']
 
   - id: 'psql-create-db'
     name: gcr.io/cloud-builders/docker
@@ -20,6 +20,7 @@ steps:
     name: gcr.io/cloud-builders/docker
     args: ['exec', 'roadkill-postgres', 'psql', '-c', 'CREATE USER roadkill WITH PASSWORD ''roadkill'';', '-U', 'postgres']
     waitFor: ['psql-create-db']
+
   - id: 'psql-assign-role'
     name: gcr.io/cloud-builders/docker
     args: ['exec', 'roadkill-postgres', 'psql', '-c', 'ALTER USER roadkill WITH SUPERUSER;', '-U', 'postgres']
@@ -39,7 +40,7 @@ steps:
     args: ['test']
     dir:  'src/Roadkill.Tests.Unit'
     waitFor: ['dotnet-build']
-    
+
   - name: gcr.io/cloud-builders/dotnet
     args: ['test']
     dir:  'src/Roadkill.Tests.Integration'
