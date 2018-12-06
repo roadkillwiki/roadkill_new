@@ -37,48 +37,11 @@ namespace Roadkill.Tests.Integration.Repositories
 			}
 		}
 
-		private void PrintPages()
-		{
-			using (var connection = new NpgsqlConnection(DocumentStoreManager.ConnectionString))
-			{
-				connection.Open();
-				var command = connection.CreateCommand();
-				command.CommandText = "delete from public.mt_doc_page";
-				//command.ExecuteNonQuery();
-
-				command.CommandText = "delete from public.mt_doc_pagecontent";
-				//command.ExecuteNonQuery();
-
-				command.CommandText = "select count(*) from public.mt_doc_page";
-				long result = (long)command.ExecuteScalar();
-				_outputHelper.WriteLine("Pages: {0}", result);
-
-				command.CommandText = "select count(*) from public.mt_doc_pagecontent";
-				result = (long)command.ExecuteScalar();
-				_outputHelper.WriteLine("PageContents: {0}", result);
-			}
-		}
-
 		public PageRepository CreateRepository()
 		{
 			IDocumentStore documentStore = DocumentStoreManager.GetMartenDocumentStore(typeof(PageRepositoryTests), _outputHelper);
 
 			return new PageRepository(documentStore);
-		}
-
-		private List<Page> CreateTenPages(PageRepository repository, List<Page> pages = null)
-		{
-			if (pages == null)
-				pages = _fixture.CreateMany<Page>(10).ToList();
-
-			var newPages = new List<Page>();
-			foreach (Page page in pages)
-			{
-				Page newPage = repository.AddNewPage(page).GetAwaiter().GetResult();
-				newPages.Add(newPage);
-			}
-
-			return newPages;
 		}
 
 		[Fact]
@@ -297,6 +260,42 @@ namespace Roadkill.Tests.Integration.Repositories
 			// then
 			Page actualPage = await repository.GetPageById(expectedPage.Id);
 			actualPage.ShouldBeEquivalent(expectedPage);
+		}
+
+		private List<Page> CreateTenPages(PageRepository repository, List<Page> pages = null)
+		{
+			if (pages == null)
+			{
+				pages = _fixture.CreateMany<Page>(10).ToList();
+			}
+
+			var newPages = new List<Page>();
+			foreach (Page page in pages)
+			{
+				Page newPage = repository.AddNewPage(page).GetAwaiter().GetResult();
+				newPages.Add(newPage);
+			}
+
+			return newPages;
+		}
+
+		private void PrintPages()
+		{
+			using (var connection = new NpgsqlConnection(DocumentStoreManager.ConnectionString))
+			{
+				connection.Open();
+				var command = connection.CreateCommand();
+				command.CommandText = "delete from public.mt_doc_page";
+				command.CommandText = "delete from public.mt_doc_pagecontent";
+
+				command.CommandText = "select count(*) from public.mt_doc_page";
+				long result = (long)command.ExecuteScalar();
+				_outputHelper.WriteLine("Pages: {0}", result);
+
+				command.CommandText = "select count(*) from public.mt_doc_pagecontent";
+				result = (long)command.ExecuteScalar();
+				_outputHelper.WriteLine("PageContents: {0}", result);
+			}
 		}
 	}
 }

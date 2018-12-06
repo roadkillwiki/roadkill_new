@@ -10,24 +10,24 @@ namespace Roadkill.Text.Plugins
     {
         public bool IsCacheable { get; set; }
 
-        public string BeforeParse(string text, PageHtml pageHtml)
+        public static string BeforeParse(PageHtml pageHtml)
         {
-            return text;
+            return pageHtml.Html;
         }
 
-        public string AfterParse(string html)
-        {
-            return html;
-        }
-
-        public string PreContainerHtml()
+        public static string PostContainerHtml()
         {
             return "";
         }
 
-        public string PostContainerHtml()
-        {
-            return "";
-        }
+	    public static string AfterParse(string html)
+	    {
+		    return html;
+	    }
+
+	    public static string PreContainerHtml()
+	    {
+		    return "";
+	    }
     }
 }

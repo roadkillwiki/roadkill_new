@@ -7,31 +7,31 @@ namespace Roadkill.Api.Common.Services
 {
 	public interface IPagesService
 	{
-	    [Post("/pages/")]
-	    [Headers("Authorization: Bearer")]
+		[Post("/pages/")]
+		[Headers("Authorization: Bearer")]
 		Task<PageModel> Add([Body] PageModel model);
 
-	    [Put("/pages/")]
-	    [Headers("Authorization: Bearer")]
+		[Put("/pages/")]
+		[Headers("Authorization: Bearer")]
 		Task<PageModel> Update([Body] PageModel model);
 
-	    [Delete("/pages/{pageId}")]
-	    [Headers("Authorization: Bearer")]
+		[Delete("/pages/{pageId}")]
+		[Headers("Authorization: Bearer")]
 		Task Delete(int pageId);
 
-	    [Get("/pages/{pageId}")]
+		[Get("/pages/{pageId}")]
 		Task<PageModel> Get(int pageId);
 
-	    [Get("/pages/allpages")]
+		[Get("/pages/allpages")]
 		Task<IEnumerable<PageModel>> AllPages();
 
-	    [Get("/pages/allpagescreatedby")]
+		[Get("/pages/allpagescreatedby")]
 		Task<IEnumerable<PageModel>> AllPagesCreatedBy(string username);
 
-	    [Get("/pages/findhomepage")]
+		[Get("/pages/findhomepage")]
 		Task<PageModel> FindHomePage();
 
-	    [Get("/pages/findbytitle")]
+		[Get("/pages/findbytitle")]
 		Task<PageModel> FindByTitle(string title);
 	}
 }

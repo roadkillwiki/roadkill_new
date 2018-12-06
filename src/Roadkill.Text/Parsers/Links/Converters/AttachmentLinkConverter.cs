@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Roadkill.Text.Parsers.Links.Converters
@@ -17,30 +18,39 @@ namespace Roadkill.Text.Parsers.Links.Converters
         public bool IsMatch(HtmlLinkTag htmlLinkTag)
         {
             if (htmlLinkTag == null)
+            {
                 return false;
+            }
 
             if (string.IsNullOrEmpty(htmlLinkTag.OriginalHref))
+            {
                 return false;
+            }
 
-            string lowerHref = htmlLinkTag.OriginalHref.ToLower();
-            return lowerHref.StartsWith("attachment:") || lowerHref.StartsWith("~/");
+	        string upperHref = htmlLinkTag.OriginalHref.ToUpperInvariant();
+            return upperHref.StartsWith("ATTACHMENT:", StringComparison.Ordinal) || upperHref.StartsWith("~/", StringComparison.Ordinal);
         }
 
         public HtmlLinkTag Convert(HtmlLinkTag htmlLinkTag)
         {
             string href = htmlLinkTag.OriginalHref;
-            string lowerHref = href?.ToLower() ?? "";
+            string upperHref = href?.ToUpperInvariant() ?? "";
 
-            if (!lowerHref.StartsWith("attachment:") && !lowerHref.StartsWith("~"))
+            if (!upperHref.StartsWith("ATTACHMENT:", StringComparison.Ordinal) &&
+                !upperHref.StartsWith("~", StringComparison.Ordinal))
+            {
                 return htmlLinkTag;
+            }
 
-            if (lowerHref.StartsWith("attachment:"))
+            if (upperHref.StartsWith("ATTACHMENT:", StringComparison.Ordinal))
             {
                 href = href.Remove(0, 11);
-                if (!href.StartsWith("/"))
+                if (!href.StartsWith("/", StringComparison.Ordinal))
+                {
                     href = "/" + href;
+                }
             }
-            else if (lowerHref.StartsWith("~/"))
+            else if (upperHref.StartsWith("~/", StringComparison.Ordinal))
             {
                 // Remove the ~
                 href = href.Remove(0, 1);
@@ -48,8 +58,10 @@ namespace Roadkill.Text.Parsers.Links.Converters
 
             // Get the full path to the attachment
             string attachmentsPath = _textSettings.AttachmentsUrlPath;
-            if (attachmentsPath.EndsWith("/"))
+            if (attachmentsPath.EndsWith("/", StringComparison.Ordinal))
+            {
                 attachmentsPath = attachmentsPath.Remove(attachmentsPath.Length - 1);
+            }
 
             htmlLinkTag.Href = _urlHelper.Content(attachmentsPath) + href;
 

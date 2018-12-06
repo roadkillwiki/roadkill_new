@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.IO;
+using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Serilog.Events;
-using System.IO;
 
 namespace Roadkill.Web
 {
-	public class Program
+	public static class Program
 	{
-		public static void Main(string[] args)
+		public static void Main()
 		{
 			Log.Logger = new LoggerConfiguration()
 				.MinimumLevel.Debug()

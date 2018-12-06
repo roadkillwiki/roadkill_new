@@ -14,9 +14,9 @@ namespace Roadkill.Text.TextMiddleware
 
         public override PageHtml Invoke(PageHtml pageHtml)
         {
-            pageHtml.Html = _textPluginRunner.AfterParse(pageHtml.Html);
-            pageHtml.PreContainerHtml = _textPluginRunner.PreContainerHtml();
-            pageHtml.PostContainerHtml = _textPluginRunner.PostContainerHtml();
+            pageHtml.Html = TextPluginRunner.AfterParse(pageHtml.Html);
+            pageHtml.PreContainerHtml = TextPluginRunner.PreContainerHtml();
+            pageHtml.PostContainerHtml = TextPluginRunner.PostContainerHtml();
             pageHtml.IsCacheable = _textPluginRunner.IsCacheable;
 
             return pageHtml;

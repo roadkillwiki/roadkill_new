@@ -1,0 +1,35 @@
+<Project>
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.6.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.6.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63401-01" PrivateAssets="All" />
+    <PackageReference Include="OpenCover" Version="4.6.519" PrivateAssets="All" />
+    <PackageReference Include="ReportGenerator" Version="4.0.4" PrivateAssets="All" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="All" />
+    <PackageReference Include="Text.Analyzers" Version="2.6.2" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <SourceLinkGitHubHosts Include="github.com" />
+  </ItemGroup>
+  <PropertyGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <Authors>C.Small</Authors>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)Roadkill.ruleset</CodeAnalysisRuleSet>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <LangVersion>latest</LangVersion>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <NoWarn>CA1716;$(NoWarn)</NoWarn>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl Condition="'$(PackageProjectUrl)' != ''">$(PackageProjectUrl).git</RepositoryUrl>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">0.1.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(BUILD_NUMBER)' != '' ">
+    <VersionPrefix>$(BUILD_NUMBER)</VersionPrefix>
+  </PropertyGroup>
+</Project>

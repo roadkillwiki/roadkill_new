@@ -9,8 +9,6 @@ using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace Roadkill.Tests.Integration.Repositories
 {
 	public class UserRepositoryTests

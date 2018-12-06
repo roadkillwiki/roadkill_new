@@ -39,23 +39,24 @@ namespace Roadkill.Api.Controllers
 
 		[HttpPost]
 		[Route(nameof(ExportPagesVersionsToXml))]
-		public async Task<string> ExportPagesVersionsToXml()
+		public Task<string> ExportPagesVersionsToXml()
 		{
-			throw new System.NotImplementedException();
+			//bad comment
+			return Task.FromResult("");
 		}
 
 		[HttpPost]
 		[Route(nameof(ExportAsSql))]
-		public async Task<string> ExportAsSql()
+		public Task<string> ExportAsSql()
 		{
-			throw new System.NotImplementedException();
+			return Task.FromResult("");
 		}
 
 		[HttpPost]
 		[Route(nameof(ExportAttachments))]
-		public async Task ExportAttachments()
+		public Task ExportAttachments()
 		{
-			throw new System.NotImplementedException();
+			return Task.CompletedTask;
 		}
 	}
 }

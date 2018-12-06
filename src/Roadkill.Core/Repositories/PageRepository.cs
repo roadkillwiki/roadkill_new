@@ -39,10 +39,125 @@ namespace Roadkill.Core.Repositories
 
 		public PageRepository(IDocumentStore store)
 		{
-			if (store == null)
-				throw new ArgumentNullException(nameof(store));
+			_store = store ?? throw new ArgumentNullException(nameof(store));
+		}
 
-			_store = store;
+		public async Task<Page> AddNewPage(Page page)
+		{
+			page.Id = 0; // reset so it's autoincremented
+
+			using (var session = _store.LightweightSession())
+			{
+				session.Store(page);
+
+				await session.SaveChangesAsync();
+				return page;
+			}
+		}
+
+		public async Task<IEnumerable<Page>> AllPages()
+		{
+			using (var session = _store.QuerySession())
+			{
+				return await session
+					.Query<Page>()
+					.ToListAsync();
+			}
+		}
+
+		public async Task<IEnumerable<string>> AllTags()
+		{
+			using (var session = _store.QuerySession())
+			{
+				return await session
+					.Query<Page>()
+					.Select(x => x.Tags)
+					.ToListAsync();
+			}
+		}
+
+		public async Task DeletePage(int pageId)
+		{
+			using (var session = _store.LightweightSession())
+			{
+				session.Delete<Page>(pageId);
+				await session.SaveChangesAsync();
+			}
+		}
+
+		public async Task DeleteAllPages()
+		{
+			using (var session = _store.LightweightSession())
+			{
+				session.DeleteWhere<Page>(x => true);
+				session.DeleteWhere<PageVersion>(x => true);
+
+				await session.SaveChangesAsync();
+			}
+		}
+
+		public async Task<IEnumerable<Page>> FindPagesCreatedBy(string username)
+		{
+			using (var session = _store.QuerySession())
+			{
+				return await session
+					.Query<Page>()
+					.Where(x => x.CreatedBy.Equals(username, StringComparison.CurrentCultureIgnoreCase))
+					.ToListAsync();
+			}
+		}
+
+		public async Task<IEnumerable<Page>> FindPagesLastModifiedBy(string username)
+		{
+			using (var session = _store.QuerySession())
+			{
+				return await session
+					.Query<Page>()
+					.Where(x => x.LastModifiedBy.Equals(username, StringComparison.CurrentCultureIgnoreCase))
+					.ToListAsync();
+			}
+		}
+
+		public async Task<IEnumerable<Page>> FindPagesContainingTag(string tag)
+		{
+			using (var session = _store.QuerySession())
+			{
+				return await session
+					.Query<Page>()
+					.Where(x => x.Tags.Contains(tag))
+					.ToListAsync();
+			}
+		}
+
+		public async Task<Page> GetPageById(int id)
+		{
+			using (var session = _store.QuerySession())
+			{
+				return await session
+					.Query<Page>()
+					.FirstOrDefaultAsync(x => x.Id == id);
+			}
+		}
+
+		public async Task<Page> GetPageByTitle(string title)
+		{
+			using (var session = _store.QuerySession())
+			{
+				return await session
+					.Query<Page>()
+					.FirstOrDefaultAsync(x => x.Title == title);
+			}
+		}
+
+		public async Task<Page> UpdateExisting(Page page)
+		{
+			using (var session = _store.LightweightSession())
+			{
+				session.Update(page);
+
+				await session.SaveChangesAsync();
+				return page;
+			}
 		}
 
 		public void Wipe()
@@ -55,124 +170,6 @@ namespace Roadkill.Core.Repositories
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
-			}
-		}
-
-		public async Task<Page> AddNewPage(Page page)
-		{
-			page.Id = 0; // reset so it's autoincremented
-
-			using (IDocumentSession session = _store.LightweightSession())
-			{
-				session.Store(page);
-
-				await session.SaveChangesAsync();
-				return page;
-			}
-		}
-
-		public async Task<IEnumerable<Page>> AllPages()
-		{
-			using (IQuerySession session = _store.QuerySession())
-			{
-				return await session
-					.Query<Page>()
-					.ToListAsync();
-			}
-		}
-
-		public async Task<IEnumerable<string>> AllTags()
-		{
-			using (IQuerySession session = _store.QuerySession())
-			{
-				return await session
-					.Query<Page>()
-					.Select(x => x.Tags)
-					.ToListAsync();
-			}
-		}
-
-		public async Task DeletePage(int pageId)
-		{
-			using (IDocumentSession session = _store.LightweightSession())
-			{
-				session.Delete<Page>(pageId);
-				await session.SaveChangesAsync();
-			}
-		}
-
-		public async Task DeleteAllPages()
-		{
-			using (IDocumentSession session = _store.LightweightSession())
-			{
-				session.DeleteWhere<Page>(x => true);
-				session.DeleteWhere<PageVersion>(x => true);
-
-				await session.SaveChangesAsync();
-			}
-		}
-
-		public async Task<IEnumerable<Page>> FindPagesCreatedBy(string username)
-		{
-			using (IQuerySession session = _store.QuerySession())
-			{
-				return await session
-					.Query<Page>()
-					.Where(x => x.CreatedBy.Equals(username, StringComparison.CurrentCultureIgnoreCase))
-					.ToListAsync();
-			}
-		}
-
-		public async Task<IEnumerable<Page>> FindPagesLastModifiedBy(string username)
-		{
-			using (IQuerySession session = _store.QuerySession())
-			{
-				return await session
-					.Query<Page>()
-					.Where(x => x.LastModifiedBy.Equals(username, StringComparison.CurrentCultureIgnoreCase))
-					.ToListAsync();
-			}
-		}
-
-		public async Task<IEnumerable<Page>> FindPagesContainingTag(string tag)
-		{
-			using (IQuerySession session = _store.QuerySession())
-			{
-				return await session
-					.Query<Page>()
-					.Where(x => x.Tags.Contains(tag))
-					.ToListAsync();
-			}
-		}
-
-		public async Task<Page> GetPageById(int id)
-		{
-			using (IQuerySession session = _store.QuerySession())
-			{
-				return await session
-					.Query<Page>()
-					.FirstOrDefaultAsync(x => x.Id == id);
-			}
-		}
-
-		public async Task<Page> GetPageByTitle(string title)
-		{
-			using (IQuerySession session = _store.QuerySession())
-			{
-				return await session
-					.Query<Page>()
-					.FirstOrDefaultAsync(x => x.Title == title);
-			}
-		}
-
-		public async Task<Page> UpdateExisting(Page page)
-		{
-			using (IDocumentSession session = _store.LightweightSession())
-			{
-				session.Update(page);
-
-				await session.SaveChangesAsync();
-				return page;
 			}
 		}
 	}

@@ -61,7 +61,6 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 		public void use_should_throw_when_middleware_is_null()
 		{
 			// given, when
-			string markup = "";
 			var builder = new TextMiddlewareBuilder(_logger);
 
 			// then

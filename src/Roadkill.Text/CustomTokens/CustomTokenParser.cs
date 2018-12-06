@@ -12,34 +12,37 @@ namespace Roadkill.Text.CustomTokens
     /// </summary>
     public class CustomTokenParser
     {
-        private readonly ILogger _logger;
         private static IEnumerable<TextToken> _tokens;
-        private static bool _isTokensFileCached;
-        public IEnumerable<TextToken> Tokens => _tokens;
+
+	    private static bool _isTokensFileCached;
+
+	    private readonly ILogger _logger;
+
+	    static CustomTokenParser()
+	    {
+		    CacheTokensFile = true;
+	    }
+
+	    public CustomTokenParser(TextSettings settings, ILogger logger)
+	    {
+		    _logger = logger;
+
+		    if (CacheTokensFile && !_isTokensFileCached)
+		    {
+			    _tokens = Deserialize(settings);
+			    ParseTokenRegexes();
+			    _isTokensFileCached = true;
+		    }
+		    else
+		    {
+			    _tokens = Deserialize(settings);
+			    ParseTokenRegexes();
+		    }
+	    }
 
         public static bool CacheTokensFile { get; set; }
 
-        static CustomTokenParser()
-        {
-            CacheTokensFile = true;
-        }
-
-        public CustomTokenParser(TextSettings settings, ILogger logger)
-        {
-            _logger = logger;
-
-            if (CacheTokensFile && !_isTokensFileCached)
-            {
-                _tokens = Deserialize(settings);
-                ParseTokenRegexes();
-                _isTokensFileCached = true;
-            }
-            else
-            {
-                _tokens = Deserialize(settings);
-                ParseTokenRegexes();
-            }
-        }
+	    public static IEnumerable<TextToken> Tokens => _tokens;
 
         public string ReplaceTokensAfterParse(string html)
         {
@@ -66,7 +69,7 @@ namespace Roadkill.Text.CustomTokens
                 // Catch bad regexes
                 try
                 {
-                    Regex regex = new Regex(token.SearchRegex, RegexOptions.Compiled | RegexOptions.Singleline);
+                    var regex = new Regex(token.SearchRegex, RegexOptions.Compiled | RegexOptions.Singleline);
                     token.CachedRegex = regex;
                 }
                 catch (ArgumentException e)
@@ -91,9 +94,13 @@ namespace Roadkill.Text.CustomTokens
                     IEnumerable<TextToken> textTokens = (List<TextToken>)serializer.Deserialize(stream);
 
                     if (textTokens == null)
+                    {
                         return new List<TextToken>();
+                    }
                     else
+                    {
                         return textTokens;
+                    }
                 }
             }
             catch (IOException e)

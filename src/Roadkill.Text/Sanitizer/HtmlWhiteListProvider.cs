@@ -13,10 +13,8 @@ namespace Roadkill.Text.Sanitizer
 
     public class HtmlWhiteListProvider : IHtmlWhiteListProvider
     {
-        public List<string> AllowedElements { get; set; }
-        public List<string> AllowedAttributes { get; set; }
-
         private readonly TextSettings _textSettings;
+
         private readonly ILogger _logger;
 
         public HtmlWhiteListProvider(TextSettings settings, ILogger logger)
@@ -29,8 +27,10 @@ namespace Roadkill.Text.Sanitizer
         {
             if (string.IsNullOrEmpty(_textSettings.HtmlElementWhiteListPath) || !File.Exists(_textSettings.HtmlElementWhiteListPath))
             {
-                if (!string.IsNullOrEmpty(_textSettings.HtmlElementWhiteListPath))
-                    _logger.LogWarning("The custom HTML white list tokens file does not exist in path '{0}' - using Default white list.", _textSettings.HtmlElementWhiteListPath);
+	            if (!string.IsNullOrEmpty(_textSettings.HtmlElementWhiteListPath))
+	            {
+		            _logger.LogWarning("The custom HTML white list tokens file does not exist in path '{0}' - using Default white list.", _textSettings.HtmlElementWhiteListPath);
+	            }
 
                 return CreateDefaultWhiteList();
             }
@@ -40,8 +40,10 @@ namespace Roadkill.Text.Sanitizer
                 string json = File.ReadAllText(_textSettings.HtmlElementWhiteListPath);
                 var whiteList = JsonConvert.DeserializeObject<HtmlWhiteListSettings>(json);
 
-                if (whiteList == null)
-                    return CreateDefaultWhiteList();
+	            if (whiteList == null)
+	            {
+		            return CreateDefaultWhiteList();
+	            }
 
                 return whiteList;
             }

@@ -31,9 +31,13 @@ namespace Roadkill.Api.Common.Models
 			get
 			{
 				if (ContentLength > 1024)
-					return ContentLength / 1024 + "KB";
+				{
+					return (ContentLength / 1024) + "KB";
+				}
 				else
+				{
 					return ContentLength + " bytes";
+				}
 			}
 		}
 

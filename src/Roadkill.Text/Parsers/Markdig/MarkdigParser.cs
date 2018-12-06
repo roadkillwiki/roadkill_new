@@ -12,18 +12,22 @@ namespace Roadkill.Text.Parsers.Markdig
 	public class MarkdigParser : IMarkupParser
 	{
 		public Func<HtmlImageTag, HtmlImageTag> ImageParsed { get; set; }
+
 		public Func<HtmlLinkTag, HtmlLinkTag> LinkParsed { get; set; }
 
 		public string ToHtml(string markdown)
 		{
 			if (string.IsNullOrEmpty(markdown))
+			{
 				return "";
+			}
 
 			var pipeline = new MarkdownPipelineBuilder();
 			MarkdownPipeline markdownPipeline = pipeline.UseAdvancedExtensions().Build();
 
 			MarkdownObject doc = Markdown.Parse(markdown, markdownPipeline);
-			var walker = new MarkdigImageAndLinkWalker((e) =>
+			var walker = new MarkdigImageAndLinkWalker(
+				(e) =>
 				{
 					ImageParsed?.Invoke(e);
 				},

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using AutoFixture;
@@ -11,12 +12,10 @@ using Xunit.Abstractions;
 
 namespace Roadkill.Tests.Integration.Adapters
 {
+	[SuppressMessage("ReSharper", "CA1063", Justification = "Dispose rules don't apply in test fixtures")]
+	[SuppressMessage("ReSharper", "CA1816", Justification = "Dispose rules don't apply in test fixtures")]
 	public class ElasticSearchAdapterFixture : IDisposable
 	{
-		public List<SearchablePage> TestPages { get; set; }
-		public ElasticClient ElasticClient { get; set; }
-		public ElasticSearchAdapter ElasticSearchAdapter { get; set; }
-
 		public ElasticSearchAdapterFixture()
 		{
 			var uri = new Uri("http://localhost:9200");
@@ -26,6 +25,17 @@ namespace Roadkill.Tests.Integration.Adapters
 			ElasticSearchAdapter = new ElasticSearchAdapter(ElasticClient);
 
 			AddDummyData();
+		}
+
+		public List<SearchablePage> TestPages { get; private set; }
+
+		public ElasticClient ElasticClient { get; set; }
+
+		public ElasticSearchAdapter ElasticSearchAdapter { get; set; }
+
+		public void Dispose()
+		{
+			ElasticClient.DeleteIndex(ElasticSearchAdapter.PagesIndexName);
 		}
 
 		private void AddDummyData()
@@ -39,11 +49,6 @@ namespace Roadkill.Tests.Integration.Adapters
 				page.Id = ++id;
 				ElasticSearchAdapter.Add(page).ConfigureAwait(false).GetAwaiter().GetResult();
 			}
-		}
-
-		public void Dispose()
-		{
-			ElasticClient.DeleteIndex(ElasticSearchAdapter.PagesIndexName);
 		}
 	}
 }

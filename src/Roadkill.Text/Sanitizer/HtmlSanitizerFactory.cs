@@ -21,17 +21,23 @@ namespace Roadkill.Text.Sanitizer
         public IHtmlSanitizer CreateHtmlSanitizer()
         {
             if (!_textSettings.UseHtmlWhiteList)
+            {
                 return null;
+            }
 
             HtmlWhiteListSettings whiteListSettings = _htmlWhiteListProvider.Deserialize();
             string[] allowedTags = whiteListSettings.AllowedElements.ToArray();
             string[] allowedAttributes = whiteListSettings.AllowedAttributes.ToArray();
 
             if (allowedTags.Length == 0)
+            {
                 allowedTags = null;
+            }
 
             if (allowedAttributes.Length == 0)
+            {
                 allowedAttributes = null;
+            }
 
             var htmlSanitizer = new HtmlSanitizer(allowedTags, null, allowedAttributes);
             htmlSanitizer.AllowDataAttributes = false;
@@ -41,7 +47,7 @@ namespace Roadkill.Text.Sanitizer
             htmlSanitizer.RemovingAttribute += (sender, e) =>
             {
                 // Don't clean /wiki/Special:Tag urls in href="" attributes
-                if (e.Attribute.Name.ToLower() == "href" && e.Attribute.Value.Contains("Special:"))
+                if (e.Attribute.Name.ToUpperInvariant() == "HREF" && e.Attribute.Value.Contains("Special:"))
                 {
                     e.Cancel = true;
                 }

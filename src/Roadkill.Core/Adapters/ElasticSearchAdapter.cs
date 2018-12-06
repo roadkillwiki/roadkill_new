@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nest;
@@ -28,21 +27,12 @@ namespace Roadkill.Core.Adapters
 			_elasticClient = elasticClient;
 		}
 
-		private async Task EnsureIndexesExist()
-		{
-			var existsResponse = await _elasticClient.IndexExistsAsync(PagesIndexName);
-			if (!existsResponse.Exists)
-			{
-				await _elasticClient.CreateIndexAsync(PagesIndexName);
-			}
-		}
-
 		public async Task<bool> Add(SearchablePage page)
 		{
 			await EnsureIndexesExist();
 			var response = await _elasticClient.IndexAsync(page, idx => idx.Index(PagesIndexName));
 
-			return (response.Result == Result.Created);
+			return response.Result == Result.Created;
 		}
 
 		public async Task RecreateIndex()
@@ -56,15 +46,15 @@ namespace Roadkill.Core.Adapters
 			await EnsureIndexesExist();
 			var response = await _elasticClient.IndexAsync(page, idx => idx.Index(PagesIndexName));
 
-			return (response.Result == Result.Updated);
+			return response.Result == Result.Updated;
 		}
 
 		public async Task<IEnumerable<SearchablePage>> Find(string query)
 		{
 			await EnsureIndexesExist();
 
-			SearchDescriptor<SearchablePage> searchDescriptor = CreateSearchDescriptor(query);
-			ISearchResponse<SearchablePage> response = await _elasticClient.SearchAsync<SearchablePage>(searchDescriptor);
+			var searchDescriptor = CreateSearchDescriptor(query);
+			var response = await _elasticClient.SearchAsync<SearchablePage>(searchDescriptor);
 
 			return response.Documents.AsEnumerable();
 		}
@@ -72,10 +62,19 @@ namespace Roadkill.Core.Adapters
 		private static SearchDescriptor<SearchablePage> CreateSearchDescriptor(string query)
 		{
 			return new SearchDescriptor<SearchablePage>()
-						.From(0)
-						.Size(20)
-						.Index(PagesIndexName)
-						.Query(q => q.QueryString(qs => qs.Query(query)));
+				.From(0)
+				.Size(20)
+				.Index(PagesIndexName)
+				.Query(q => q.QueryString(qs => qs.Query(query)));
+		}
+
+		private async Task EnsureIndexesExist()
+		{
+			var existsResponse = await _elasticClient.IndexExistsAsync(PagesIndexName);
+			if (!existsResponse.Exists)
+			{
+				await _elasticClient.CreateIndexAsync(PagesIndexName);
+			}
 		}
 	}
 }

@@ -1,10 +1,10 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Roadkill.Text.Parsers.Links.Converters
 {
     public class SpecialLinkConverter : IHtmlLinkTagConverter
     {
-        // TODO: NETStandard - replace urlhelper to IUrlHelper
         private readonly IUrlHelper _urlHelper;
 
         public SpecialLinkConverter(IUrlHelper urlHelper)
@@ -15,21 +15,25 @@ namespace Roadkill.Text.Parsers.Links.Converters
         public bool IsMatch(HtmlLinkTag htmlLinkTag)
         {
             if (htmlLinkTag == null)
+            {
                 return false;
+            }
 
             string href = htmlLinkTag.OriginalHref;
-            string lowerHref = href?.ToLower() ?? "";
+            string upperHref = href?.ToUpperInvariant() ?? "";
 
-            return lowerHref.StartsWith("special:");
+            return upperHref.StartsWith("SPECIAL:", StringComparison.Ordinal);
         }
 
         public HtmlLinkTag Convert(HtmlLinkTag htmlLinkTag)
         {
             string href = htmlLinkTag.OriginalHref;
-            string lowerHref = href?.ToLower();
+            string upperHref = href?.ToUpperInvariant();
 
-            if (!lowerHref.StartsWith("special:"))
+            if (!upperHref.StartsWith("SPECIAL:", StringComparison.Ordinal))
+            {
                 return htmlLinkTag;
+            }
 
             htmlLinkTag.Href = _urlHelper.Content("~/wiki/" + href);
 

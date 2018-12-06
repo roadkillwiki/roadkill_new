@@ -10,7 +10,9 @@ namespace Roadkill.Api.Client
         public static IServiceCollection AddRoadkillApi(this IServiceCollection services, string baseAddress, RefitSettings refitSettings = null)
         {
             if (refitSettings == null)
+            {
                 refitSettings = new RefitSettings();
+            }
 
             services.AddRefitClient<IEmailService>(refitSettings)
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseAddress));

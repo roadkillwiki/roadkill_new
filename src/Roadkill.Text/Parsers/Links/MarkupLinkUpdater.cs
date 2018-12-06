@@ -24,9 +24,11 @@ namespace Roadkill.Text.Parsers.Links
 		public bool ContainsPageLink(string text, string pageName)
 		{
 			if (string.IsNullOrEmpty(text))
-				return false;
+            {
+                return false;
+            }
 
-			pageName = AddDashesForMarkdownTitle(pageName);
+            pageName = AddDashesForMarkdownTitle(pageName);
 			string customRegex = GetRegexForTitle(pageName);
 
 			Regex regex = new Regex(customRegex, RegexOptions.IgnoreCase);
@@ -54,31 +56,7 @@ namespace Roadkill.Text.Parsers.Links
 			});
 		}
 
-		private string OnLinkMatched(System.Text.RegularExpressions.Match match, string newPageName)
-		{
-			if (match.Success && match.Groups.Count == 3)
-			{
-				if (!string.IsNullOrEmpty(match.Groups["url"].Value))
-					return match.Value.Replace(match.Groups["url"].Value, newPageName);
-			}
-
-			return match.Value;
-		}
-
-		/// <summary>-=
-		/// Gets a regex to update all links in a page.
-		/// </summary>
-		private string GetRegexForTitle(string pageName)
-		{
-			string regex = "[%LINKTEXT%](%URL%)";
-			regex = EscapeRegex(regex);
-			regex = regex.Replace("%LINKTEXT%", "(?<name>.+?)");
-			regex = regex.Replace("%URL%", "(?<url>" + pageName + "+?)");
-
-			return regex;
-		}
-
-		private string EscapeRegex(string regex)
+		private static string EscapeRegex(string regex)
 		{
 			regex = regex.Replace("|", @"\|")
 				.Replace("(", @"\(")
@@ -89,15 +67,45 @@ namespace Roadkill.Text.Parsers.Links
 			return regex;
 		}
 
+		private static string OnLinkMatched(Match match, string newPageName)
+		{
+			if (match.Success && match.Groups.Count == 3)
+			{
+				if (!string.IsNullOrEmpty(match.Groups["url"].Value))
+                {
+                    return match.Value.Replace(match.Groups["url"].Value, newPageName);
+                }
+            }
+
+			return match.Value;
+		}
+
+		/// <summary>-=
+		/// Gets a regex to update all links in a page.
+		/// </summary>
+		private static string GetRegexForTitle(string pageName)
+		{
+			string regex = "[%LINKTEXT%](%URL%)";
+			regex = EscapeRegex(regex);
+			regex = regex.Replace("%LINKTEXT%", "(?<name>.+?)");
+			regex = regex.Replace("%URL%", "(?<url>" + pageName + "+?)");
+
+			return regex;
+		}
+
 		private string AddDashesForMarkdownTitle(string title, bool escape = true)
 		{
 			if (_parser is object)
 			{
 				if (escape)
-					title = title.Replace(" ", @"\-");
-				else
-					title = title.Replace(" ", "-");
-			}
+                {
+                    title = title.Replace(" ", @"\-");
+                }
+                else
+                {
+                    title = title.Replace(" ", "-");
+                }
+            }
 
 			return title;
 		}

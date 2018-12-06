@@ -8,9 +8,10 @@ using Xunit.Abstractions;
 
 namespace Roadkill.Tests.Integration.Repositories
 {
-	public class DocumentStoreManager
+	public static class DocumentStoreManager
 	{
 		private static readonly ConcurrentDictionary<string, IDocumentStore> _documentStores = new ConcurrentDictionary<string, IDocumentStore>();
+
 		public static string ConnectionString => "host=roadkill-postgres;port=5432;database=roadkill;username=roadkill;password=roadkill;";
 
 		public static IDocumentStore GetMartenDocumentStore(Type testClassType, ITestOutputHelper outputHelper)
@@ -19,9 +20,11 @@ namespace Roadkill.Tests.Integration.Repositories
 
 			// Use a different schema for each test class, so their data is isolated
 			if (testClassType != null)
-				documentStoreSchemaName = testClassType.Name;
+            {
+                documentStoreSchemaName = testClassType.Name;
+            }
 
-			if (_documentStores.ContainsKey(documentStoreSchemaName))
+            if (_documentStores.ContainsKey(documentStoreSchemaName))
 			{
 				outputHelper.WriteLine("DocumentStoreManager: found doc store in cache {0}", documentStoreSchemaName);
 				return _documentStores[documentStoreSchemaName];
@@ -34,11 +37,11 @@ namespace Roadkill.Tests.Integration.Repositories
 			return _documentStores[documentStoreSchemaName];
 		}
 
-		internal static IDocumentStore CreateDocumentStore(string connectionString, string schemaName, ITestOutputHelper outputHelper)
+		private static IDocumentStore CreateDocumentStore(string connectionString, string schemaName, ITestOutputHelper outputHelper)
 		{
 			try
 			{
-				StoreOptions options = ConfigureOptions(connectionString, schemaName, outputHelper);
+				StoreOptions options = ConfigureOptions(connectionString, schemaName);
 				var documentStore = new DocumentStore(options);
 
 				return documentStore;
@@ -51,7 +54,7 @@ namespace Roadkill.Tests.Integration.Repositories
 			}
 		}
 
-		private static StoreOptions ConfigureOptions(string connectionString, string schemaName, ITestOutputHelper outputHelper)
+		private static StoreOptions ConfigureOptions(string connectionString, string schemaName)
 		{
 			var options = new StoreOptions();
 			options.AutoCreateSchemaObjects = AutoCreate.All;

@@ -33,32 +33,19 @@ namespace Roadkill.Core.Repositories
 
 		public PageVersionRepository(IDocumentStore store)
 		{
-			if (store == null)
-				throw new ArgumentNullException(nameof(store));
-
-			_store = store;
-		}
-
-		public void Wipe()
-		{
-			try
-			{
-				_store.Advanced.Clean.DeleteDocumentsFor(typeof(PageVersion));
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-			}
+			_store = store ?? throw new ArgumentNullException(nameof(store));
 		}
 
 		public async Task<PageVersion> AddNewVersion(int pageId, string text, string author, DateTime? dateTime = null)
 		{
-			using (IDocumentSession session = _store.LightweightSession())
+			using (var session = _store.LightweightSession())
 			{
 				if (dateTime == null)
-					dateTime = DateTime.UtcNow;
+                {
+                    dateTime = DateTime.UtcNow;
+                }
 
-				var pageVersion = new PageVersion()
+                var pageVersion = new PageVersion
 				{
 					Id = Guid.NewGuid(),
 					Author = author,
@@ -75,7 +62,7 @@ namespace Roadkill.Core.Repositories
 
 		public async Task<IEnumerable<PageVersion>> AllVersions()
 		{
-			using (IQuerySession session = _store.QuerySession())
+			using (var session = _store.QuerySession())
 			{
 				return await session
 					.Query<PageVersion>()
@@ -85,7 +72,7 @@ namespace Roadkill.Core.Repositories
 
 		public async Task DeleteVersion(Guid id)
 		{
-			using (IDocumentSession session = _store.OpenSession())
+			using (var session = _store.OpenSession())
 			{
 				session.Delete<PageVersion>(id);
 				session.DeleteWhere<PageVersion>(x => x.Id == id);
@@ -95,7 +82,7 @@ namespace Roadkill.Core.Repositories
 
 		public async Task<IEnumerable<PageVersion>> FindPageVersionsByPageId(int pageId)
 		{
-			using (IQuerySession session = _store.QuerySession())
+			using (var session = _store.QuerySession())
 			{
 				return await session
 					.Query<PageVersion>()
@@ -107,7 +94,7 @@ namespace Roadkill.Core.Repositories
 
 		public async Task<IEnumerable<PageVersion>> FindPageVersionsByAuthor(string username)
 		{
-			using (IQuerySession session = _store.QuerySession())
+			using (var session = _store.QuerySession())
 			{
 				return await session
 					.Query<PageVersion>()
@@ -119,7 +106,7 @@ namespace Roadkill.Core.Repositories
 
 		public async Task<PageVersion> GetLatestVersion(int pageId)
 		{
-			using (IQuerySession session = _store.QuerySession())
+			using (var session = _store.QuerySession())
 			{
 				return await session
 					.Query<PageVersion>()
@@ -130,7 +117,7 @@ namespace Roadkill.Core.Repositories
 
 		public async Task<PageVersion> GetById(Guid id)
 		{
-			using (IQuerySession session = _store.QuerySession())
+			using (var session = _store.QuerySession())
 			{
 				return await session
 					.Query<PageVersion>()
@@ -140,10 +127,22 @@ namespace Roadkill.Core.Repositories
 
 		public async Task UpdateExistingVersion(PageVersion version)
 		{
-			using (IDocumentSession session = _store.LightweightSession())
+			using (var session = _store.LightweightSession())
 			{
 				session.Store(version);
 				await session.SaveChangesAsync();
+			}
+		}
+
+		public void Wipe()
+		{
+			try
+			{
+				_store.Advanced.Clean.DeleteDocumentsFor(typeof(PageVersion));
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
 			}
 		}
 	}

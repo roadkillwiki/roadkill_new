@@ -36,22 +36,28 @@ namespace Roadkill.Text.Parsers.Markdig
 
 						var descendentForAltTag = child.Descendants().FirstOrDefault();
 						if (descendentForAltTag != null)
-							altText = descendentForAltTag.ToString();
+                        {
+                            altText = descendentForAltTag.ToString();
+                        }
 
-						string title = altText;
+                        string title = altText;
 
 						if (_imageDelegate != null)
 						{
 							HtmlImageTag args = InvokeImageParsedEvent(linkInline.Url, altText);
 
 							if (!string.IsNullOrEmpty(args.Alt))
-								altText = args.Alt;
+                            {
+                                altText = args.Alt;
+                            }
 
-							if (!string.IsNullOrEmpty(args.Title))
-								title = args.Title;
+                            if (!string.IsNullOrEmpty(args.Title))
+                            {
+                                title = args.Title;
+                            }
 
-							// Update the HTML from the data the event gives back
-							linkInline.Url = args.Src;
+                            // Update the HTML from the data the event gives back
+                            linkInline.Url = args.Src;
 						}
 
 						// Replace to alt= attribute, it's a literal
@@ -74,9 +80,11 @@ namespace Roadkill.Text.Parsers.Markdig
 							string text = linkInline.Title;
 							var descendentForAltTag = child.Descendants().FirstOrDefault();
 							if (descendentForAltTag != null)
-								text = descendentForAltTag.ToString();
+                            {
+                                text = descendentForAltTag.ToString();
+                            }
 
-							HtmlLinkTag args = InvokeLinkParsedEvent(linkInline.Url, text, linkInline.Label);
+                            HtmlLinkTag args = InvokeLinkParsedEvent(linkInline.Url, text, linkInline.Label);
 
 							// Update the HTML from the data the event gives back
 							linkInline.Url = args.Href;
@@ -87,7 +95,9 @@ namespace Roadkill.Text.Parsers.Markdig
 							}
 
 							if (!string.IsNullOrEmpty(args.CssClass))
+							{
 								AddClass(linkInline, args.CssClass);
+							}
 
 							// Replace the link's text
 							var literalInline = new LiteralInline(args.Text);
@@ -95,13 +105,15 @@ namespace Roadkill.Text.Parsers.Markdig
 						}
 
 						// Markdig TODO: make these configurable (external-links: [])
-						if (!string.IsNullOrEmpty(linkInline.Url) &&
-							(linkInline.Url.ToLower().StartsWith("http://") ||
-							linkInline.Url.ToLower().StartsWith("https://") ||
-							linkInline.Url.ToLower().StartsWith("mailto:"))
-							)
+						if (!string.IsNullOrEmpty(linkInline.Url))
 						{
-							AddAttribute(linkInline, "rel", "nofollow");
+							string upperUrl = linkInline.Url.ToUpperInvariant();
+							if (upperUrl.StartsWith("HTTP://", StringComparison.Ordinal) ||
+							    upperUrl.StartsWith("HTTPS://", StringComparison.Ordinal) ||
+							    upperUrl.StartsWith("MAILTO:", StringComparison.Ordinal))
+							{
+								AddAttribute(linkInline, "rel", "nofollow");
+							}
 						}
 					}
 				}
@@ -110,7 +122,7 @@ namespace Roadkill.Text.Parsers.Markdig
 			}
 		}
 
-		private void EnsureAttributesInLink(LinkInline link)
+		private static void EnsureAttributesInLink(LinkInline link)
 		{
 			HtmlAttributes attributes = link.GetAttributes();
 			if (attributes == null)
@@ -130,7 +142,7 @@ namespace Roadkill.Text.Parsers.Markdig
 			}
 		}
 
-		private void AddAttribute(LinkInline link, string name, string value)
+		private static void AddAttribute(LinkInline link, string name, string value)
 		{
 			HtmlAttributes attributes = link.GetAttributes();
 
@@ -141,7 +153,7 @@ namespace Roadkill.Text.Parsers.Markdig
 			}
 		}
 
-		private void AddClass(LinkInline link, string cssClass)
+		private static void AddClass(LinkInline link, string cssClass)
 		{
 			HtmlAttributes attributes = link.GetAttributes();
 
@@ -155,8 +167,7 @@ namespace Roadkill.Text.Parsers.Markdig
 		private HtmlImageTag InvokeImageParsedEvent(string url, string altText)
 		{
 			// Markdig TODO
-			//string linkID = altText.ToLowerInvariant();
-
+			// string linkID = altText.ToLowerInvariant();
 			HtmlImageTag args = new HtmlImageTag(url, url, altText, "");
 			_imageDelegate(args);
 

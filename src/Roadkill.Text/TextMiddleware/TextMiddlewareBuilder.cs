@@ -11,7 +11,7 @@ namespace Roadkill.Text.TextMiddleware
 {
 	public interface ITextMiddlewareBuilder
 	{
-		List<Middleware> MiddlewareItems { get; set; }
+		List<Middleware> MiddlewareItems { get; }
 
 		TextMiddlewareBuilder Use(Middleware middleware);
 
@@ -21,13 +21,14 @@ namespace Roadkill.Text.TextMiddleware
 	public class TextMiddlewareBuilder : ITextMiddlewareBuilder
 	{
 		private readonly ILogger _logger;
-		public List<Middleware> MiddlewareItems { get; set; }
 
 		public TextMiddlewareBuilder(ILogger logger)
 		{
 			_logger = logger;
 			MiddlewareItems = new List<Middleware>();
 		}
+
+		public List<Middleware> MiddlewareItems { get; }
 
 		public static TextMiddlewareBuilder Default(TextSettings textSettings, ILogger logger)
 		{
@@ -45,9 +46,11 @@ namespace Roadkill.Text.TextMiddleware
 		public TextMiddlewareBuilder Use(Middleware middleware)
 		{
 			if (middleware == null)
-				throw new ArgumentNullException(nameof(middleware));
+            {
+                throw new ArgumentNullException(nameof(middleware));
+            }
 
-			MiddlewareItems.Add(middleware);
+            MiddlewareItems.Add(middleware);
 			return this;
 		}
 

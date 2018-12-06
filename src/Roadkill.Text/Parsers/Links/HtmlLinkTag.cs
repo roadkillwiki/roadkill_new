@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Roadkill.Text.Parsers.Links
@@ -8,6 +9,28 @@ namespace Roadkill.Text.Parsers.Links
 	/// </summary>
 	public class HtmlLinkTag
 	{
+		private readonly List<string> _externalLinkPrefixes = new List<string>()
+		{
+			"http://",
+			"https://",
+			"www.",
+			"mailto:",
+			"#",
+			"tag:"
+		};
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HtmlLinkTag"/> class.
+		/// </summary>
+		public HtmlLinkTag(string originalHref, string href, string text, string target)
+		{
+			OriginalHref = originalHref;
+			Href = href;
+			Text = text;
+			Target = target;
+			CssClass = "";
+		}
+
 		/// <summary>
 		/// The original href.
 		/// </summary>
@@ -41,32 +64,12 @@ namespace Roadkill.Text.Parsers.Links
 			get
 			{
 				if (string.IsNullOrEmpty(Href))
-					return true;
+                {
+                    return true;
+                }
 
-				return !_externalLinkPrefixes.Any(x => Href.StartsWith(x));
+                return !_externalLinkPrefixes.Any(x => Href.StartsWith(x, StringComparison.Ordinal));
 			}
-		}
-
-		private readonly List<string> _externalLinkPrefixes = new List<string>()
-		{
-			"http://",
-			"https://",
-			"www.",
-			"mailto:",
-			"#",
-			"tag:"
-		};
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlLinkTag"/> class.
-		/// </summary>
-		public HtmlLinkTag(string originalHref, string href, string text, string target)
-		{
-			OriginalHref = originalHref;
-			Href = href;
-			Text = text;
-			Target = target;
-			CssClass = "";
 		}
 	}
 }

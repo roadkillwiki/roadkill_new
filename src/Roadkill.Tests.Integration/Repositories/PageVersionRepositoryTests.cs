@@ -10,8 +10,6 @@ using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace Roadkill.Tests.Integration.Repositories
 {
 	public class PageVersionRepositoryTests
@@ -41,28 +39,6 @@ namespace Roadkill.Tests.Integration.Repositories
 			IDocumentStore documentStore = DocumentStoreManager.GetMartenDocumentStore(typeof(PageVersionRepository), _outputHelper);
 
 			return new PageVersionRepository(documentStore);
-		}
-
-		private List<PageVersion> CreateTenPages(PageVersionRepository repository)
-		{
-			IDocumentStore documentStore = DocumentStoreManager.GetMartenDocumentStore(typeof(PageVersionRepository), _outputHelper);
-			var pageRepository = new PageRepository(documentStore);
-
-			List<Page> pages = _fixture.CreateMany<Page>(10).ToList();
-
-			var pageVersions = new List<PageVersion>();
-			foreach (Page page in pages)
-			{
-				string text = _fixture.Create<string>();
-				string author = _fixture.Create<string>();
-				DateTime dateTime = DateTime.Today;
-
-				Page newPage = pageRepository.AddNewPage(page).GetAwaiter().GetResult();
-				PageVersion pageVersion = repository.AddNewVersion(newPage.Id, text, author, dateTime).GetAwaiter().GetResult();
-				pageVersions.Add(pageVersion);
-			}
-
-			return pageVersions;
 		}
 
 		[Fact]
@@ -219,6 +195,28 @@ namespace Roadkill.Tests.Integration.Repositories
 			Assert.NotNull(latestVersion);
 			latestVersion.ShouldNotBeNull();
 			latestVersion.ShouldBeEquivalent(pageVersion);
+		}
+
+		private List<PageVersion> CreateTenPages(PageVersionRepository repository)
+		{
+			IDocumentStore documentStore = DocumentStoreManager.GetMartenDocumentStore(typeof(PageVersionRepository), _outputHelper);
+			var pageRepository = new PageRepository(documentStore);
+
+			List<Page> pages = _fixture.CreateMany<Page>(10).ToList();
+
+			var pageVersions = new List<PageVersion>();
+			foreach (Page page in pages)
+			{
+				string text = _fixture.Create<string>();
+				string author = _fixture.Create<string>();
+				DateTime dateTime = DateTime.Today;
+
+				Page newPage = pageRepository.AddNewPage(page).GetAwaiter().GetResult();
+				PageVersion pageVersion = repository.AddNewVersion(newPage.Id, text, author, dateTime).GetAwaiter().GetResult();
+				pageVersions.Add(pageVersion);
+			}
+
+			return pageVersions;
 		}
 	}
 }

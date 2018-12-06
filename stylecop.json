@@ -1,6 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
   "settings": {
+    "indentation": {
+      "indentationSize": 4,
+      "useTabs": true,
+      "tabSize": 4
+    },
     "documentationRules": {
       "companyName": "Roadkill",
       "copyrightText": "(c) {year} {ownerName}. All Rights Reserved.",

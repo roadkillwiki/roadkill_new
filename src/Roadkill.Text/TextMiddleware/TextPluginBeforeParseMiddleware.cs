@@ -14,7 +14,7 @@ namespace Roadkill.Text.TextMiddleware
 
         public override PageHtml Invoke(PageHtml pageHtml)
         {
-            string text = _textPluginRunner.BeforeParse(pageHtml.Html, pageHtml);
+            string text = TextPluginRunner.BeforeParse(pageHtml);
             pageHtml.Html = text;
 
             return pageHtml;

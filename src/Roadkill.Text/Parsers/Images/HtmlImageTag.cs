@@ -5,6 +5,18 @@
 	/// </summary>
 	public class HtmlImageTag
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HtmlImageTag"/> class.
+		/// </summary>
+		public HtmlImageTag(string originalSrc, string src, string alt, string title, HorizontalAlignment horizontalAlign = HorizontalAlignment.None)
+		{
+			OriginalSrc = originalSrc;
+			Src = src;
+			Alt = alt;
+			Title = title;
+			HorizontalAlign = horizontalAlign;
+		}
+
 		public enum HorizontalAlignment
 		{
 			Left,
@@ -37,17 +49,5 @@
 		/// The type of horizontal align. Defaults to "Inline".
 		/// </summary>
 		public HorizontalAlignment HorizontalAlign { get; set; }
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlImageTag"/> class.
-		/// </summary>
-		public HtmlImageTag(string originalSrc, string src, string alt, string title, HorizontalAlignment horizontalAlign = HorizontalAlignment.None)
-		{
-			OriginalSrc = originalSrc;
-			Src = src;
-			Alt = alt;
-			Title = title;
-			HorizontalAlign = horizontalAlign;
-		}
 	}
 }
