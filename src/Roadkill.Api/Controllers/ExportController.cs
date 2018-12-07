@@ -41,7 +41,6 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(ExportPagesVersionsToXml))]
 		public Task<string> ExportPagesVersionsToXml()
 		{
-			//bad comment
 			return Task.FromResult("");
 		}
 

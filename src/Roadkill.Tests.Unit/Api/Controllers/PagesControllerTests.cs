@@ -13,8 +13,6 @@ using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;
 
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
 	public class PagesControllerTests

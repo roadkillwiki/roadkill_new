@@ -28,9 +28,10 @@ namespace Roadkill.Core
 			// ElasticSearch TODO
 
 			// Configure default conventions
+			// SomeClass => ISomeClass
 			services.Scan(scan => scan
 				.FromAssemblyOf<DependencyInjection>()
-				.AddClasses() // SomeClass => ISomeClass
+				.AddClasses()
 				.UsingRegistrationStrategy(RegistrationStrategy.Skip)
 				.AsMatchingInterface()
 				.WithTransientLifetime());

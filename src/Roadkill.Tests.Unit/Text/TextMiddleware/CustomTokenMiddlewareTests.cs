@@ -2,11 +2,11 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 using Roadkill.Text;
 using Roadkill.Text.CustomTokens;
 using Roadkill.Text.Models;
 using Roadkill.Text.TextMiddleware;
+using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.TextMiddleware
 {
@@ -45,8 +45,8 @@ here is some more content
 			// Act
 			PageHtml actualPageHtml = middleware.Invoke(pagehtml);
 
-			actualPageHtml.Html = actualPageHtml.Html.Replace(Environment.NewLine, "");
-			expectedHtml = expectedHtml.Replace(Environment.NewLine, "");
+			actualPageHtml.Html = actualPageHtml.Html.Replace(Environment.NewLine, "", StringComparison.Ordinal);
+			expectedHtml = expectedHtml.Replace(Environment.NewLine, "", StringComparison.Ordinal);
 
 			// Assert
 			Assert.Equal(expectedHtml, actualPageHtml.Html);

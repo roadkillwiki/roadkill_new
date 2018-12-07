@@ -1,5 +1,6 @@
 using Roadkill.Text.Parsers.Links;
 using Roadkill.Text.Parsers.Markdig;
+using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Parsers.Links
@@ -89,16 +90,17 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
             string actualMarkup = updater.ReplacePageLinks(text, "the internal wiki page title", "buy stuff online");
 
             // Assert
-            Assert.Equal(expectedMarkup, actualMarkup);
+            expectedMarkup.ShouldBe(actualMarkup);
         }
 
-        // ReplacePageLinks:
-        //	- x Should rename basic creole title
-        //	- x Should rename multiple creole titles
-        //  - x Should rename title inside creole markup block
-        //	- Should not replace title that's not found
-        //  (Repeat for markdown)
-
+	    /*
+		 ReplacePageLinks:
+			- x Should rename basic creole title
+			- x Should rename multiple creole titles
+			- x Should rename title inside creole markup block
+			- Should not replace title that's not found
+			(Repeat for markdown)
+	     */
         [Fact]
         public void replacepagelinks_should_rename_basic_markdown_title()
         {
@@ -113,7 +115,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
             string actualMarkup = updater.ReplacePageLinks(text, "the internal wiki page title", "buy stuff online");
 
             // Assert
-            Assert.Equal(expectedMarkup, actualMarkup);
+            expectedMarkup.ShouldBe(actualMarkup);
         }
 
         [Fact]
@@ -135,7 +137,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
             string actualMarkup = updater.ReplacePageLinks(text, "the internal wiki page title", "buy stuff online");
 
             // Assert
-            Assert.Equal(expectedMarkup, actualMarkup);
+            expectedMarkup.ShouldBe(actualMarkup);
         }
 
         [Fact]
@@ -157,7 +159,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
             string actualMarkup = updater.ReplacePageLinks(text, "the internal wiki page title", "buy stuff online");
 
             // Assert
-            Assert.Equal(expectedMarkup, actualMarkup);
+            expectedMarkup.ShouldBe(actualMarkup);
         }
 
         [Fact]
@@ -175,7 +177,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
             string actualMarkup = updater.ReplacePageLinks(text, "page title", "buy stuff online");
 
             // Assert
-            Assert.Equal(text, actualMarkup);
+            text.ShouldBe(actualMarkup);
         }
     }
 }

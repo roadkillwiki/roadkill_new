@@ -1,36 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using Markdig;
 using Markdig.Renderers;
 using Markdig.Syntax;
 using Roadkill.Text.Parsers.Markdig;
+using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
 {
     public class MarkdigImageAndLinkWalkerTests
     {
-        private MarkdownDocument CreateMarkdownObject(string markdown)
-        {
-            var pipeline = new MarkdownPipelineBuilder()
-                .UseAdvancedExtensions()
-                .Build();
-
-            MarkdownDocument doc = Markdown.Parse(markdown, pipeline);
-            return doc;
-        }
-
-        private string ConvertToHtml(MarkdownObject markdownObject)
-        {
-            var builder = new StringBuilder();
-            var textwriter = new StringWriter(builder);
-
-            var renderer = new HtmlRenderer(textwriter);
-            renderer.Render(markdownObject);
-
-            return builder.ToString();
-        }
-
         [Fact]
         public void should_call_image_and_link_events()
         {
@@ -45,8 +26,8 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             walker.WalkAndBindParseEvents(markdownObject);
 
             // walk
-            Assert.True(imageParsed);
-            Assert.True(linkParsed);
+            imageParsed.ShouldBeTrue();
+            linkParsed.ShouldBeTrue();
         }
 
         [Fact]
@@ -89,7 +70,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string html = ConvertToHtml(markdownObject);
 
             // then
-            Assert.Equal("<p><a href=\"new-href\" class=\"my-class\" target=\"new-target\">new-text</a></p>\n", html);
+            html.ShouldBe("<p><a href=\"new-href\" class=\"my-class\" target=\"new-target\">new-text</a></p>\n");
         }
 
         [Fact]
@@ -108,9 +89,9 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string html = ConvertToHtml(markdownObject);
 
             // then
-            Assert.Contains("<a href=\"mailto:email@example.com\" rel=\"nofollow\">my email</a>", html);
-            Assert.Contains("<a href=\"http://www.googlez.com\" rel=\"nofollow\">my http site</a>", html);
-            Assert.Contains("<a href=\"https://www.littlebamboo.com\" rel=\"nofollow\">my https site</a>", html);
+            html.ShouldContain("<a href=\"mailto:email@example.com\" rel=\"nofollow\">my email</a>");
+            html.ShouldContain("<a href=\"http://www.googlez.com\" rel=\"nofollow\">my http site</a>");
+            html.ShouldContain("<a href=\"https://www.littlebamboo.com\" rel=\"nofollow\">my https site</a>");
         }
 
         [Fact]
@@ -125,7 +106,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string html = ConvertToHtml(markdownObject);
 
             // then
-            Assert.Equal("<p><img src=\"meme.jpg\" class=\"img-responsive\" border=\"0\" alt=\"my image\" title=\"my image\" /></p>\n", html);
+            html.ShouldBe("<p><img src=\"meme.jpg\" class=\"img-responsive\" border=\"0\" alt=\"my image\" title=\"my image\" /></p>\n");
         }
 
         [Fact]
@@ -133,19 +114,20 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
         {
             // given
             MarkdownDocument markdownObject = CreateMarkdownObject("![my image](meme.jpg)");
-            var walker = new MarkdigImageAndLinkWalker(image =>
-            {
-                image.Alt = "new-alt";
-                image.Title = "new-title";
-                image.Src = "new-image.jpg";
-            }, null);
+            var walker = new MarkdigImageAndLinkWalker(
+	            image =>
+				{
+					image.Alt = "new-alt";
+					image.Title = "new-title";
+					image.Src = "new-image.jpg";
+				}, null);
 
             // when
             walker.WalkAndBindParseEvents(markdownObject);
             string html = ConvertToHtml(markdownObject);
 
             // then
-            Assert.Equal("<p><img src=\"new-image.jpg\" class=\"img-responsive\" border=\"0\" alt=\"new-alt\" title=\"new-title\" /></p>\n", html);
+            html.ShouldBe("<p><img src=\"new-image.jpg\" class=\"img-responsive\" border=\"0\" alt=\"new-alt\" title=\"new-title\" /></p>\n");
         }
 
         [Fact]
@@ -160,7 +142,28 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string html = ConvertToHtml(markdownObject);
 
             // then
-            Assert.Equal("", html);
+			html.ShouldBe("");
         }
+
+	    private static MarkdownDocument CreateMarkdownObject(string markdown)
+	    {
+		    var pipeline = new MarkdownPipelineBuilder()
+			    .UseAdvancedExtensions()
+			    .Build();
+
+		    MarkdownDocument doc = Markdown.Parse(markdown, pipeline);
+		    return doc;
+	    }
+
+	    private static string ConvertToHtml(MarkdownObject markdownObject)
+	    {
+		    var builder = new StringBuilder();
+		    var textwriter = new StringWriter(builder);
+
+		    var renderer = new HtmlRenderer(textwriter);
+		    renderer.Render(markdownObject);
+
+		    return builder.ToString();
+	    }
     }
 }

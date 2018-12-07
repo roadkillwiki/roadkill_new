@@ -12,11 +12,9 @@ using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;
 
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	public class PageVersionsControllerTests
+	public sealed class PageVersionsControllerTests : IDisposable
 	{
 		private readonly Fixture _fixture;
 		private readonly Mock<IPageVersionModelConverter> _viewModelCreatorMock;
@@ -243,6 +241,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByAuthor(author), Times.Once);
 			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
+		}
+
+		public void Dispose()
+		{
+			_pageVersionsController?.Dispose();
 		}
 	}
 }

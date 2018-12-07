@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -11,11 +12,9 @@ using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;
 
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	public class TagsControllerTests
+	public sealed class TagsControllerTests : IDisposable
 	{
 		private Mock<IPageRepository> _pageRepositoryMock;
 		private TagsController _tagsController;
@@ -110,6 +109,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			_pageRepositoryMock.Verify(x => x.FindPagesContainingTag("gutentag"), Times.Once);
 			_pageViewModelConverterMock.Verify(x => x.ConvertToViewModel(It.IsAny<Page>()));
+		}
+
+		public void Dispose()
+		{
+			_tagsController?.Dispose();
 		}
 	}
 }

@@ -7,8 +7,6 @@ using Roadkill.Api.Controllers;
 using Roadkill.Core.Configuration;
 using Xunit;
 
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
 	public class EmailControllerTests
@@ -53,14 +51,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			await emailController.Send(from, to, subject, body);
 
 			// then
-
 			_mailTransportMock.Verify(x => x.ConnectAsync(smtpSettings.Host, smtpSettings.Port, smtpSettings.UseSsl, cancelToken), Times.Once);
 			_mailTransportMock.Verify(x => x.AuthenticateAsync(smtpSettings.Username, smtpSettings.Password, cancelToken), Times.Once);
 			_mailTransportMock.Verify(x => x.SendAsync(It.Is<MimeMessage>(message => CheckMessageMatches(message, expectedMessage)), cancelToken, null), Times.Once);
 			_mailTransportMock.Verify(x => x.DisconnectAsync(true, cancelToken), Times.Once);
 		}
 
-		private bool CheckMessageMatches(MimeMessage message, MimeMessage expectedMessage)
+		private static bool CheckMessageMatches(MimeMessage message, MimeMessage expectedMessage)
 		{
 			return message.To.ToString() == expectedMessage.To.ToString() &&
 					message.From.ToString() == expectedMessage.From.ToString() &&

@@ -10,12 +10,12 @@ namespace Roadkill.Web
 	[SuppressMessage("Stylecop", "CA1822", Justification = "Methods cannot be static as they are used by the runtime")]
 	public class Startup
 	{
-		private IConfiguration Configuration { get; }
-
 		public Startup(IConfiguration configuration)
 		{
 			Configuration = configuration;
 		}
+
+		private IConfiguration Configuration { get; }
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)

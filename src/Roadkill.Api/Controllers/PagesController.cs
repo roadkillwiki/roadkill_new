@@ -13,10 +13,11 @@ namespace Roadkill.Api.Controllers
 {
     [Authorize]
     [Route("[controller]")]
-    //[ApiController] // this adds [FromBody] by default and model validation
-    public class PagesController : ControllerBase//, IPagesService
+    public class PagesController : ControllerBase
     {
+	    // [ApiController] // this adds [FromBody] by default and model validation
         private readonly IPageRepository _pageRepository;
+
         private readonly IPageModelConverter _pageModelConverter;
 
         public PagesController(IPageRepository pageRepository, IPageModelConverter pageModelConverter)
@@ -31,10 +32,11 @@ namespace Roadkill.Api.Controllers
         public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
         {
             // TODO: fill createdon property
-
             Page page = _pageModelConverter.ConvertToPage(model);
-            if (page == null)
-                return NotFound();
+	        if (page == null)
+	        {
+		        return NotFound();
+	        }
 
             Page newPage = await _pageRepository.AddNewPage(page);
             return _pageModelConverter.ConvertToViewModel(newPage);
@@ -45,8 +47,10 @@ namespace Roadkill.Api.Controllers
         public async Task<ActionResult<PageModel>> Update(PageModel model)
         {
             Page page = _pageModelConverter.ConvertToPage(model);
-            if (page == null)
-                return NotFound();
+	        if (page == null)
+	        {
+		        return NotFound();
+	        }
 
             Page newPage = await _pageRepository.UpdateExisting(page);
             return _pageModelConverter.ConvertToViewModel(newPage);
@@ -64,8 +68,10 @@ namespace Roadkill.Api.Controllers
         public async Task<ActionResult<PageModel>> Get(int id)
         {
             Page page = await _pageRepository.GetPageById(id);
-            if (page == null)
-                return NotFound();
+	        if (page == null)
+	        {
+		        return NotFound();
+	        }
 
             return _pageModelConverter.ConvertToViewModel(page);
         }
@@ -97,8 +103,10 @@ namespace Roadkill.Api.Controllers
         {
             IEnumerable<Page> pagesWithHomePageTag = await _pageRepository.FindPagesContainingTag("homepage");
 
-            if (!pagesWithHomePageTag.Any())
-                return NotFound();
+	        if (!pagesWithHomePageTag.Any())
+	        {
+		        return NotFound();
+	        }
 
             Page firstResult = pagesWithHomePageTag.First();
             return _pageModelConverter.ConvertToViewModel(firstResult);
@@ -110,8 +118,10 @@ namespace Roadkill.Api.Controllers
         public async Task<ActionResult<PageModel>> FindByTitle(string title)
         {
             Page page = await _pageRepository.GetPageByTitle(title);
-            if (page == null)
-                return NotFound();
+	        if (page == null)
+	        {
+		        return NotFound();
+	        }
 
             return _pageModelConverter.ConvertToViewModel(page);
         }

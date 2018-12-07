@@ -1,11 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 using Roadkill.Core.Entities;
-using Xunit;
 using Roadkill.Core.Repositories;
 using Roadkill.Text;
 using Roadkill.Text.Parsers.Links;
+using Shouldly;
+using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Parsers.Links
 {
@@ -38,7 +40,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("https://www.google.com/some-page-23", actualTag.Href);
+			actualTag.Href.ShouldBe("https://www.google.com/some-page-23");
 		}
 
 		[Fact]
@@ -51,7 +53,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("http://msdn.microsoft.com/en-us/library/system.componentmodel.descriptionattribute.aspx", actualTag.Href);
+			actualTag.Href.ShouldBe("http://msdn.microsoft.com/en-us/library/system.componentmodel.descriptionattribute.aspx");
 		}
 
 		[Theory]
@@ -60,6 +62,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 		[InlineData("www.example.com")]
 		[InlineData("mailto:me@example.com")]
 		[InlineData("tag:the-architecture-of-old")]
+		[SuppressMessage("Stylecop", "CA1054", Justification = "It's ok to not use a URI, I said so.")]
 		public void should_add_external_links_css_class_to_links_and_keep_url(string url)
 		{
 			// Arrange
@@ -69,8 +72,8 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal(url, actualTag.Href);
-			Assert.Equal("external-link", actualTag.CssClass);
+			actualTag.Href.ShouldBe(url);
+			actualTag.CssClass.ShouldBe("external-link");
 		}
 
 		[Fact]
@@ -83,8 +86,8 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("#my-anchor", actualTag.Href);
-			Assert.Equal("", actualTag.CssClass);
+			actualTag.Href.ShouldBe("#my-anchor");
+			actualTag.CssClass.ShouldBe("");
 		}
 
 		[Theory]
@@ -100,7 +103,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("/attachments/my/folder/image1.jpg", actualTag.Href);
+			actualTag.Href.ShouldBe("/attachments/my/folder/image1.jpg");
 		}
 
 		[Fact]
@@ -115,7 +118,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("~/wiki/Special:blah/url-helper", actualTag.Href);
+			actualTag.Href.ShouldBe("~/wiki/Special:blah/url-helper");
 		}
 
 		[Fact]
@@ -128,7 +131,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("~/wiki/Special:Foo", actualTag.Href);
+			actualTag.Href.ShouldBe("~/wiki/Special:Foo");
 		}
 
 		[Fact]
@@ -141,7 +144,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("http://www.google.com/?blah=xyz#myanchor", actualTag.Href);
+			actualTag.Href.ShouldBe("http://www.google.com/?blah=xyz#myanchor");
 		}
 
 		[Fact]
@@ -163,7 +166,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("/wiki/1/foo-page?blah=xyz#myanchor", actualTag.Href);
+			actualTag.Href.ShouldBe("/wiki/1/foo-page?blah=xyz#myanchor");
 		}
 
 		[Fact]
@@ -176,7 +179,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("http://www.google.com/?blah=xyz%23myanchor", actualTag.Href);
+			actualTag.Href.ShouldBe("http://www.google.com/?blah=xyz%23myanchor");
 		}
 
 		[Fact]
@@ -196,7 +199,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("/wiki/1/foo#myanchor", actualTag.Href);
+			actualTag.Href.ShouldBe("/wiki/1/foo#myanchor");
 		}
 
 		[Fact]
@@ -215,8 +218,8 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("my-page-on-engineering", actualTag.OriginalHref);
-			Assert.Equal("/wiki/1/my-page-on-engineering", actualTag.Href);
+			actualTag.OriginalHref.ShouldBe("my-page-on-engineering");
+			actualTag.Href.ShouldBe("/wiki/1/my-page-on-engineering");
 		}
 
 		[Fact]
@@ -236,7 +239,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("/wiki/1/football", actualTag.Href);
+			actualTag.Href.ShouldBe("/wiki/1/football");
 		}
 
 		[Fact]
@@ -249,7 +252,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("missing-page-link", actualTag.CssClass);
+			actualTag.CssClass.ShouldBe("missing-page-link");
 		}
 
 		[Fact]
@@ -269,8 +272,8 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			HtmlLinkTag actualTag = _linkHrefParser.Parse(linkTag);
 
 			// Assert
-			Assert.Equal("/wiki/1/despair", actualTag.Href);
-			Assert.Equal("", actualTag.Target);
+			actualTag.Href.ShouldBe("/wiki/1/despair");
+			actualTag.Target.ShouldBe("");
 		}
 	}
 }

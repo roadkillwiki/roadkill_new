@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Text;
 using MailKit;
 using MailKit.Net.Smtp;
@@ -17,6 +18,8 @@ using Scrutor;
 
 namespace Roadkill.Api
 {
+	[SuppressMessage("Stylecop", "CA1052", Justification = "Can't be static, it needs a type for scanning")]
+	[SuppressMessage("Stylecop", "CA1724", Justification = "The name DependencyInjection is fine to share")]
     public class DependencyInjection
     {
         public const string JwtPassword = "password123456789"; // TODO: make configurable
@@ -39,15 +42,13 @@ namespace Roadkill.Api
                 return TextMiddlewareBuilder.Default(textSettings, logger);
             });
 
+	        // SomeClass => ISomeClass
             services.Scan(scan => scan
                 .FromAssemblyOf<Roadkill.Api.DependencyInjection>()
-
-                // SomeClass => ISomeClass
                 .AddClasses()
                 .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                 .AsMatchingInterface()
-                .WithTransientLifetime()
-            );
+                .WithTransientLifetime());
         }
 
         public static void ConfigureJwt(IServiceCollection services)
@@ -73,12 +74,6 @@ namespace Roadkill.Api
             services.AddAuthorization(ConfigureJwtClaimsPolicies);
         }
 
-        private static void ConfigureJwtClaimsPolicies(AuthorizationOptions options)
-        {
-            options.AddPolicy("Admins", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
-            options.AddPolicy("Editors", policy => policy.RequireClaim(ClaimTypes.Role, "Editor"));
-        }
-
         public static void ConfigureIdentity(IServiceCollection services)
         {
             services.AddIdentity<RoadkillUser, IdentityRole>(
@@ -93,6 +88,12 @@ namespace Roadkill.Api
                     })
                 .AddMartenStores<RoadkillUser, IdentityRole>()
                 .AddDefaultTokenProviders();
+        }
+
+        private static void ConfigureJwtClaimsPolicies(AuthorizationOptions options)
+        {
+            options.AddPolicy("Admins", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
+            options.AddPolicy("Editors", policy => policy.RequireClaim(ClaimTypes.Role, "Editor"));
         }
     }
 }

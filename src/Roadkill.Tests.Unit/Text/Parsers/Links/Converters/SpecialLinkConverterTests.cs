@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Roadkill.Text.Parsers.Links;
 using Roadkill.Text.Parsers.Links.Converters;
+using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Parsers.Links.Converters
@@ -27,7 +28,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links.Converters
             bool actualMatch = _converter.IsMatch(htmlTag);
 
             // Assert
-            Assert.False(actualMatch);
+            actualMatch.ShouldBeFalse();
         }
 
         [Theory]
@@ -45,7 +46,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links.Converters
             bool actualMatch = _converter.IsMatch(htmlTag);
 
             // Assert
-            Assert.Equal(actualMatch, expectedMatch);
+            actualMatch.ShouldBe(expectedMatch);
         }
 
         [Theory]
@@ -62,8 +63,8 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links.Converters
             var actualTag = _converter.Convert(originalTag);
 
             // Assert
-            Assert.Equal(originalTag.OriginalHref, actualTag.OriginalHref);
-            Assert.Equal(expectedHref, actualTag.Href);
+            originalTag.OriginalHref.ShouldBe(actualTag.OriginalHref);
+            expectedHref.ShouldBe(actualTag.Href);
 
             Times timesCalled = (calledUrlHelper) ? Times.Once() : Times.Never();
             _urlHelperMock.Verify(x => x.Content(It.IsAny<string>()), timesCalled);

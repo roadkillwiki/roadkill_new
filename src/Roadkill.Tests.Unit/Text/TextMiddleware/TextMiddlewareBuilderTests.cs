@@ -13,35 +13,11 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 {
 	public class TextMiddlewareBuilderTests
 	{
-		public class MiddleWareMock : Middleware
-		{
-			public string SearchString { get; set; }
-			public string Replacement { get; set; }
-
-			public override PageHtml Invoke(PageHtml pageHtml)
-			{
-				return pageHtml.Html.Replace(SearchString, Replacement);
-			}
-		}
-
 		private readonly ILogger _logger;
 
 		public TextMiddlewareBuilderTests()
 		{
 			_logger = Mock.Of<ILogger>();
-		}
-
-		private TextMiddlewareBuilder CreateBuilderWithoutParser()
-		{
-			var builder = new TextMiddlewareBuilder(_logger);
-			var settings = new TextSettings();
-			var whiteListProvider = Mock.Of<IHtmlWhiteListProvider>();
-
-			builder.Use(new CustomTokenMiddleware(new CustomTokenParser(settings, _logger)))
-				   .Use(new HarmfulTagMiddleware(new HtmlSanitizerFactory(settings, whiteListProvider)))
-				   .Use(new TextPluginAfterParseMiddleware(new TextPluginRunner()));
-
-			return builder;
 		}
 
 		[Fact]
@@ -101,6 +77,31 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 
 			// then
 			Assert.Equal("value1 value2", result);
+		}
+
+		private TextMiddlewareBuilder CreateBuilderWithoutParser()
+		{
+			var builder = new TextMiddlewareBuilder(_logger);
+			var settings = new TextSettings();
+			var whiteListProvider = Mock.Of<IHtmlWhiteListProvider>();
+
+			builder.Use(new CustomTokenMiddleware(new CustomTokenParser(settings, _logger)))
+				.Use(new HarmfulTagMiddleware(new HtmlSanitizerFactory(settings, whiteListProvider)))
+				.Use(new TextPluginAfterParseMiddleware(new TextPluginRunner()));
+
+			return builder;
+		}
+
+		private class MiddleWareMock : Middleware
+		{
+			public string SearchString { get; set; }
+
+			public string Replacement { get; set; }
+
+			public override PageHtml Invoke(PageHtml pageHtml)
+			{
+				return pageHtml.Html.Replace(SearchString, Replacement, StringComparison.Ordinal);
+			}
 		}
 	}
 }

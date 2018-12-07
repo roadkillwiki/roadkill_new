@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Roadkill.Api.Common.Models;
 using Roadkill.Core.Entities;
@@ -46,7 +47,7 @@ namespace Roadkill.Api.ModelConverters
 			};
 		}
 
-		private IEnumerable<string> TagsToList(string csvTags)
+		private static IEnumerable<string> TagsToList(string csvTags)
 		{
 			List<string> tagList = new List<string>();
 			char delimiter = ',';
@@ -54,16 +55,20 @@ namespace Roadkill.Api.ModelConverters
 			if (!string.IsNullOrEmpty(csvTags))
 			{
 				// For the legacy tag seperator format
-				if (csvTags.IndexOf(";") != -1)
-					delimiter = ';';
+				if (csvTags.IndexOf(";", StringComparison.Ordinal) != -1)
+                {
+                    delimiter = ';';
+                }
 
-				if (csvTags.IndexOf(delimiter) != -1)
+                if (csvTags.IndexOf(delimiter, StringComparison.Ordinal) != -1)
 				{
 					string[] parts = csvTags.Split(delimiter);
 					foreach (string item in parts)
 					{
 						if (item != "," && !string.IsNullOrWhiteSpace(item))
+						{
 							tagList.Add(item.Trim());
+						}
 					}
 				}
 				else
@@ -75,15 +80,17 @@ namespace Roadkill.Api.ModelConverters
 			return tagList;
 		}
 
-		public static string CreateSeoFriendlyPageTitle(string title)
+		private static string CreateSeoFriendlyPageTitle(string title)
 		{
 			if (string.IsNullOrEmpty(title))
-				return title;
+            {
+                return title;
+            }
 
-			// Search engine friendly slug routine with help from http://www.intrepidstudios.com/blog/2009/2/10/function-to-generate-a-url-friendly-string.aspx
+            // Search engine friendly slug routine with help from http://www.intrepidstudios.com/blog/2009/2/10/function-to-generate-a-url-friendly-string.aspx
 
-			// remove invalid characters
-			title = Regex.Replace(title, @"[^\w\d\s-]", "");  // this is unicode safe, but may need to revert back to 'a-zA-Z0-9', need to check spec
+            // remove invalid characters
+            title = Regex.Replace(title, @"[^\w\d\s-]", "");  // this is unicode safe, but may need to revert back to 'a-zA-Z0-9', need to check spec
 
 			// convert multiple spaces/hyphens into one space
 			title = Regex.Replace(title, @"[\s-]+", " ").Trim();

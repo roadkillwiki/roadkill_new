@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,11 +12,9 @@ using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;
 
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	public class ExportControllerTests
+	public sealed class ExportControllerTests : IDisposable
 	{
 		private Mock<IPageRepository> _pageRepositoryMock;
 		private ExportController _exportController;
@@ -46,6 +45,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			var deserializedPages = serializer.Deserialize(new StringReader(actualXml)) as List<Page>;
 			deserializedPages.Count.ShouldBe(actualPages.Count());
+		}
+
+		public void Dispose()
+		{
+			_exportController?.Dispose();
 		}
 	}
 }

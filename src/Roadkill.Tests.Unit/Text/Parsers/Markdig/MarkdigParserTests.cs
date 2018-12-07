@@ -2,6 +2,7 @@ using System;
 using Roadkill.Text.Parsers.Images;
 using Roadkill.Text.Parsers.Links;
 using Roadkill.Text.Parsers.Markdig;
+using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
@@ -20,7 +21,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string actualHtml = parser.ToHtml("[googz](http://www.google.com)![img](/myimage.jpg)");
 
             // then
-            Assert.Equal(expectedHtml, actualHtml);
+            expectedHtml.ShouldBe(actualHtml);
         }
 
         [Fact]
@@ -54,7 +55,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string actualHtml = parser.ToHtml("[googz](http://www.google.com)![img](/myimage.jpg)");
 
             // then
-            Assert.Equal(expectedHtml, actualHtml);
+            expectedHtml.ShouldBe(actualHtml);
         }
 
         [Fact]
@@ -69,7 +70,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string html = parser.ToHtml(markdown);
 
             // then
-            Assert.Equal(expectedHtml, html);
+            expectedHtml.ShouldBe(html);
         }
 
         [Fact]
@@ -82,7 +83,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string html = parser.ToHtml(null);
 
             // then
-            Assert.Equal("", html);
+            html.ShouldBeEmpty();
         }
 
         [Fact]
@@ -97,7 +98,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Markdig
             string html = parser.ToHtml(markdown);
 
             // then
-            Assert.Equal(expectedHtml, html);
+            expectedHtml.ShouldBe(html);
         }
 
         [Fact]
@@ -124,9 +125,11 @@ http://www.google.com
             string actualHtml = parser.ToHtml(markdown);
 
             // then
-            expectedHtml = expectedHtml.Replace("\n", "").Replace("\r", "");
-            actualHtml = actualHtml.Replace("\n", "").Replace("\r", "");
-            Assert.Equal(expectedHtml, actualHtml);
+            expectedHtml = expectedHtml.Replace("\n", "", StringComparison.Ordinal)
+									   .Replace("\r", "", StringComparison.Ordinal);
+            actualHtml = actualHtml.Replace("\n", "", StringComparison.Ordinal)
+								   .Replace("\r", "", StringComparison.Ordinal);
+            expectedHtml.ShouldBe(actualHtml);
         }
     }
 }

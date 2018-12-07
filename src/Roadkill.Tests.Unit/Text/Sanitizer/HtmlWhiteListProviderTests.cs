@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
+using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Sanitizer
@@ -29,15 +30,15 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 			HtmlWhiteListSettings settings = _htmlWhiteListProvider.Deserialize();
 
 			// then
-			Assert.Equal(2, settings.AllowedElements.Count);
-			Assert.Equal(3, settings.AllowedAttributes.Count);
+			settings.AllowedElements.Count.ShouldBe(2);
+			settings.AllowedAttributes.Count.ShouldBe(3);
 
-			Assert.Equal("blah", settings.AllowedElements[0]);
-			Assert.Equal("test", settings.AllowedElements[1]);
+			settings.AllowedElements[0].ShouldBe("blah");
+			settings.AllowedElements[1].ShouldBe("test");
 
-			Assert.Equal("id", settings.AllowedAttributes[0]);
-			Assert.Equal("class", settings.AllowedAttributes[1]);
-			Assert.Equal("href", settings.AllowedAttributes[2]);
+			settings.AllowedAttributes[0].ShouldBe("id");
+			settings.AllowedAttributes[1].ShouldBe("class");
+			settings.AllowedAttributes[2].ShouldBe("href");
 		}
 
 		[Fact]
@@ -50,7 +51,7 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 			HtmlWhiteListSettings settings = _htmlWhiteListProvider.Deserialize();
 
 			// then
-			AssertExtensions.Equivalent(defaultSettings, settings);
+			defaultSettings.ShouldBeEquivalent(settings);
 		}
 
 		[Fact]
@@ -64,7 +65,7 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 			HtmlWhiteListSettings settings = _htmlWhiteListProvider.Deserialize();
 
 			// then
-			AssertExtensions.Equivalent(defaultSettings, settings);
+			defaultSettings.ShouldBeEquivalent(settings);
 		}
 
 		[Fact]
@@ -78,7 +79,7 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 			HtmlWhiteListSettings settings = _htmlWhiteListProvider.Deserialize();
 
 			// then
-			AssertExtensions.Equivalent(defaultSettings, settings);
+			defaultSettings.ShouldBeEquivalent(settings);
 		}
 	}
 }

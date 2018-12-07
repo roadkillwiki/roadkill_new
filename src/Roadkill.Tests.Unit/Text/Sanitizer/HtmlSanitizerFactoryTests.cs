@@ -3,32 +3,13 @@ using Ganss.XSS;
 using Moq;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
+using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Sanitizer
 {
     public class HtmlSanitizerFactoryTests
     {
-        private HtmlSanitizerFactory CreateFactory(TextSettings textSettings = null, Mock<IHtmlWhiteListProvider> whiteListProviderMock = null)
-        {
-            if (textSettings == null)
-            {
-                textSettings = new TextSettings() { UseHtmlWhiteList = true };
-            }
-
-            if (whiteListProviderMock == null)
-            {
-                whiteListProviderMock = new Mock<IHtmlWhiteListProvider>();
-                whiteListProviderMock.Setup(x => x.Deserialize()).Returns(new HtmlWhiteListSettings()
-                {
-                    AllowedElements = new List<string>(),
-                    AllowedAttributes = new List<string>()
-                });
-            }
-
-            return new HtmlSanitizerFactory(textSettings, whiteListProviderMock.Object);
-        }
-
         [Fact]
         public void should_return_null_when_not_enabled()
         {
@@ -40,7 +21,7 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
             IHtmlSanitizer sanitizer = factory.CreateHtmlSanitizer();
 
             // then
-            Assert.Null(sanitizer);
+            sanitizer.ShouldBeNull();
         }
 
         [Fact]
@@ -62,15 +43,15 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
             IHtmlSanitizer sanitizer = factory.CreateHtmlSanitizer();
 
             // then
-            Assert.NotNull(sanitizer);
-            Assert.False(sanitizer.AllowDataAttributes);
+            sanitizer.ShouldNotBeNull();
+            sanitizer.AllowDataAttributes.ShouldNotBeNull();
 
-            Assert.Contains("http", sanitizer.AllowedSchemes);
-            Assert.Contains("https", sanitizer.AllowedSchemes);
-            Assert.Contains("mailto", sanitizer.AllowedSchemes);
+            sanitizer.AllowedSchemes.ShouldContain("http");
+            sanitizer.AllowedSchemes.ShouldContain("https");
+            sanitizer.AllowedSchemes.ShouldContain("mailto");
 
-            Assert.Contains("StarWarsMarquee", sanitizer.AllowedTags);
-            Assert.Contains("cheesecake", sanitizer.AllowedAttributes);
+            sanitizer.AllowedTags.ShouldContain("StarWarsMarquee");
+            sanitizer.AllowedAttributes.ShouldContain("cheesecake");
         }
 
         [Fact]
@@ -86,7 +67,27 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
             // then
             string actualHtml = sanitizer.Sanitize(expectedHtml);
 
-            Assert.Equal(expectedHtml, actualHtml);
+            expectedHtml.ShouldBe(actualHtml);
         }
+
+	    private HtmlSanitizerFactory CreateFactory(TextSettings textSettings = null, Mock<IHtmlWhiteListProvider> whiteListProviderMock = null)
+	    {
+		    if (textSettings == null)
+		    {
+			    textSettings = new TextSettings() { UseHtmlWhiteList = true };
+		    }
+
+		    if (whiteListProviderMock == null)
+		    {
+			    whiteListProviderMock = new Mock<IHtmlWhiteListProvider>();
+			    whiteListProviderMock.Setup(x => x.Deserialize()).Returns(new HtmlWhiteListSettings()
+			    {
+				    AllowedElements = new List<string>(),
+				    AllowedAttributes = new List<string>()
+			    });
+		    }
+
+		    return new HtmlSanitizerFactory(textSettings, whiteListProviderMock.Object);
+	    }
     }
 }

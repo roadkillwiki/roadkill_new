@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Roadkill.Text;
 using Roadkill.Text.Parsers.Images;
+using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Text.Parsers.Images
@@ -24,6 +26,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Images
         [InlineData("www.foo.com/img.jpg")]
         [InlineData("http://www.example.com/img.jpg")]
         [InlineData("https://www.foo.com/img.jpg")]
+        [SuppressMessage("Stylecop", "CA1054", Justification = "It's ok to not use a URI, I said so.")]
         public void should_ignore_urls_starting_with_ww_http_and_https(string imageUrl)
         {
             // Arrange
@@ -33,7 +36,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Images
             HtmlImageTag actualTag = _srcParser.Parse(htmlImageTag);
 
             // Assert
-            Assert.Equal(imageUrl, actualTag.Src);
+            imageUrl.ShouldBe(actualTag.Src);
         }
 
         [Theory]
@@ -50,7 +53,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Images
             HtmlImageTag actualTag = _srcParser.Parse(htmlImageTag);
 
             // Assert
-            Assert.Equal(expectedPath, actualTag.Src);
+            expectedPath.ShouldBe(actualTag.Src);
         }
     }
 }

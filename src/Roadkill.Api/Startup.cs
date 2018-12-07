@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using Hellang.Middleware.ProblemDetails;
@@ -18,16 +19,19 @@ using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
 
 namespace Roadkill.Api
 {
+	[SuppressMessage("Stylecop", "CA1822", Justification = "Methods cannot be static as they are used by the runtime")]
 	public class Startup
 	{
-	    private IConfigurationRoot _configuration { get; set; }
-	    private IHostingEnvironment _hostingEnvironment { get; set; }
 	    private readonly ILoggerFactory _loggerFactory;
+
+		private IConfigurationRoot _configuration;
+
+		private IHostingEnvironment _hostingEnvironment;
 
 		public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
-		    _loggerFactory = loggerFactory;
-		    _hostingEnvironment = env;
+			_loggerFactory = loggerFactory;
+			_hostingEnvironment = env;
 
 			var builder = new ConfigurationBuilder();
 			builder
@@ -37,7 +41,6 @@ namespace Roadkill.Api
 
 			_configuration = builder.Build();
 		}
-
 
 	    public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
@@ -71,8 +74,9 @@ namespace Roadkill.Api
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+		public void Configure(IApplicationBuilder app)
 		{
+			// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory
 			app.UseSwagger();
 			app.UseSwaggerUi3();
 			app.UseStaticFiles();

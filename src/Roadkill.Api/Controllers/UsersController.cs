@@ -9,29 +9,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Roadkill.Api.Models;
 using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers
 {
-    [Authorize]
+	[Authorize]
     [Route("[controller]")]
-    public class UsersController : ControllerBase //, IUserService
+    public class UsersController : ControllerBase
     {
         private readonly UserManager<RoadkillUser> _userManager;
+
         private readonly SignInManager<RoadkillUser> _signInManager;
 
-        public class AuthenticateModel
-        {
-            public string Email { get; set; }
-            public string Password { get; set; }
-        }
-
-        public UsersController(UserManager<RoadkillUser> userManager, SignInManager<RoadkillUser> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
+	    public UsersController(UserManager<RoadkillUser> userManager, SignInManager<RoadkillUser> signInManager)
+	    {
+		    _userManager = userManager;
+		    _signInManager = signInManager;
+	    }
 
         [HttpGet]
         [Route(nameof(GetAll))]
@@ -48,8 +44,10 @@ namespace Roadkill.Api.Controllers
         {
             // chris@example.org/password
             RoadkillUser user = await _userManager.FindByEmailAsync(authenticateModel.Email);
-            if (user == null)
-                await AddTestUsers();
+	        if (user == null)
+	        {
+		        await AddTestUsers();
+	        }
 
             user = await _userManager.FindByEmailAsync(authenticateModel.Email);
 
@@ -93,23 +91,6 @@ namespace Roadkill.Api.Controllers
             return Forbid();
         }
 
-        private async Task AddTestUsers()
-        {
-            var editorUser = new RoadkillUser()
-            {
-                UserName = "editor@example.org",
-                Email = "editor@example.org",
-            };
-            await _userManager.CreateAsync(editorUser, "password");
-
-            var adminUser = new RoadkillUser()
-            {
-                UserName = "admin@example.org",
-                Email = "admin@example.org",
-            };
-            await _userManager.CreateAsync(adminUser, "password");
-        }
-
         [HttpGet]
         [Route(nameof(UsersWithClaim))]
         [Authorize(Policy = "Admins")]
@@ -139,5 +120,22 @@ namespace Roadkill.Api.Controllers
 
             return result;
         }
+
+	    private async Task AddTestUsers()
+	    {
+		    var editorUser = new RoadkillUser()
+		    {
+			    UserName = "editor@example.org",
+			    Email = "editor@example.org",
+		    };
+		    await _userManager.CreateAsync(editorUser, "password");
+
+		    var adminUser = new RoadkillUser()
+		    {
+			    UserName = "admin@example.org",
+			    Email = "admin@example.org",
+		    };
+		    await _userManager.CreateAsync(adminUser, "password");
+	    }
     }
 }
