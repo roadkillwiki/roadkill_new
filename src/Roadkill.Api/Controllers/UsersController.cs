@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Roadkill.Api.Models;
+using Roadkill.Api.Common.Models;
 using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -40,26 +40,26 @@ namespace Roadkill.Api.Controllers
         [HttpPost]
         [Route(nameof(Authenticate))]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromBody] AuthenticateModel authenticateModel)
+        public async Task<IActionResult> Authenticate([FromBody] AuthenticationModel authenticationModel)
         {
             // chris@example.org/password
-            RoadkillUser user = await _userManager.FindByEmailAsync(authenticateModel.Email);
+            RoadkillUser user = await _userManager.FindByEmailAsync(authenticationModel.Email);
 	        if (user == null)
 	        {
 		        await AddTestUsers();
 	        }
 
-            user = await _userManager.FindByEmailAsync(authenticateModel.Email);
+            user = await _userManager.FindByEmailAsync(authenticationModel.Email);
 
-            SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticateModel.Password, true, false);
+            SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);
             if (result.Succeeded)
             {
                 Claim roleClaim = null;
-                if (authenticateModel.Email == "editor@example.org")
+                if (authenticationModel.Email == "editor@example.org")
                 {
                     roleClaim = new Claim(ClaimTypes.Role, "Editor");
                 }
-                else if (authenticateModel.Email == "admin@example.org")
+                else if (authenticationModel.Email == "admin@example.org")
                 {
                     roleClaim = new Claim(ClaimTypes.Role, "Admin");
                 }

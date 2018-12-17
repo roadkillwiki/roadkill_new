@@ -11,12 +11,6 @@ namespace Roadkill.Api.Common.Services
 
 		Task<bool> AddUser(string email, string username, string password, bool isAdmin, bool isEditor);
 
-		Task<bool> Authenticate(string email, string password);
-
-		Task ChangePassword(string email, string newPassword);
-
-		Task<bool> ChangePassword(string email, string oldPassword, string newPassword);
-
 		Task<bool> DeleteUser(string email);
 
 		Task<UserModel> GetUserById(Guid id, bool? isActivated = null);
@@ -32,10 +26,6 @@ namespace Roadkill.Api.Common.Services
 		Task<IEnumerable<UserModel>> ListAdmins();
 
 		Task<IEnumerable<UserModel>> ListEditors();
-
-		Task Logout();
-
-		Task<string> ResetPassword(string email);
 
 		Task<string> Signup(UserModel model, Action completed);
 

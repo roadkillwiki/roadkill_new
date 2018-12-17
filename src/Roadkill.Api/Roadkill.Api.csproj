@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="2.1.2" />
     <PackageReference Include="MailKit" Version="2.1.0.1" />
-    <PackageReference Include="Marten.AspNetIdentity" Version="1.0.26" />
+    <PackageReference Include="Marten.AspNetIdentity" Version="1.0.29" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.6" />
     <PackageReference Include="NSwag.AspNetCore" Version="12.0.4" />
     <PackageReference Include="Scrutor" Version="3.0.2" />
@@ -40,6 +40,10 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models" />
   </ItemGroup>
 
 </Project>
