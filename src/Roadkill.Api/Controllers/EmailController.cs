@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using Roadkill.Api.Common.Services;
 using Roadkill.Core.Configuration;
+using Roadkill.Core.Settings;
 
 namespace Roadkill.Api.Controllers
 {

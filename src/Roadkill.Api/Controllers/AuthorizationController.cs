@@ -42,25 +42,23 @@ namespace Roadkill.Api.Controllers
             SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);
             if (result.Succeeded)
             {
-	            IList<Claim> userClaims = await _userManager.GetClaimsAsync(user);
-	            if (userClaims.Count == 0)
+	            IList<Claim> existingClaims = await _userManager.GetClaimsAsync(user);
+	            if (existingClaims.Count == 0)
 	            {
 		            return Forbid();
 	            }
 
-                var claims = new List<Claim>()
-                {
-                    new Claim(ClaimTypes.Name, user.Email),
-                };
+	            var allClaims = new List<Claim>(existingClaims)
+	            {
+		            new Claim(ClaimTypes.Name, user.Email)
+	            };
 
-	            claims.AddRange(userClaims);
-
-                var key = Encoding.ASCII.GetBytes(DependencyInjection.JwtPassword);
+	            var key = Encoding.ASCII.GetBytes(DependencyInjection.JwtPassword);
                 var symmetricSecurityKey = new SymmetricSecurityKey(key);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(claims),
+                    Subject = new ClaimsIdentity(allClaims),
                     Expires = DateTime.UtcNow.AddDays(7), // TODO: make configurable
                     SigningCredentials =
                         new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature)

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
@@ -22,8 +23,6 @@ namespace Roadkill.Api
 	[SuppressMessage("Stylecop", "CA1724", Justification = "The name DependencyInjection is fine to share")]
     public class DependencyInjection
     {
-        public const string JwtPassword = "password123456789"; // TODO: make configurable
-
         public static void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging();
@@ -51,9 +50,9 @@ namespace Roadkill.Api
                 .WithTransientLifetime());
         }
 
-        public static void ConfigureJwt(IServiceCollection services)
+        public static void ConfigureJwt(IServiceCollection services, JwtSettings jwtSettings)
         {
-            var key = Encoding.ASCII.GetBytes(JwtPassword);
+            var password = Encoding.ASCII.GetBytes(jwtSettings.Password);
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -66,7 +65,7 @@ namespace Roadkill.Api
                     x.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        IssuerSigningKey = new SymmetricSecurityKey(password),
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };

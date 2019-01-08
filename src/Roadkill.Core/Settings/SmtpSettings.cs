@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace Roadkill.Core.Configuration
+﻿namespace Roadkill.Core.Settings
 {
-	public class SmtpSettings : IOptions<SmtpSettings>
+	public class SmtpSettings
 	{
 		public string Host { get; set; }
 
@@ -14,6 +12,5 @@ namespace Roadkill.Core.Configuration
 
 		public bool UseSsl { get; set; }
 
-		public SmtpSettings Value => this;
 	}
 }

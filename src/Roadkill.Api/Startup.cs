@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using Hellang.Middleware.ProblemDetails;
 using Marten;
 using Microsoft.AspNetCore.Builder;
@@ -12,8 +15,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Roadkill.Api.Settings;
 using Roadkill.Core.Configuration;
-
+using Roadkill.Core.Settings;
 using ApiDependencyInjection = Roadkill.Api.DependencyInjection;
 using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
 
@@ -49,22 +53,31 @@ namespace Roadkill.Api
 		        x.IncludeExceptionDetails = context => _hostingEnvironment.IsDevelopment();
 		        x.Map<Exception>(ex => new ExceptionProblemDetails(ex, StatusCodes.Status500InternalServerError));
 		    });
+
+			ILogger startupLogger = _loggerFactory.CreateLogger("Startup");
 			services.AddLogging();
 
-			// Configuration
-			services.AddOptions();
-			services.Configure<SmtpSettings>(_configuration.GetSection("Smtp"));
+			// Settings
+			var jwtSettings = new JwtSettings();
+			_configuration.Bind("Jwt", jwtSettings);
+
+			if (string.IsNullOrEmpty(jwtSettings.Password) || jwtSettings.Password.Length < 20)
+			{
+				startupLogger.LogError($"The JWT password '{jwtSettings.Password}' is empty or under 20 characters in length.");
+				throw new InvalidOperationException("The JWT password is empty or under 20 characters in length.");
+			}
+
+			CoreDependencyInjection.GuardAllConfigProperties("Jwt", jwtSettings);
 
 			// Roadkill IoC
-			string connectionString = _configuration["ConnectionString"];
-			CoreDependencyInjection.ConfigureServices(services, connectionString, _loggerFactory.CreateLogger("Startup"));
+			CoreDependencyInjection.ConfigureServices(services, _configuration, startupLogger);
 			ApiDependencyInjection.ConfigureServices(services);
 
 			// Authentication (ASP.NET Identity)
 			ApiDependencyInjection.ConfigureIdentity(services);
 
 			// Authorization (JWT)
-			ApiDependencyInjection.ConfigureJwt(services);
+			ApiDependencyInjection.ConfigureJwt(services, jwtSettings);
 
 			services.AddMvc();
 			services.AddSwaggerDocument();
