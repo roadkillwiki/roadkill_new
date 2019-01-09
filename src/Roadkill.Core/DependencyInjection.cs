@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Marten;
@@ -60,7 +61,7 @@ namespace Roadkill.Core
 			IEnumerable<PropertyInfo> publicProperties = typeof(T).GetProperties().Where(x => x.MemberType == MemberTypes.Property);
 			foreach (PropertyInfo property in publicProperties)
 			{
-				string value = Convert.ToString(property.GetValue(instance));
+				string value = Convert.ToString(property.GetValue(instance), CultureInfo.InvariantCulture);
 				if (string.IsNullOrEmpty(value))
 				{
 					throw new InvalidOperationException($"Setting: {sectionName}__{property.Name} is missing or empty");

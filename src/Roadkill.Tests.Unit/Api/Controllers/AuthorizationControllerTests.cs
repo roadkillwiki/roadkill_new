@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using Roadkill.Api.Common.Models;
 using Roadkill.Api.Controllers;
+using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
 using Shouldly;
 using Xunit;
@@ -21,14 +22,16 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		private AuthorizationController _authorizationController;
 		private UserManager<RoadkillUser> _userManagerMock;
 		private SignInManager<RoadkillUser> _signinManagerMock;
+		private JwtSettings _jwtSettings;
 
 		public AuthorizationControllerTests()
 		{
 			_fixture = new Fixture();
 			_userManagerMock = Substitute.For<UserManager<RoadkillUser>>();
 			_signinManagerMock = Substitute.For<SignInManager<RoadkillUser>>();
+			_jwtSettings = new JwtSettings();
 
-			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock);
+			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtSettings);
 		}
 
 		[Fact]

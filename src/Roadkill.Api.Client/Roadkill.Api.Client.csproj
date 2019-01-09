@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
       <PackageReference Include="Refit" Version="4.6.58" />
       <PackageReference Include="Refit.HttpClientFactory" Version="4.6.58" />
     </ItemGroup>

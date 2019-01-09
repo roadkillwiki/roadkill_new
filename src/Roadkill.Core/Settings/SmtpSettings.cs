@@ -11,6 +11,5 @@
 		public string Password { get; set; }
 
 		public bool UseSsl { get; set; }
-
 	}
 }

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Roadkill.Api.Common.Models;
+using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -24,11 +25,16 @@ namespace Roadkill.Api.Controllers
         private readonly UserManager<RoadkillUser> _userManager;
 
         private readonly SignInManager<RoadkillUser> _signInManager;
+        private readonly JwtSettings _jwtSettings;
 
-	    public AuthorizationController(UserManager<RoadkillUser> userManager, SignInManager<RoadkillUser> signInManager)
+        public AuthorizationController(
+		    UserManager<RoadkillUser> userManager,
+		    SignInManager<RoadkillUser> signInManager,
+		    JwtSettings jwtSettings)
 	    {
 		    _userManager = userManager;
 		    _signInManager = signInManager;
+		    _jwtSettings = jwtSettings;
 	    }
 
         [HttpPost]
@@ -36,7 +42,6 @@ namespace Roadkill.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticationModel authenticationModel)
         {
-            // chris@example.org/password
             RoadkillUser user = await _userManager.FindByEmailAsync(authenticationModel.Email);
 
             SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);
@@ -53,13 +58,13 @@ namespace Roadkill.Api.Controllers
 		            new Claim(ClaimTypes.Name, user.Email)
 	            };
 
-	            var key = Encoding.ASCII.GetBytes(DependencyInjection.JwtPassword);
+	            var key = Encoding.ASCII.GetBytes(_jwtSettings.Password);
                 var symmetricSecurityKey = new SymmetricSecurityKey(key);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(allClaims),
-                    Expires = DateTime.UtcNow.AddDays(7), // TODO: make configurable
+                    Expires = DateTime.UtcNow.AddDays(_jwtSettings.ExpireDays),
                     SigningCredentials =
                         new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature)
                 };

@@ -17,10 +17,10 @@ namespace Roadkill.Api.Controllers
 		private readonly IMailTransport _mailTransport;
 		private readonly SmtpSettings _settings;
 
-		public EmailController(IMailTransport mailTransport, IOptions<SmtpSettings> settings)
+		public EmailController(IMailTransport mailTransport, SmtpSettings settings)
 		{
 			_mailTransport = mailTransport;
-			_settings = settings.Value;
+			_settings = settings;
 		}
 
 		[HttpPost]

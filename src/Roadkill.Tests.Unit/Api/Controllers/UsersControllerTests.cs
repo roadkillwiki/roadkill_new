@@ -16,15 +16,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		private readonly Fixture _fixture;
 		private UsersController _usersController;
 		private UserManager<RoadkillUser> _userManagerMock;
-		private SignInManager<RoadkillUser> _signinManagerMock;
 
 		public UsersControllerTests()
 		{
 			_fixture = new Fixture();
 			_userManagerMock = Substitute.For<UserManager<RoadkillUser>>();
-			_signinManagerMock = Substitute.For<SignInManager<RoadkillUser>>();
 
-			_usersController = new UsersController(_userManagerMock, _signinManagerMock);
+			_usersController = new UsersController(_userManagerMock);
 		}
 
 		[Fact]

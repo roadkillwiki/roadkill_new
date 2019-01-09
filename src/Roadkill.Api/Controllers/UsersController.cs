@@ -21,12 +21,9 @@ namespace Roadkill.Api.Controllers
     {
         private readonly UserManager<RoadkillUser> _userManager;
 
-        private readonly SignInManager<RoadkillUser> _signInManager;
-
-	    public UsersController(UserManager<RoadkillUser> userManager, SignInManager<RoadkillUser> signInManager)
+	    public UsersController(UserManager<RoadkillUser> userManager)
 	    {
 		    _userManager = userManager;
-		    _signInManager = signInManager;
 	    }
 
         [HttpGet]
@@ -35,60 +32,6 @@ namespace Roadkill.Api.Controllers
         public async Task<IEnumerable<RoadkillUser>> GetAll()
         {
             return await _userManager.Users.ToListAsync();
-        }
-
-        [HttpPost]
-        [Route(nameof(Authenticate))]
-        [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromBody] AuthenticationModel authenticationModel)
-        {
-            // chris@example.org/password
-            RoadkillUser user = await _userManager.FindByEmailAsync(authenticationModel.Email);
-	        if (user == null)
-	        {
-		        await AddTestUsers();
-	        }
-
-            user = await _userManager.FindByEmailAsync(authenticationModel.Email);
-
-            SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);
-            if (result.Succeeded)
-            {
-                Claim roleClaim = null;
-                if (authenticationModel.Email == "editor@example.org")
-                {
-                    roleClaim = new Claim(ClaimTypes.Role, "Editor");
-                }
-                else if (authenticationModel.Email == "admin@example.org")
-                {
-                    roleClaim = new Claim(ClaimTypes.Role, "Admin");
-                }
-
-                var claims = new List<Claim>()
-                {
-                    new Claim(ClaimTypes.Name, user.Email),
-                    roleClaim
-                };
-
-                var key = Encoding.ASCII.GetBytes(DependencyInjection.JwtPassword);
-                var symmetricSecurityKey = new SymmetricSecurityKey(key);
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(claims),
-                    Expires = DateTime.UtcNow.AddDays(7), // TODO: make configurable
-                    SigningCredentials =
-                        new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature)
-                };
-
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                string bearerToken = tokenHandler.WriteToken(token);
-
-                return Ok(bearerToken);
-            }
-
-            return Forbid();
         }
 
         [HttpGet]

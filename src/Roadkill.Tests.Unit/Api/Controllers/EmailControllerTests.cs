@@ -4,7 +4,6 @@ using MailKit;
 using MimeKit;
 using Moq;
 using Roadkill.Api.Controllers;
-using Roadkill.Core.Configuration;
 using Roadkill.Core.Settings;
 using Xunit;
 
