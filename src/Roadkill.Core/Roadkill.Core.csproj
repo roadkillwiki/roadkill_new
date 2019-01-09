@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Marten" Version="3.2.0" />
-    <PackageReference Include="Marten.AspNetIdentity" Version="1.0.26" />
+    <PackageReference Include="Marten.AspNetIdentity" Version="1.0.29" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
     <PackageReference Include="NEST" Version="6.4.0" />
     <PackageReference Include="Scrutor" Version="3.0.2" />

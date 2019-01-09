@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Marten" Version="3.2.0" />
+    <PackageReference Include="NSubstitute" Version="3.1.0" />
     <PackageReference Include="Scrutor" Version="3.0.2" />
     <PackageReference Include="AutoFixture" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1" />
