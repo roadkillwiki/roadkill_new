@@ -29,7 +29,6 @@ namespace Roadkill.Web
 		{
 			if (env.IsDevelopment())
 			{
-				app.UseBrowserLink();
 				app.UseDeveloperExceptionPage();
 			}
 			else

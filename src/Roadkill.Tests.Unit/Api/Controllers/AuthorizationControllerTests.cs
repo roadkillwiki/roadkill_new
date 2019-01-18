@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,16 +11,20 @@ using Roadkill.Api.Common.Models;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
+using Roadkill.Tests.Unit.Mocks;
 using Shouldly;
 using Xunit;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
+	[SuppressMessage("Stylecop", "CA1063", Justification = "IDisposable overkill")]
+	[SuppressMessage("Stylecop", "CA1001", Justification = "IDisposable overkill")]
 	public sealed class AuthorizationControllerTests
 	{
 		private readonly Fixture _fixture;
 		private AuthorizationController _authorizationController;
+		private MockUserStore _mockUserStore;
 		private UserManager<RoadkillUser> _userManagerMock;
 		private SignInManager<RoadkillUser> _signinManagerMock;
 		private JwtSettings _jwtSettings;
@@ -27,8 +32,9 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		public AuthorizationControllerTests()
 		{
 			_fixture = new Fixture();
-			_userManagerMock = Substitute.For<UserManager<RoadkillUser>>();
-			_signinManagerMock = Substitute.For<SignInManager<RoadkillUser>>();
+			_mockUserStore = new MockUserStore();
+			_userManagerMock = MockIdentityManagersFactory.CreateUserManager(_mockUserStore);
+			_signinManagerMock = MockIdentityManagersFactory.CreateSigninManager(_userManagerMock);
 			_jwtSettings = new JwtSettings();
 
 			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtSettings);

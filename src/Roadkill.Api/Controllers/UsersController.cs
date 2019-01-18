@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,9 +30,9 @@ namespace Roadkill.Api.Controllers
         [HttpGet]
         [Route(nameof(GetAll))]
         [Authorize(Policy = "Admins")]
-        public async Task<IEnumerable<RoadkillUser>> GetAll()
+        public Task<IEnumerable<RoadkillUser>> GetAll()
         {
-            return await _userManager.Users.ToListAsync();
+	        return Task.FromResult(_userManager.Users.AsEnumerable());
         }
 
         [HttpGet]

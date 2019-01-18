@@ -42,8 +42,4 @@
     <Content Remove="wwwroot\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models" />
-  </ItemGroup>
-
 </Project>
