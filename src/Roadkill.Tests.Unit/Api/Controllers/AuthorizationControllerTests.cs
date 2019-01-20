@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.AspNetCore.Identity;
@@ -24,7 +25,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	{
 		private readonly Fixture _fixture;
 		private AuthorizationController _authorizationController;
-		private MockUserStore _mockUserStore;
+		private MockUserStore<RoadkillUser> _mockUserStore;
 		private UserManager<RoadkillUser> _userManagerMock;
 		private SignInManager<RoadkillUser> _signinManagerMock;
 		private JwtSettings _jwtSettings;
@@ -32,7 +33,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		public AuthorizationControllerTests()
 		{
 			_fixture = new Fixture();
-			_mockUserStore = new MockUserStore();
+			_mockUserStore = new MockUserStore<RoadkillUser>();
 			_userManagerMock = MockIdentityManagersFactory.CreateUserManager(_mockUserStore);
 			_signinManagerMock = MockIdentityManagersFactory.CreateSigninManager(_userManagerMock);
 			_jwtSettings = new JwtSettings();
@@ -46,9 +47,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// given
 			var signInResult = SignInResult.Success;
 			string email = "admin@example.org";
-			string password = "labrador";
+			string password = "Passw0rd9000";
 			var roadkillUser = new RoadkillUser()
 			{
+				Id = "1",
+				UserName = email,
+				NormalizedUserName = email.ToUpperInvariant(),
 				Email = email,
 				NormalizedEmail = email.ToUpperInvariant()
 			};
@@ -59,14 +63,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				Password = password
 			};
 
-			var claimsList = new List<Claim>()
-			{
-				new Claim(ClaimTypes.Role, "Admin")
-			};
-
-			_userManagerMock.FindByEmailAsync(email).Returns(roadkillUser);
-			_signinManagerMock.PasswordSignInAsync(roadkillUser, password, true, false).Returns(signInResult);
-			_userManagerMock.GetClaimsAsync(roadkillUser).Returns(claimsList);
+			await _userManagerMock.CreateAsync(roadkillUser, password);
+			await _userManagerMock.AddClaimAsync(roadkillUser, new Claim(ClaimTypes.Role, "Admin"));
 
 			// Inject SecurityTokenHandler
 

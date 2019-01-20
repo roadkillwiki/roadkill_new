@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NSubstitute;
@@ -86,11 +87,11 @@ namespace Roadkill.Tests.Unit.Mocks
                 null);
         }
 
-		public static UserManager<RoadkillUser> CreateUserManager(MockUserStore userStore = null)
+		public static UserManager<RoadkillUser> CreateUserManager(MockUserStore<RoadkillUser> userStore = null)
 		{
 			if (userStore == null)
             {
-                userStore = new MockUserStore();
+                userStore = new MockUserStore<RoadkillUser>();
             }
 
             return new UserManager<RoadkillUser>(
@@ -102,7 +103,7 @@ namespace Roadkill.Tests.Unit.Mocks
 				null,
 				null,
 				null,
-				null);
+				new NullLogger<UserManager<RoadkillUser>>());
 		}
 
 		public static SignInManager<RoadkillUser> CreateSigninManager(UserManager<RoadkillUser> userManager)
@@ -112,7 +113,7 @@ namespace Roadkill.Tests.Unit.Mocks
 				new Mock<IHttpContextAccessor>().Object,
 				new Mock<IUserClaimsPrincipalFactory<RoadkillUser>>().Object,
 				null,
-				null,
+				new NullLogger<SignInManager<RoadkillUser>>(),
 				null);
 		}
 	}

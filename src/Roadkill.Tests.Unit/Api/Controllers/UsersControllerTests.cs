@@ -30,12 +30,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		private readonly Fixture _fixture;
 		private UsersController _usersController;
 		private UserManager<RoadkillUser> _userManagerMock;
-		private MockUserStore _mockUserStore;
+		private MockUserStore<RoadkillUser> _mockUserStore;
 
 		public UsersControllerTests()
 		{
 			_fixture = new Fixture();
-			_mockUserStore = new MockUserStore();
+			_mockUserStore = new MockUserStore<RoadkillUser>();
 			_userManagerMock = MockIdentityManagersFactory.CreateUserManager(_mockUserStore);
 
 			_usersController = new UsersController(_userManagerMock);
