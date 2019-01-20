@@ -27,7 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.App" />
+		<PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.7" />
 		<PackageReference Include="Marten" Version="3.2.0" />
 		<PackageReference Include="Marten.AspNetIdentity" Version="1.0.29" />
 		<PackageReference Include="NSubstitute" Version="3.1.0" />
