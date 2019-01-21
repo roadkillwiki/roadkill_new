@@ -3,6 +3,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.InMemory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -87,30 +89,33 @@ namespace Roadkill.Tests.Unit.Mocks
                 null);
         }
 
-		public static UserManager<RoadkillUser> CreateUserManager(MockUserStore<RoadkillUser> userStore = null)
+		public static UserManager<RoadkillUser> CreateUserManager(InMemoryUserStore<RoadkillUser> userStore = null)
 		{
 			if (userStore == null)
             {
-                userStore = new MockUserStore<RoadkillUser>();
+                userStore = new InMemoryUserStore<RoadkillUser>();
             }
 
             return new UserManager<RoadkillUser>(
 				userStore,
 				null,
+				new PasswordHasher<RoadkillUser>(),
 				null,
 				null,
 				null,
 				null,
-				null,
-				null,
+				new ServiceCollection().BuildServiceProvider(),
 				new NullLogger<UserManager<RoadkillUser>>());
 		}
 
 		public static SignInManager<RoadkillUser> CreateSigninManager(UserManager<RoadkillUser> userManager)
 		{
+			var contextAccessor = new Mock<IHttpContextAccessor>();
+			contextAccessor.Setup(x => x.HttpContext).Returns(new Mock<HttpContext>().Object);
+
 			return new SignInManager<RoadkillUser>(
 				userManager,
-				new Mock<IHttpContextAccessor>().Object,
+				contextAccessor.Object,
 				new Mock<IUserClaimsPrincipalFactory<RoadkillUser>>().Object,
 				null,
 				new NullLogger<SignInManager<RoadkillUser>>(),

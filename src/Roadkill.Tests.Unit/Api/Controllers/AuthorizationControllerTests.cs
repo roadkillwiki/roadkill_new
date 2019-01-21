@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.InMemory;
 using Microsoft.AspNetCore.Mvc;
-using NSubstitute;
 using Roadkill.Api.Common.Models;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.Settings;
@@ -25,7 +23,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	{
 		private readonly Fixture _fixture;
 		private AuthorizationController _authorizationController;
-		private MockUserStore<RoadkillUser> _mockUserStore;
+		private InMemoryUserStore<RoadkillUser> _mockUserStore;
 		private UserManager<RoadkillUser> _userManagerMock;
 		private SignInManager<RoadkillUser> _signinManagerMock;
 		private JwtSettings _jwtSettings;
@@ -33,7 +31,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		public AuthorizationControllerTests()
 		{
 			_fixture = new Fixture();
-			_mockUserStore = new MockUserStore<RoadkillUser>();
+			_mockUserStore = new InMemoryUserStore<RoadkillUser>();
 			_userManagerMock = MockIdentityManagersFactory.CreateUserManager(_mockUserStore);
 			_signinManagerMock = MockIdentityManagersFactory.CreateSigninManager(_userManagerMock);
 			_jwtSettings = new JwtSettings();
@@ -47,14 +45,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// given
 			var signInResult = SignInResult.Success;
 			string email = "admin@example.org";
-			string password = "Passw0rd9000";
+			string password = "Passw0rd9000!";
 			var roadkillUser = new RoadkillUser()
 			{
 				Id = "1",
 				UserName = email,
 				NormalizedUserName = email.ToUpperInvariant(),
 				Email = email,
-				NormalizedEmail = email.ToUpperInvariant()
+				NormalizedEmail = email.ToUpperInvariant(),
+				RoleClaims = new List<string>()
 			};
 
 			var model = new AuthenticationModel()

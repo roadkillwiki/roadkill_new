@@ -9,6 +9,7 @@ using Marten.AspNetIdentity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.InMemory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -30,12 +31,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		private readonly Fixture _fixture;
 		private UsersController _usersController;
 		private UserManager<RoadkillUser> _userManagerMock;
-		private MockUserStore<RoadkillUser> _mockUserStore;
+		private InMemoryUserStore<RoadkillUser> _mockUserStore;
 
 		public UsersControllerTests()
 		{
 			_fixture = new Fixture();
-			_mockUserStore = new MockUserStore<RoadkillUser>();
+			_mockUserStore = new InMemoryUserStore<RoadkillUser>();
 			_userManagerMock = MockIdentityManagersFactory.CreateUserManager(_mockUserStore);
 
 			_usersController = new UsersController(_userManagerMock);
@@ -46,7 +47,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		{
 			// given
 			var expectedAllUsers = _fixture.CreateMany<RoadkillUser>(5);
-			_mockUserStore.Users = expectedAllUsers.AsQueryable();
+
+			foreach (RoadkillUser user in expectedAllUsers)
+			{
+				await _mockUserStore.CreateAsync(user);
+			}
 
 			// when
 			IEnumerable<RoadkillUser> actualAllUsers = await _usersController.GetAll();
