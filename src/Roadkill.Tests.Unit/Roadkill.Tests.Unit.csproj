@@ -53,4 +53,9 @@
 		<ProjectReference Include="..\Roadkill.Text\Roadkill.Text.csproj" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <Folder Include="Mocks" />
+	</ItemGroup>
+
 </Project>

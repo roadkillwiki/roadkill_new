@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using NSubstitute;
 using Roadkill.Api.Common.Models;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
-using Roadkill.Tests.Unit.Mocks;
 using Shouldly;
 using Xunit;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -25,7 +25,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	{
 		private readonly Fixture _fixture;
 		private AuthorizationController _authorizationController;
-		private MockUserStore<RoadkillUser> _mockUserStore;
 		private UserManager<RoadkillUser> _userManagerMock;
 		private SignInManager<RoadkillUser> _signinManagerMock;
 		private JwtSettings _jwtSettings;
@@ -33,10 +32,32 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		public AuthorizationControllerTests()
 		{
 			_fixture = new Fixture();
-			_mockUserStore = new MockUserStore<RoadkillUser>();
-			_userManagerMock = MockIdentityManagersFactory.CreateUserManager(_mockUserStore);
-			_signinManagerMock = MockIdentityManagersFactory.CreateSigninManager(_userManagerMock);
-			_jwtSettings = new JwtSettings();
+			var fakeStore = Substitute.For<IUserStore<RoadkillUser>>();
+
+			_userManagerMock = Substitute.For<UserManager<RoadkillUser>>(
+				fakeStore,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new NullLogger<UserManager<RoadkillUser>>());
+
+			_signinManagerMock = Substitute.For<SignInManager<RoadkillUser>>(
+				_userManagerMock,
+				new Mock<IHttpContextAccessor>().Object,
+				new Mock<IUserClaimsPrincipalFactory<RoadkillUser>>().Object,
+				null,
+				new NullLogger<SignInManager<RoadkillUser>>(),
+				null);
+
+			_jwtSettings = new JwtSettings()
+			{
+				Password = "this-password-should-be-over-18-characters",
+				ExpireDays = 365
+			};
 
 			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtSettings);
 		}
@@ -45,7 +66,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		public async Task GetAll_should_return_all_users_from_manager()
 		{
 			// given
-			var signInResult = SignInResult.Success;
 			string email = "admin@example.org";
 			string password = "Passw0rd9000";
 			var roadkillUser = new RoadkillUser()
@@ -63,8 +83,18 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				Password = password
 			};
 
-			await _userManagerMock.CreateAsync(roadkillUser, password);
-			await _userManagerMock.AddClaimAsync(roadkillUser, new Claim(ClaimTypes.Role, "Admin"));
+			_userManagerMock.FindByEmailAsync(email)
+				.Returns(Task.FromResult(roadkillUser));
+
+			_signinManagerMock.PasswordSignInAsync(roadkillUser, password, true, false)
+				.Returns(Task.FromResult(SignInResult.Success));
+
+			var claims = new List<Claim>()
+			{
+				new Claim(ClaimTypes.Role, "Admin")
+			};
+			_userManagerMock.GetClaimsAsync(roadkillUser)
+				.Returns(Task.FromResult(claims as IList<Claim>));
 
 			// Inject SecurityTokenHandler
 
