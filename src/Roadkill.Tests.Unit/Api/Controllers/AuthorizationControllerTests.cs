@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.InMemory;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
@@ -65,14 +66,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// given
 			string jwtToken = "jwt token";
 			string email = "admin@example.org";
-			string password = "Passw0rd9000";
+			string password = "Passw0rd9000!";
 			var roadkillUser = new RoadkillUser()
 			{
 				Id = "1",
 				UserName = email,
 				NormalizedUserName = email.ToUpperInvariant(),
 				Email = email,
-				NormalizedEmail = email.ToUpperInvariant()
+				NormalizedEmail = email.ToUpperInvariant(),
+				RoleClaims = new List<string>()
 			};
 
 			var model = new AuthenticationModel()
