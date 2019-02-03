@@ -47,11 +47,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			var expectedAllUsers = _fixture.CreateMany<RoadkillUser>(5);
 			_userManagerMock.Users.Returns(expectedAllUsers.AsQueryable());
 
-			foreach (RoadkillUser user in expectedAllUsers)
-			{
-				await _mockUserStore.CreateAsync(user);
-			}
-
 			// when
 			IEnumerable<RoadkillUser> actualAllUsers = await _usersController.GetAll();
 
