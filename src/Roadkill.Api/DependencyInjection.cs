@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using MailKit;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Roadkill.Api.JWT;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
 using Roadkill.Text;
@@ -39,6 +41,14 @@ namespace Roadkill.Api
                 var logger = provider.GetService<ILogger>();
 
                 return TextMiddlewareBuilder.Default(textSettings, logger);
+            });
+
+            // JWT
+            services.AddScoped<IJwtTokenProvider>(provider =>
+            {
+	            var jwtSettings = provider.GetService<JwtSettings>();
+	            var tokenHandler = new JwtSecurityTokenHandler();
+	            return new JwtTokenProvider(jwtSettings, tokenHandler);
             });
 
 	        // SomeClass => ISomeClass

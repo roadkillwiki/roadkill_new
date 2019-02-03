@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -7,10 +9,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NSubstitute;
 using Roadkill.Api.Common.Models;
 using Roadkill.Api.Controllers;
+using Roadkill.Api.JWT;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
 using Shouldly;
@@ -23,15 +27,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	[SuppressMessage("Stylecop", "CA1001", Justification = "IDisposable overkill")]
 	public sealed class AuthorizationControllerTests
 	{
-		private readonly Fixture _fixture;
 		private AuthorizationController _authorizationController;
 		private UserManager<RoadkillUser> _userManagerMock;
 		private SignInManager<RoadkillUser> _signinManagerMock;
-		private JwtSettings _jwtSettings;
+		private IJwtTokenProvider _jwtTokenProvider;
 
 		public AuthorizationControllerTests()
 		{
-			_fixture = new Fixture();
 			var fakeStore = Substitute.For<IUserStore<RoadkillUser>>();
 
 			_userManagerMock = Substitute.For<UserManager<RoadkillUser>>(
@@ -53,19 +55,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				new NullLogger<SignInManager<RoadkillUser>>(),
 				null);
 
-			_jwtSettings = new JwtSettings()
-			{
-				Password = "this-password-should-be-over-18-characters",
-				ExpireDays = 365
-			};
-
-			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtSettings);
+			_jwtTokenProvider = Substitute.For<IJwtTokenProvider>();
+			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtTokenProvider);
 		}
 
 		[Fact]
-		public async Task GetAll_should_return_all_users_from_manager()
+		public async Task Authenticate_should_return_token_from_provider()
 		{
 			// given
+			string jwtToken = "jwt token";
 			string email = "admin@example.org";
 			string password = "Passw0rd9000";
 			var roadkillUser = new RoadkillUser()
@@ -89,22 +87,78 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_signinManagerMock.PasswordSignInAsync(roadkillUser, password, true, false)
 				.Returns(Task.FromResult(SignInResult.Success));
 
-			var claims = new List<Claim>()
-			{
-				new Claim(ClaimTypes.Role, "Admin")
-			};
+			var claims = new List<Claim>() { new Claim("any", "thing") } as IList<Claim>;
 			_userManagerMock.GetClaimsAsync(roadkillUser)
-				.Returns(Task.FromResult(claims as IList<Claim>));
+				.Returns(Task.FromResult(claims));
 
-			// Inject SecurityTokenHandler
+			_jwtTokenProvider.CreateToken(claims, roadkillUser.Email)
+				.Returns(jwtToken);
 
 			// when
 			OkObjectResult actionResult = await _authorizationController.Authenticate(model) as OkObjectResult;
 
 			// then
 			actionResult.ShouldNotBeNull();
-			actionResult.Value.ShouldBeOfType<string>();
-			actionResult.Value.ToString().ShouldNotBeNullOrWhiteSpace();
+			actionResult.Value.ShouldBe(jwtToken);
+		}
+
+		[Fact]
+		public async Task Authenticate_should_return_forbidden_if_user_is_not_found()
+		{
+			// given
+			string email = "admin@example.org";
+			string password = "Passw0rd9000";
+
+			var model = new AuthenticationModel()
+			{
+				Email = email,
+				Password = password
+			};
+
+			_userManagerMock.FindByEmailAsync(email)
+				.Returns(Task.FromResult((RoadkillUser)null));
+
+			// when
+			var actionResult = await _authorizationController.Authenticate(model);
+
+			// then
+			actionResult.ShouldNotBeNull();
+			actionResult.ShouldBeOfType<ForbidResult>();
+		}
+
+		[Fact]
+		public async Task Authenticate_should_return_forbidden_when_signin_fails()
+		{
+			// given
+			string email = "admin@example.org";
+			string password = "Passw0rd9000";
+			var roadkillUser = new RoadkillUser()
+			{
+				Id = "1",
+				UserName = email,
+				NormalizedUserName = email.ToUpperInvariant(),
+				Email = email,
+				NormalizedEmail = email.ToUpperInvariant()
+			};
+
+			var model = new AuthenticationModel()
+			{
+				Email = email,
+				Password = password
+			};
+
+			_userManagerMock.FindByEmailAsync(email)
+				.Returns(Task.FromResult(roadkillUser));
+
+			_signinManagerMock.PasswordSignInAsync(roadkillUser, password, true, false)
+				.Returns(Task.FromResult(SignInResult.Failed));
+
+			// when
+			var actionResult = await _authorizationController.Authenticate(model);
+
+			// then
+			actionResult.ShouldNotBeNull();
+			actionResult.ShouldBeOfType<ForbidResult>();
 		}
 	}
 }
