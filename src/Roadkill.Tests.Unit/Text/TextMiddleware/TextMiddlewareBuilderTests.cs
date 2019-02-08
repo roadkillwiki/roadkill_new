@@ -13,11 +13,11 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 {
 	public class TextMiddlewareBuilderTests
 	{
-		private readonly ILogger _logger;
+		private readonly ILogger<TextMiddlewareBuilder> _logger;
 
 		public TextMiddlewareBuilderTests()
 		{
-			_logger = Mock.Of<ILogger>();
+			_logger = Mock.Of<ILogger<TextMiddlewareBuilder>>();
 		}
 
 		[Fact]

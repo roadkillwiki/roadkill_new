@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Common.Models;
 using Roadkill.Api.Common.Services;
+using Roadkill.Api.JWT;
 using Roadkill.Api.ModelConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
@@ -27,7 +28,7 @@ namespace Roadkill.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "Editors")]
+        [Authorize(Policy = PolicyNames.Editor)]
         [Route(nameof(Add))]
         public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
         {
@@ -43,7 +44,7 @@ namespace Roadkill.Api.Controllers
         }
 
         [HttpPut]
-        [Authorize(Policy = "Editors")]
+        [Authorize(Policy = PolicyNames.Editor)]
         public async Task<ActionResult<PageModel>> Update(PageModel model)
         {
             Page page = _pageModelConverter.ConvertToPage(model);
@@ -57,7 +58,7 @@ namespace Roadkill.Api.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Policy = "Admins")]
+        [Authorize(Policy = PolicyNames.Admin)]
         public async Task Delete(int pageId)
         {
             await _pageRepository.DeletePage(pageId);

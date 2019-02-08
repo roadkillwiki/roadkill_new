@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using NSubstitute;
 using Roadkill.Api.Controllers;
+using Roadkill.Api.JWT;
 using Roadkill.Core.Authorization;
+using Roadkill.Tests.Unit.Api.JWT;
 using Shouldly;
 using Xunit;
 
@@ -52,6 +56,32 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actualAllUsers.Count().ShouldBe(expectedAllUsers.Count());
+		}
+
+		[Fact]
+		public async Task FindUsersWithClaim()
+		{
+			// given
+			string claimName = ClaimTypes.Role;
+			string claimValue = RoleNames.Admin;
+			var claim = new Claim(claimName, claimValue);
+
+			_userManagerMock.GetUsersForClaimAsync(claim)
+				.Returns(Task.FromResult(new List<RoadkillUser>() as IList<RoadkillUser>));
+
+			// when
+			IEnumerable<RoadkillUser> actualAllUsers =
+				await _usersController.FindUsersWithClaim(claimName, claimValue);
+
+			// then
+			actualAllUsers.ShouldNotBeNull();
+
+			Received.InOrder(async () =>
+			{
+				await _userManagerMock.GetUsersForClaimAsync(It.Is<Claim>(
+						c => c.Type == claimName &&
+						     c.Value == claimValue));
+			});
 		}
 	}
 }

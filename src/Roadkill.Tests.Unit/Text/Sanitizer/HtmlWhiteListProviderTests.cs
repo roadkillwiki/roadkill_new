@@ -15,7 +15,7 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 
 		public HtmlWhiteListProviderTests()
 		{
-			var logger = Mock.Of<ILogger>();
+			var logger = Mock.Of<ILogger<HtmlWhiteListProvider>>();
 			_textSettings = new TextSettings();
 			_htmlWhiteListProvider = new HtmlWhiteListProvider(_textSettings, logger);
 		}

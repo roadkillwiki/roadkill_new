@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Roadkill.Text.CustomTokens;
 using Roadkill.Text.Models;
@@ -20,9 +21,9 @@ namespace Roadkill.Text.TextMiddleware
 
 	public class TextMiddlewareBuilder : ITextMiddlewareBuilder
 	{
-		private readonly ILogger _logger;
+		private readonly ILogger<TextMiddlewareBuilder> _logger;
 
-		public TextMiddlewareBuilder(ILogger logger)
+		public TextMiddlewareBuilder(ILogger<TextMiddlewareBuilder> logger)
 		{
 			_logger = logger;
 			MiddlewareItems = new List<Middleware>();
@@ -30,9 +31,13 @@ namespace Roadkill.Text.TextMiddleware
 
 		public List<Middleware> MiddlewareItems { get; }
 
-		public static TextMiddlewareBuilder Default(TextSettings textSettings, ILogger logger)
+		public static TextMiddlewareBuilder Default(IServiceProvider provider)
 		{
-			var whiteListProvider = new HtmlWhiteListProvider(textSettings, logger);
+			TextSettings textSettings = provider.GetService<TextSettings>();
+			var logger = provider.GetService<ILogger<TextMiddlewareBuilder>>();
+			var whiteListLogger = provider.GetService<ILogger<HtmlWhiteListProvider>>();
+
+			var whiteListProvider = new HtmlWhiteListProvider(textSettings, whiteListLogger);
 			var builder = new TextMiddlewareBuilder(logger);
 
 			builder.Use(new CustomTokenMiddleware(new CustomTokenParser(textSettings, logger)))

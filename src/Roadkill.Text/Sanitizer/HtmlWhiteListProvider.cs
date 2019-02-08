@@ -15,9 +15,9 @@ namespace Roadkill.Text.Sanitizer
     {
         private readonly TextSettings _textSettings;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<HtmlWhiteListProvider> _logger;
 
-        public HtmlWhiteListProvider(TextSettings settings, ILogger logger)
+        public HtmlWhiteListProvider(TextSettings settings, ILogger<HtmlWhiteListProvider> logger)
         {
             _textSettings = settings;
             _logger = logger;

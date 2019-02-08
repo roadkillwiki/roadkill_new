@@ -35,13 +35,7 @@ namespace Roadkill.Api
             // Markdown
             services.AddScoped<TextSettings>();
             services.AddScoped<IHtmlWhiteListProvider, HtmlWhiteListProvider>();
-            services.AddScoped<ITextMiddlewareBuilder>(provider =>
-            {
-                var textSettings = provider.GetService<TextSettings>();
-                var logger = provider.GetService<ILogger>();
-
-                return TextMiddlewareBuilder.Default(textSettings, logger);
-            });
+            services.AddScoped<ITextMiddlewareBuilder>(TextMiddlewareBuilder.Default);
 
             // JWT
             services.AddScoped<IJwtTokenProvider>(provider =>
@@ -101,8 +95,8 @@ namespace Roadkill.Api
 
         private static void ConfigureJwtClaimsPolicies(AuthorizationOptions options)
         {
-            options.AddPolicy("Admins", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
-            options.AddPolicy("Editors", policy => policy.RequireClaim(ClaimTypes.Role, "Editor"));
+            options.AddPolicy(PolicyNames.Admin, policy => policy.RequireClaim(ClaimTypes.Role, RoleNames.Admin));
+            options.AddPolicy(PolicyNames.Editor, policy => policy.RequireClaim(ClaimTypes.Role, RoleNames.Editor));
         }
     }
 }
