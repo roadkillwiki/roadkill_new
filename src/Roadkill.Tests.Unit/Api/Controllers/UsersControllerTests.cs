@@ -59,29 +59,28 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task FindUsersWithClaim()
+		public async Task FindUsersWithClaim_should_return_specific_users_for_claim()
 		{
 			// given
 			string claimName = ClaimTypes.Role;
 			string claimValue = RoleNames.Admin;
-			var claim = new Claim(claimName, claimValue);
 
-			_userManagerMock.GetUsersForClaimAsync(claim)
-				.Returns(Task.FromResult(new List<RoadkillUser>() as IList<RoadkillUser>));
+			var expectedUsers = new List<RoadkillUser>()
+			{
+				_fixture.Create<RoadkillUser>(),
+				_fixture.Create<RoadkillUser>()
+			};
+
+			_userManagerMock.GetUsersForClaimAsync(Arg.Is<Claim>(c => c.Type == claimName && c.Value == claimValue))
+				.Returns(Task.FromResult((IList<RoadkillUser>)expectedUsers));
 
 			// when
-			IEnumerable<RoadkillUser> actualAllUsers =
+			IEnumerable<RoadkillUser> actualUsers =
 				await _usersController.FindUsersWithClaim(claimName, claimValue);
 
 			// then
-			actualAllUsers.ShouldNotBeNull();
-
-			Received.InOrder(async () =>
-			{
-				await _userManagerMock.GetUsersForClaimAsync(It.Is<Claim>(
-						c => c.Type == claimName &&
-						     c.Value == claimValue));
-			});
+			actualUsers.ShouldNotBeNull();
+			actualUsers.ShouldBe(expectedUsers);
 		}
 	}
 }
