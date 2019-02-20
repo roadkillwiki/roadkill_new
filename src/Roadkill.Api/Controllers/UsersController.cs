@@ -54,16 +54,15 @@ namespace Roadkill.Api.Controllers
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(newUser, password);
-
-            await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, "admin"));
+            IdentityResult result = await _userManager.CreateAsync(newUser, password);
+            await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Admin));
 
             return result;
         }
 
         [HttpPost]
-        [Route(nameof(AddAdmin))]
-        public async Task<IdentityResult> AddEditor(string email)
+        [Route(nameof(AddEditor))]
+        public async Task<IdentityResult> AddEditor(string email, string password)
         {
 	        var newUser = new RoadkillUser()
 	        {
@@ -72,12 +71,8 @@ namespace Roadkill.Api.Controllers
 		        EmailConfirmed = true
 	        };
 
-	        var user = await _userManager.FindByEmailAsync("chris@example.org");
-	        await _userManager.DeleteAsync(newUser);
-
-	        var result = await _userManager.CreateAsync(newUser, "password");
-
-	        await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, "Editor"));
+	        IdentityResult result = await _userManager.CreateAsync(newUser, password);
+	        await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Editor));
 
 	        return result;
         }
