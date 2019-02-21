@@ -49,6 +49,12 @@ namespace Roadkill.Api.Controllers
 	            return Forbid();
             }
 
+            if (user.LockoutEnabled)
+            {
+	            // Lockout is used to delete users as well as lock them out
+	            return Forbid();
+            }
+
             SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);
             if (result.Succeeded)
             {

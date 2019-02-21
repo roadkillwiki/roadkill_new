@@ -22,6 +22,24 @@ namespace Roadkill.Api.Controllers
 	[Authorize(Policy = PolicyNames.Admin)]
     public class UsersController : ControllerBase
     {
+	    public static readonly IdentityError EmailExistsError = new IdentityError()
+	    {
+		    Code = "EmailAlreadyExists",
+		    Description = "The email address already exists."
+	    };
+
+	    public static readonly IdentityError EmailDoesNotExistError = new IdentityError()
+	    {
+		    Code = "EmailDoesNotExist",
+		    Description = "The email address does not exist."
+	    };
+
+	    public static readonly IdentityError UserIsLockedOut = new IdentityError()
+	    {
+		    Code = "UserAlreadyLockedOut",
+		    Description = "The user with the email address is already locked out."
+	    };
+
         private readonly UserManager<RoadkillUser> _userManager;
 
 	    public UsersController(UserManager<RoadkillUser> userManager)
@@ -47,6 +65,12 @@ namespace Roadkill.Api.Controllers
         [Route(nameof(AddAdmin))]
         public async Task<IdentityResult> AddAdmin(string email, string password)
         {
+	        var user = await _userManager.FindByEmailAsync(email);
+	        if (user != null)
+	        {
+		        return IdentityResult.Failed(EmailExistsError);
+	        }
+
             var newUser = new RoadkillUser()
             {
                 UserName = email,
@@ -64,6 +88,12 @@ namespace Roadkill.Api.Controllers
         [Route(nameof(AddEditor))]
         public async Task<IdentityResult> AddEditor(string email, string password)
         {
+	        var user = await _userManager.FindByEmailAsync(email);
+	        if (user != null)
+	        {
+		        return IdentityResult.Failed(EmailExistsError);
+	        }
+
 	        var newUser = new RoadkillUser()
 	        {
 		        UserName = email,
@@ -74,6 +104,28 @@ namespace Roadkill.Api.Controllers
 	        IdentityResult result = await _userManager.CreateAsync(newUser, password);
 	        await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Editor));
 
+	        return result;
+        }
+
+        [HttpPost]
+        [Route(nameof(DeleteUser))]
+        public async Task<IdentityResult> DeleteUser(string email)
+        {
+	        var user = await _userManager.FindByEmailAsync(email);
+	        if (user == null)
+	        {
+		        return IdentityResult.Failed(EmailExistsError);
+	        }
+
+	        if (user.LockoutEnabled)
+	        {
+		        return IdentityResult.Failed(UserIsLockedOut);
+	        }
+
+	        user.LockoutEnd = DateTime.MaxValue;
+	        user.LockoutEnabled = true;
+
+	        IdentityResult result = await _userManager.UpdateAsync(user);
 	        return result;
         }
 
