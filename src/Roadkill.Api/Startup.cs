@@ -2,28 +2,23 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using Hellang.Middleware.ProblemDetails;
-using Marten;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using NSwag;
+using NSwag.SwaggerGeneration.Processors.Security;
 using Roadkill.Api.Settings;
-using Roadkill.Core.Configuration;
-using Roadkill.Core.Settings;
 using ApiDependencyInjection = Roadkill.Api.DependencyInjection;
 using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
 
+[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace Roadkill.Api
 {
 	[SuppressMessage("Stylecop", "CA1822", Justification = "Methods cannot be static as they are used by the runtime")]
+	[SuppressMessage("ReSharper", "SA1118", Justification = "cos")]
 	public class Startup
 	{
 	    private readonly ILoggerFactory _loggerFactory;
@@ -48,26 +43,26 @@ namespace Roadkill.Api
 
 	    public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-		    services.AddProblemDetails(x =>
-		    {
-		        x.IncludeExceptionDetails = context => _hostingEnvironment.IsDevelopment();
-		        x.Map<Exception>(ex => new ExceptionProblemDetails(ex, StatusCodes.Status500InternalServerError));
-		    });
-
 			ILogger startupLogger = _loggerFactory.CreateLogger("Startup");
 			services.AddLogging();
 
-			// Settings
+			// JWT password
 			var jwtSettings = new JwtSettings();
 			_configuration.Bind("Jwt", jwtSettings);
-
-			if (string.IsNullOrEmpty(jwtSettings.Password) || jwtSettings.Password.Length < 20)
+			CoreDependencyInjection.GuardAllConfigProperties("Jwt", jwtSettings);
+			if (jwtSettings.Password.Length < 20)
 			{
-				startupLogger.LogError($"The JWT password '{jwtSettings.Password}' is empty or under 20 characters in length.");
-				throw new InvalidOperationException("The JWT password is empty or under 20 characters in length.");
+				startupLogger.LogError($"The JWT.Password is under 20 characters in length.");
+				throw new InvalidOperationException("The JWT.Password setting is under 20 characters in length.");
 			}
 
-			CoreDependencyInjection.GuardAllConfigProperties("Jwt", jwtSettings);
+			if (jwtSettings.ExpiresDays < 1)
+			{
+				startupLogger.LogError($"The JWT.ExpiresDays is {jwtSettings.ExpiresDays}.");
+				throw new InvalidOperationException("The JWT.ExpiresDays is setting should be 1 or greater.");
+			}
+
+			services.AddSingleton(jwtSettings);
 
 			// Roadkill IoC
 			CoreDependencyInjection.ConfigureServices(services, _configuration, startupLogger);
@@ -80,7 +75,21 @@ namespace Roadkill.Api
 			ApiDependencyInjection.ConfigureJwt(services, jwtSettings);
 
 			services.AddMvc();
-			services.AddSwaggerDocument();
+			services.AddSwaggerDocument(document =>
+			{
+				// Add an authenticate button to Swagger for JWT tokens
+				document.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT"));
+				document.DocumentProcessors.Add(new SecurityDefinitionAppender("JWT", new SwaggerSecurityScheme
+				{
+					Type = SwaggerSecuritySchemeType.ApiKey,
+					Name = "Authorization",
+					In = SwaggerSecurityApiKeyLocation.Header,
+					Description = "Type into the textbox: Bearer {your JWT token}. You can get a JWT token from /Authorization/Authenticate."
+				}));
+
+				// Post process the generated document
+				document.PostProcess = d => d.Info.Title = "Roadkill v3 API";
+			});
 
 			var provider = services.BuildServiceProvider();
 			return provider;
@@ -90,11 +99,9 @@ namespace Roadkill.Api
 		public void Configure(IApplicationBuilder app)
 		{
 			// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory
-			app.UseSwagger();
 			app.UseSwaggerUi3();
-			app.UseStaticFiles();
+			app.UseSwagger();
 			app.UseAuthentication();
-		    app.UseProblemDetails();
 			app.UseMvc();
 		}
 	}

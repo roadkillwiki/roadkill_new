@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using NSubstitute;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.JWT;
 using Roadkill.Core.Authorization;
-using Roadkill.Tests.Unit.Api.JWT;
 using Shouldly;
 using Xunit;
 
@@ -45,17 +45,56 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task GetAll_should_return_all_users_from_manager()
+		public async Task GetByEmail_should_return_user()
+		{
+			// given
+			string email = "donny@trump.com";
+
+			_userManagerMock.FindByEmailAsync(email)
+				.Returns(new RoadkillUser() { Email = email });
+
+			// when
+			var actionResult = await _usersController.GetByEmail(email);
+
+			// then
+			actionResult.ShouldBeOkObjectResult();
+			RoadkillUser actualUser = actionResult.GetOkObjectResultValue();
+			actualUser.Email.ShouldBe(email);
+		}
+
+		[Fact]
+		public async Task GetByEmail_should_return_notfound_when_user_doesnt_exist()
+		{
+			// given
+			string email = "okfingers@trump.com";
+			var expectedError = UsersController.EmailDoesNotExistError;
+
+			_userManagerMock.FindByEmailAsync(email)
+				.Returns(Task.FromResult((RoadkillUser)null));
+
+			// when
+			ActionResult<RoadkillUser> actionResult = await _usersController.GetByEmail(email);
+
+			// then
+			actionResult.ShouldBeNotFoundObjectResult();
+			string errorMessage = actionResult.GetNotFoundValue<RoadkillUser, string>();
+			errorMessage.ShouldBe(expectedError);
+		}
+
+		[Fact]
+		public void FindAll_should_return_all_users_from_manager()
 		{
 			// given
 			var expectedAllUsers = _fixture.CreateMany<RoadkillUser>(5);
 			_userManagerMock.Users.Returns(expectedAllUsers.AsQueryable());
 
 			// when
-			IEnumerable<RoadkillUser> actualAllUsers = await _usersController.GetAll();
+			var actionResult = _usersController.FindAll();
 
 			// then
-			actualAllUsers.Count().ShouldBe(expectedAllUsers.Count());
+			actionResult.ShouldBeOkObjectResult();
+			IEnumerable<RoadkillUser> actualUsers = actionResult.GetOkObjectResultValue();
+			actualUsers.Count().ShouldBe(expectedAllUsers.Count());
 		}
 
 		[Fact]
@@ -75,11 +114,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult((IList<RoadkillUser>)expectedUsers));
 
 			// when
-			IEnumerable<RoadkillUser> actualUsers =
-				await _usersController.FindUsersWithClaim(claimName, claimValue);
+			var actionResult = await _usersController.FindUsersWithClaim(claimName, claimValue);
 
 			// then
-			actualUsers.ShouldNotBeNull();
+			actionResult.ShouldBeOkObjectResult();
+			IEnumerable<RoadkillUser> actualUsers = actionResult.GetOkObjectResultValue();
 			actualUsers.ShouldBe(expectedUsers);
 		}
 
@@ -98,10 +137,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			// when
-			IdentityResult actualResult = await _usersController.AddAdmin(email, password);
+			var actionResult = await _usersController.CreateAdmin(email, password);
 
 			// then
-			actualResult.ShouldBe(IdentityResult.Success);
+			actionResult.ShouldBeCreatedAtRouteResult();
+			string actualEmailAddress = actionResult.CreatedAtRouteResultValue();
+			actualEmailAddress.ShouldBe(email);
+
 			await _userManagerMock
 				.Received(1)
 				.CreateAsync(
@@ -129,10 +171,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			// when
-			IdentityResult actualResult = await _usersController.AddEditor(email, password);
+			var actionResult = await _usersController.CreateEditor(email, password);
 
 			// then
-			actualResult.ShouldBe(IdentityResult.Success);
+			actionResult.ShouldBeCreatedAtRouteResult();
+			string actualEmailAddress = actionResult.CreatedAtRouteResultValue();
+			actualEmailAddress.ShouldBe(email);
+
 			await _userManagerMock
 				.Received(1)
 				.CreateAsync(
@@ -146,7 +191,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task AddAdmin_should_return_failed_if_email_exists()
+		public async Task AddAdmin_should_return_badrequest_if_email_exists()
 		{
 			// given
 			string email = "donald@trump.com";
@@ -157,15 +202,16 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(new RoadkillUser() { Email = email });
 
 			// when
-			IdentityResult actualResult = await _usersController.AddAdmin(email, password);
+			var actionResult = await _usersController.CreateAdmin(email, password);
 
 			// then
-			actualResult.Succeeded.ShouldBeFalse();
-			actualResult.Errors.First().ShouldBe(expectedError);
+			actionResult.ShouldBeBadRequestObjectResult();
+			string errorMessage = actionResult.GetBadRequestValue();
+			errorMessage.ShouldBe(expectedError);
 		}
 
 		[Fact]
-		public async Task AddEditor_should_return_failed_if_email_exists()
+		public async Task AddEditor_should_return_badrequest_if_email_exists()
 		{
 			// given
 			string email = "daffy@trump.com";
@@ -176,52 +222,81 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(new RoadkillUser() { Email = email });
 
 			// when
-			IdentityResult actualResult = await _usersController.AddEditor(email, password);
+			var actionResult = await _usersController.CreateEditor(email, password);
 
 			// then
-			actualResult.Succeeded.ShouldBeFalse();
-			actualResult.Errors.First().ShouldBe(expectedError);
+			actionResult.ShouldBeBadRequestObjectResult();
+			string errorMessage = actionResult.GetBadRequestValue();
+			errorMessage.ShouldBe(expectedError);
 		}
 
 		[Fact]
-		public async Task DeleteUser_user_dont_exist()
+		public async Task DeleteUser_should_return_no_content_and_set_user_as_locked_out()
 		{
 			// given
 			string email = "okfingers@trump.com";
+
+			_userManagerMock.FindByEmailAsync(email)
+				.Returns(new RoadkillUser() { Email = email });
+
+			_userManagerMock.UpdateAsync(Arg.Is<RoadkillUser>(u => u.Email == email))
+				.Returns(Task.FromResult(IdentityResult.Success));
+
+			// when
+			var actionResult = await _usersController.DeleteUser(email);
+
+			// then
+			actionResult.ShouldBeNoContentResult();
+
+			await _userManagerMock
+				.Received(1)
+				.UpdateAsync(Arg.Is<RoadkillUser>(
+					u => u.Email == email &&
+					     u.LockoutEnabled == true &&
+					     u.LockoutEnd == DateTime.MaxValue));
+		}
+
+		[Fact]
+		public async Task DeleteUser_should_return_notfound_when_user_doesnt_exist()
+		{
+			// given
+			string email = "fakeuser@trump.com";
 			var expectedError = UsersController.EmailDoesNotExistError;
 
-
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillUser() { Email = email });
-
-			_userManagerMock.UpdateAsync(Arg.Is<RoadkillUser>(u => u.Email == email))
-				.Returns(Task.FromResult(IdentityResult.Success));
+				.Returns(Task.FromResult((RoadkillUser)null));
 
 			// when
-			IdentityResult actualResult = await _usersController.DeleteUser(email);
+			var actionResult = await _usersController.DeleteUser(email);
 
 			// then
-			actualResult.Succeeded.ShouldBeTrue();
+			actionResult.ShouldBeNotFoundObjectResult();
+			string errorMessage = actionResult.GetNotFoundValue();
+			errorMessage.ShouldBe(expectedError);
 		}
 
 		[Fact]
-		public async Task DeleteUser()
+		public async Task DeleteUser_should_return_badrequest_when_user_is_already_lockedout()
 		{
 			// given
-			string email = "okfingers@trump.com";
+			string email = "lockedout@trump.com";
+			var expectedError = UsersController.UserIsLockedOutError;
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillUser() { Email = email });
-
-			_userManagerMock.UpdateAsync(Arg.Is<RoadkillUser>(u => u.Email == email))
-				.Returns(Task.FromResult(IdentityResult.Success));
+				.Returns(new RoadkillUser()
+				{
+					Email = email,
+					LockoutEnd = DateTime.MaxValue,
+					LockoutEnabled = true
+				});
 
 			// when
-			IdentityResult actualResult = await _usersController.DeleteUser(email);
+			var actionResult = await _usersController.DeleteUser(email);
 
 			// then
-			actualResult.Succeeded.ShouldBeFalse();
-			actualResult.Errors.First().ShouldBe(expectedError);
+			actionResult.ShouldBeBadRequestObjectResult();
+			string errorMessage = actionResult.GetBadRequestValue();
+			errorMessage.ShouldBe(expectedError);
 		}
 	}
 }

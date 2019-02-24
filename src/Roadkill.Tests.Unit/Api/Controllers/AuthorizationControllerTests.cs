@@ -92,17 +92,17 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(jwtToken);
 
 			// when
-			IActionResult actionResult = await _authorizationController.Authenticate(model);
+			ActionResult<string> actionResult = await _authorizationController.Authenticate(model);
 
 			// then
-			actionResult.ShouldBeOfType<OkObjectResult>("OK result not returned from Authenticate");
+			actionResult.Result.ShouldBeOfType<OkObjectResult>();
 
-			var okResult = actionResult as OkObjectResult;
+			var okResult = actionResult.Result as OkObjectResult;
 			okResult.Value.ShouldBe(jwtToken);
 		}
 
 		[Fact]
-		public async Task Authenticate_should_return_forbidden_if_user_is_not_found()
+		public async Task Authenticate_should_return_notfound_if_user_is_not_found()
 		{
 			// given
 			string email = "admin@example.org";
@@ -118,35 +118,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult((RoadkillUser)null));
 
 			// when
-			var actionResult = await _authorizationController.Authenticate(model);
+			ActionResult<string> actionResult = await _authorizationController.Authenticate(model);
 
 			// then
 			actionResult.ShouldNotBeNull();
-			actionResult.ShouldBeOfType<ForbidResult>();
-		}
-
-		[Fact]
-		public async Task Authenticate_should_return_forbidden_if_user_is_locked_out()
-		{
-			// given
-			string email = "anybody@example.org";
-			string password = "Passw0rd9000";
-
-			var model = new AuthenticationModel()
-			{
-				Email = email,
-				Password = password
-			};
-
-			_userManagerMock.FindByEmailAsync(email)
-				.Returns(Task.FromResult(new RoadkillUser() { LockoutEnabled = true }));
-
-			// when
-			var actionResult = await _authorizationController.Authenticate(model);
-
-			// then
-			actionResult.ShouldNotBeNull();
-			actionResult.ShouldBeOfType<ForbidResult>();
+			actionResult.Result.ShouldBeOfType<NotFoundResult>();
 		}
 
 		[Fact]
@@ -177,11 +153,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult(SignInResult.Failed));
 
 			// when
-			var actionResult = await _authorizationController.Authenticate(model);
+			ActionResult<string> actionResult = await _authorizationController.Authenticate(model);
 
 			// then
 			actionResult.ShouldNotBeNull();
-			actionResult.ShouldBeOfType<ForbidResult>();
+			actionResult.Result.ShouldBeOfType<ForbidResult>();
 		}
 	}
 }

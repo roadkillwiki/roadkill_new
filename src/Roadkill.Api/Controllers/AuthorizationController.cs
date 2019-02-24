@@ -19,7 +19,6 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
     [Route("[controller]")]
     public class AuthorizationController : ControllerBase
     {
@@ -41,18 +40,12 @@ namespace Roadkill.Api.Controllers
         [HttpPost]
         [Route(nameof(Authenticate))]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromBody] AuthenticationModel authenticationModel)
+        public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticationModel authenticationModel)
         {
             RoadkillUser user = await _userManager.FindByEmailAsync(authenticationModel.Email);
             if (user == null)
             {
-	            return Forbid();
-            }
-
-            if (user.LockoutEnabled)
-            {
-	            // Lockout is used to delete users as well as lock them out
-	            return Forbid();
+	            return NotFound();
             }
 
             SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);

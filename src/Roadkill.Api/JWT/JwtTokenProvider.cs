@@ -33,7 +33,7 @@ namespace Roadkill.Api.JWT
 			var tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(allClaims),
-				Expires = DateTime.UtcNow.AddDays(_jwtSettings.ExpireDays),
+				Expires = DateTime.UtcNow.AddDays(_jwtSettings.ExpiresDays),
 				SigningCredentials =
 					new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature)
 			};

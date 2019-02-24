@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -8,6 +9,7 @@ using Marten.AspNetIdentity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +20,8 @@ using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;
 using Scrutor;
+using ApiDependencyInjection = Roadkill.Api.DependencyInjection;
+using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
 
 namespace Roadkill.Api
 {
@@ -40,9 +44,9 @@ namespace Roadkill.Api
             // JWT
             services.AddScoped<IJwtTokenProvider>(provider =>
             {
-	            var jwtSettings = provider.GetService<JwtSettings>();
+	            var settings = provider.GetService<JwtSettings>();
 	            var tokenHandler = new JwtSecurityTokenHandler();
-	            return new JwtTokenProvider(jwtSettings, tokenHandler);
+	            return new JwtTokenProvider(settings, tokenHandler);
             });
 
 	        // SomeClass => ISomeClass

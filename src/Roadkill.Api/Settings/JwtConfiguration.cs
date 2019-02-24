@@ -4,6 +4,6 @@ namespace Roadkill.Api.Settings
 	{
 		public string Password { get; set; }
 
-		public int ExpireDays { get; set; }
+		public int ExpiresDays { get; set; }
 	}
 }
