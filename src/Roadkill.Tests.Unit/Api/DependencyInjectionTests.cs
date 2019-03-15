@@ -7,7 +7,7 @@ using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;
 using Shouldly;
 using Xunit;
-using DependencyInjection = Roadkill.Api.DependencyInjection;
+using DependencyInjection = Roadkill.Api.DependencyInjection.DependencyInjection;
 
 namespace Roadkill.Tests.Unit.Api
 {

@@ -35,8 +35,4 @@
     <ProjectReference Include="..\Roadkill.Localisation\Roadkill.Localisation.csproj" />
     <ProjectReference Include="..\Roadkill.Text\Roadkill.Text.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Extensions" />
-  </ItemGroup>
 </Project>

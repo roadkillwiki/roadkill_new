@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
 
-namespace Roadkill.Api
+namespace Roadkill.Api.Extensions
 {
 	public static class SwaggerExtensions
 	{

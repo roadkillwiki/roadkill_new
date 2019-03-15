@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,9 +8,7 @@ using Marten.AspNetIdentity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Roadkill.Api.JWT;
 using Roadkill.Api.Settings;
@@ -20,10 +17,9 @@ using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;
 using Scrutor;
-using ApiDependencyInjection = Roadkill.Api.DependencyInjection;
-using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
+using ApiDependencyInjection = Roadkill.Api.DependencyInjection.DependencyInjection;
 
-namespace Roadkill.Api
+namespace Roadkill.Api.DependencyInjection
 {
 	[SuppressMessage("Stylecop", "CA1052", Justification = "Can't be static, it needs a type for scanning")]
 	[SuppressMessage("Stylecop", "CA1724", Justification = "The name DependencyInjection is fine to share")]
@@ -51,7 +47,7 @@ namespace Roadkill.Api
 
 	        // SomeClass => ISomeClass
             services.Scan(scan => scan
-                .FromAssemblyOf<Roadkill.Api.DependencyInjection>()
+                .FromAssemblyOf<ApiDependencyInjection>()
                 .AddClasses()
                 .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                 .AsMatchingInterface()

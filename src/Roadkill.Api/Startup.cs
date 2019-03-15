@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using System.Net.Mime;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Roadkill.Api.Extensions;
+using Roadkill.Api.HealthChecks;
 using Roadkill.Api.Settings;
-using ApiDependencyInjection = Roadkill.Api.DependencyInjection;
+using ApiDependencyInjection = Roadkill.Api.DependencyInjection.DependencyInjection;
 using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
 
 [assembly: ApiConventionType(typeof(DefaultApiConventions))]
@@ -90,19 +98,23 @@ namespace Roadkill.Api
 				options.AssumeDefaultVersionWhenUnspecified = true;
 			});
 			services.AddAllSwagger();
+			services.AddHealthChecks()
+				.AddCheck<MartenHealthCheck>("marten");
 
-			var provider = services.BuildServiceProvider();
-			return provider;
+			return services.BuildServiceProvider();
 		}
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app)
+	    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IHostingEnvironment environment)
 		{
 			// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory
-			app.UseSwaggerUi3();
+			app.UseSwaggerUi3(settings => { settings.Path = ""; });
 			app.UseSwagger();
 			app.UseAuthentication();
 			app.UseMvc();
+			app.UseJsonExceptionHandler(environment);
+			app.UseForwardedHeaders();
+			app.UseJsonHealthChecks();
 		}
 	}
 }
