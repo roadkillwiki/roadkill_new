@@ -19,7 +19,9 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 namespace Roadkill.Api.Controllers
 {
 	[Authorize]
-    [Route("[controller]")]
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
 	[Authorize(Policy = PolicyNames.Admin)]
     public class UsersController : ControllerBase
     {

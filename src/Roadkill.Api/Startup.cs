@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSwag;
-using NSwag.SwaggerGeneration.Processors.Security;
 using Roadkill.Api.Settings;
 using ApiDependencyInjection = Roadkill.Api.DependencyInjection;
 using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
@@ -74,22 +72,24 @@ namespace Roadkill.Api
 			// Authorization (JWT)
 			ApiDependencyInjection.ConfigureJwt(services, jwtSettings);
 
-			services.AddMvc();
-			services.AddSwaggerDocument(document =>
-			{
-				// Add an authenticate button to Swagger for JWT tokens
-				document.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT"));
-				document.DocumentProcessors.Add(new SecurityDefinitionAppender("JWT", new SwaggerSecurityScheme
+			services
+				.AddMvcCore()
+				.AddDataAnnotations()
+				.AddApiExplorer()
+				.AddJsonFormatters()
+				.SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+				.AddVersionedApiExplorer(options =>
 				{
-					Type = SwaggerSecuritySchemeType.ApiKey,
-					Name = "Authorization",
-					In = SwaggerSecurityApiKeyLocation.Header,
-					Description = "Type into the textbox: Bearer {your JWT token}. You can get a JWT token from /Authorization/Authenticate."
-				}));
+					options.SubstituteApiVersionInUrl = true;
+					options.GroupNameFormat = "VVV";
+				});
 
-				// Post process the generated document
-				document.PostProcess = d => d.Info.Title = "Roadkill v3 API";
+			services.AddApiVersioning(options =>
+			{
+				options.ApiVersionReader = new UrlSegmentApiVersionReader();
+				options.AssumeDefaultVersionWhenUnspecified = true;
 			});
+			services.AddAllSwagger();
 
 			var provider = services.BuildServiceProvider();
 			return provider;
