@@ -33,6 +33,7 @@ namespace Roadkill.Tests.Unit.Api
 		{
 			// given
 			var services = new ServiceCollection();
+			services.AddLogging();
 
 			// when
 			services.AddMarkdown();
