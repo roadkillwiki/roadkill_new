@@ -3,9 +3,11 @@ using System.Linq;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Newtonsoft.Json;
+using Roadkill.Api.Middleware;
 
 namespace Roadkill.Api.Extensions
 {
@@ -34,6 +36,16 @@ namespace Roadkill.Api.Extensions
 			};
 
 			app.UseHealthChecks("/healthcheck", options);
+
+			return app;
+		}
+
+		public static IApplicationBuilder UseJsonExceptionHandler(this IApplicationBuilder app, IHostingEnvironment environment)
+		{
+			app.UseExceptionHandler(new ExceptionHandlerOptions()
+			{
+				ExceptionHandler = new JsonExceptionMiddleware(environment).Invoke
+			});
 
 			return app;
 		}

@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using Marten;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Roadkill.Api.Common.Models;
 using Roadkill.Api.JWT;
-using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers
 {
-    [Route("[controller]")]
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
     public class AuthorizationController : ControllerBase
     {
         private readonly UserManager<RoadkillUser> _userManager;

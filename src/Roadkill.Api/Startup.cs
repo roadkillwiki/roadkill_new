@@ -16,20 +16,18 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Roadkill.Api.Extensions;
 using Roadkill.Api.HealthChecks;
-using Roadkill.Api.Settings;
-using ApiDependencyInjection = Roadkill.Api.DependencyInjection.DependencyInjection;
-using CoreDependencyInjection = Roadkill.Core.DependencyInjection;
+using Roadkill.Core.Configuration;
+using Roadkill.Core.Extensions;
+using Roadkill.Core.Settings;
 
 [assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace Roadkill.Api
 {
-	[SuppressMessage("Stylecop", "CA1822", Justification = "Methods cannot be static as they are used by the runtime")]
-	[SuppressMessage("ReSharper", "SA1118", Justification = "cos")]
 	public class Startup
 	{
 	    private readonly ILoggerFactory _loggerFactory;
 
-		private IConfigurationRoot _configuration;
+		private readonly IConfigurationRoot _configuration;
 
 		private IHostingEnvironment _hostingEnvironment;
 
@@ -49,55 +47,24 @@ namespace Roadkill.Api
 
 	    public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-			ILogger startupLogger = _loggerFactory.CreateLogger("Startup");
+			ILogger logger = _loggerFactory.CreateLogger("Startup");
+
+			// Shared
 			services.AddLogging();
 
-			// JWT password
-			var jwtSettings = new JwtSettings();
-			_configuration.Bind("Jwt", jwtSettings);
-			CoreDependencyInjection.GuardAllConfigProperties("Jwt", jwtSettings);
-			if (jwtSettings.Password.Length < 20)
-			{
-				startupLogger.LogError($"The JWT.Password is under 20 characters in length.");
-				throw new InvalidOperationException("The JWT.Password setting is under 20 characters in length.");
-			}
+			// Core
+			services.ScanAndRegisterCore();
+			var postgresSettings = services.AddConfigurationOf<PostgresSettings>(_configuration);
+			services.AddConfigurationOf<SmtpSettings>(_configuration);
+			services.AddMartenDocumentStore(postgresSettings.ConnectionString, logger);
 
-			if (jwtSettings.ExpiresDays < 1)
-			{
-				startupLogger.LogError($"The JWT.ExpiresDays is {jwtSettings.ExpiresDays}.");
-				throw new InvalidOperationException("The JWT.ExpiresDays is setting should be 1 or greater.");
-			}
-
-			services.AddSingleton(jwtSettings);
-
-			// Roadkill IoC
-			CoreDependencyInjection.ConfigureServices(services, _configuration, startupLogger);
-			ApiDependencyInjection.ConfigureServices(services);
-
-			// Authentication (ASP.NET Identity)
-			ApiDependencyInjection.ConfigureIdentity(services);
-
-			// Authorization (JWT)
-			ApiDependencyInjection.ConfigureJwt(services, jwtSettings);
-
-			services
-				.AddMvcCore()
-				.AddDataAnnotations()
-				.AddApiExplorer()
-				.AddJsonFormatters()
-				.SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-				.AddVersionedApiExplorer(options =>
-				{
-					options.SubstituteApiVersionInUrl = true;
-					options.GroupNameFormat = "VVV";
-				});
-
-			services.AddApiVersioning(options =>
-			{
-				options.ApiVersionReader = new UrlSegmentApiVersionReader();
-				options.AssumeDefaultVersionWhenUnspecified = true;
-			});
-			services.AddAllSwagger();
+			// API
+			services.ScanAndRegisterApi();
+			services.AddMailkit();
+			services.AddMarkdown();
+			services.AddJwtDefaults(_configuration, logger);
+			services.AddIdentityDefaults();
+			services.AddMvcAndVersionedSwagger();
 			services.AddHealthChecks()
 				.AddCheck<MartenHealthCheck>("marten");
 
