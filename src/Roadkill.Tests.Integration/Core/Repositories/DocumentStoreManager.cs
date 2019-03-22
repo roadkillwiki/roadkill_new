@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
 using Marten;
 using Roadkill.Core.Entities;
 using Xunit.Abstractions;
 
-namespace Roadkill.Tests.Integration.Repositories
+namespace Roadkill.Tests.Integration.Core.Repositories
 {
 	public static class DocumentStoreManager
 	{

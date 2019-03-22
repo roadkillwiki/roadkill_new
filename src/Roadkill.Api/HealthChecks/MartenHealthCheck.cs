@@ -5,7 +5,7 @@ using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Roadkill.Core.Configuration;
+using Roadkill.Core.Settings;
 
 namespace Roadkill.Api.HealthChecks
 {

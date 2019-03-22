@@ -58,6 +58,12 @@ namespace Roadkill.Api.Extensions
 		public static IServiceCollection AddJwtDefaults(this IServiceCollection services, IConfiguration configuration, ILogger logger)
 		{
 			var jwtSettings = services.AddConfigurationOf<JwtSettings>(configuration);
+			if (jwtSettings == null)
+			{
+				logger.LogError($"No JWT settings were found. Do you have a JWT section in your configuration file?");
+				throw new InvalidOperationException("No JWT settings were found. Do you have a JWT section in your configuration file?");
+			}
+
 			if (jwtSettings.Password.Length < 20)
 			{
 				logger.LogError($"The JWT.Password is under 20 characters in length.");

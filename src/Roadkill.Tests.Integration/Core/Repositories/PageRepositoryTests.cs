@@ -14,7 +14,7 @@ using Xunit.Abstractions;
 // ReSharper disable PossibleMultipleEnumeration
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
-namespace Roadkill.Tests.Integration.Repositories
+namespace Roadkill.Tests.Integration.Core.Repositories
 {
 	public class PageRepositoryTests
 	{

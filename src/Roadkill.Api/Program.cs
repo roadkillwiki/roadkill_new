@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -7,7 +8,7 @@ namespace Roadkill.Api
 {
 	public static class Program
 	{
-		public static void Main()
+		public static void Main(string[] args)
 		{
 			Log.Logger = new LoggerConfiguration()
 				.MinimumLevel.Debug()
@@ -16,14 +17,18 @@ namespace Roadkill.Api
 				.WriteTo.Console()
 				.CreateLogger();
 
-			var host = new WebHostBuilder()
-				.UseKestrel()
-				.UseContentRoot(Directory.GetCurrentDirectory())
-				.UseStartup<Startup>()
-				.UseSerilog()
-				.Build();
-
+			IWebHostBuilder builder = CreateWebHostBuilder(args);
+			IWebHost host = builder.Build();
 			host.Run();
+		}
+
+		public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+		{
+			var host = WebHost.CreateDefaultBuilder(args)
+				.UseStartup<Startup>()
+				.UseSerilog();
+
+			return host;
 		}
 	}
 }

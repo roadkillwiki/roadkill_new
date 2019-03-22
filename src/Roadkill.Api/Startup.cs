@@ -16,39 +16,29 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Roadkill.Api.Extensions;
 using Roadkill.Api.HealthChecks;
-using Roadkill.Core.Configuration;
 using Roadkill.Core.Extensions;
 using Roadkill.Core.Settings;
 
 [assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace Roadkill.Api
 {
-	public class Startup
+	public class Startup : StartupBase
 	{
-	    private readonly ILoggerFactory _loggerFactory;
-
-		private readonly IConfigurationRoot _configuration;
+		private readonly IConfiguration _configuration;
 
 		private IHostingEnvironment _hostingEnvironment;
 
-		public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
+		private ILogger<Startup> _logger;
+
+		public Startup(IHostingEnvironment env, ILogger<Startup> logger, IConfiguration configuration)
 		{
-			_loggerFactory = loggerFactory;
+			_logger = logger;
 			_hostingEnvironment = env;
-
-			var builder = new ConfigurationBuilder();
-			builder
-				.SetBasePath(Path.Combine(env.ContentRootPath))
-				.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-				.AddEnvironmentVariables();
-
-			_configuration = builder.Build();
+			_configuration = configuration;
 		}
 
-	    public IServiceProvider ConfigureServices(IServiceCollection services)
+		public override void ConfigureServices(IServiceCollection services)
 		{
-			ILogger logger = _loggerFactory.CreateLogger("Startup");
-
 			// Shared
 			services.AddLogging();
 
@@ -56,30 +46,33 @@ namespace Roadkill.Api
 			services.ScanAndRegisterCore();
 			var postgresSettings = services.AddConfigurationOf<PostgresSettings>(_configuration);
 			services.AddConfigurationOf<SmtpSettings>(_configuration);
-			services.AddMartenDocumentStore(postgresSettings.ConnectionString, logger);
+			services.AddMartenDocumentStore(postgresSettings.ConnectionString, _logger);
 
 			// API
 			services.ScanAndRegisterApi();
 			services.AddMailkit();
 			services.AddMarkdown();
-			services.AddJwtDefaults(_configuration, logger);
+			services.AddJwtDefaults(_configuration, _logger);
 			services.AddIdentityDefaults();
 			services.AddMvcAndVersionedSwagger();
 			services.AddHealthChecks()
 				.AddCheck<MartenHealthCheck>("marten");
+		}
 
-			return services.BuildServiceProvider();
+		public void ConfigureTestServices(IServiceCollection services)
+		{
+			// Configure services for Test environment
 		}
 
 	    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment environment)
+		public override void Configure(IApplicationBuilder app)
 		{
 			// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory
 			app.UseSwaggerUi3(settings => { settings.Path = ""; });
 			app.UseSwagger();
 			app.UseAuthentication();
 			app.UseMvc();
-			app.UseJsonExceptionHandler(environment);
+			app.UseJsonExceptionHandler(_hostingEnvironment);
 			app.UseForwardedHeaders();
 			app.UseJsonHealthChecks();
 		}

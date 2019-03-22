@@ -2,17 +2,17 @@
 using System.Linq;
 using AutoFixture;
 using Marten;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Roadkill.Tests.Integration.Repositories
+namespace Roadkill.Tests.Integration.Core.Repositories
 {
 	public class DummyDataMakerTests
 	{
 		private readonly Fixture _fixture;
-		private ITestOutputHelper _outputHelper;
+		private readonly ITestOutputHelper _outputHelper;
 
 		public DummyDataMakerTests(ITestOutputHelper outputHelper)
 		{
@@ -20,16 +20,18 @@ namespace Roadkill.Tests.Integration.Repositories
 			_outputHelper = outputHelper;
 		}
 
-		public PageRepository CreateRepository()
+		private PageRepository CreateRepository()
 		{
 			IDocumentStore documentStore = DocumentStoreManager.GetMartenDocumentStore(null, _outputHelper);
 			return new PageRepository(documentStore);
 		}
 
-		private List<Page> CreateTenPages(PageRepository repository, List<Page> pages = null)
+		private List<Page> CreateTenPages(IPageRepository repository, List<Page> pages = null)
 		{
 			if (pages == null)
+			{
 				pages = _fixture.CreateMany<Page>(10).ToList();
+			}
 
 			var newPages = new List<Page>();
 			foreach (Page page in pages)
@@ -42,8 +44,7 @@ namespace Roadkill.Tests.Integration.Repositories
 			return newPages;
 		}
 
-		//[Fact]
-		public async void TenPagesPlease()
+		private void TenPagesPlease()
 		{
 			PageRepository repository = CreateRepository();
 			CreateTenPages(repository);

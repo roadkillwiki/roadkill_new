@@ -1,4 +1,4 @@
-namespace Roadkill.Core.Configuration
+namespace Roadkill.Core.Settings
 {
 	public class PostgresSettings
 	{

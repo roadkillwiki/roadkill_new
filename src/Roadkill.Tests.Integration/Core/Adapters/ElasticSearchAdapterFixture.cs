@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Threading;
 using AutoFixture;
 using Elasticsearch.Net;
 using Nest;
 using Roadkill.Core.Adapters;
 using Roadkill.Core.Entities;
-using Xunit.Abstractions;
 
-namespace Roadkill.Tests.Integration.Adapters
+namespace Roadkill.Tests.Integration.Core.Adapters
 {
 	[SuppressMessage("ReSharper", "CA1063", Justification = "Dispose rules don't apply in test fixtures")]
 	[SuppressMessage("ReSharper", "CA1816", Justification = "Dispose rules don't apply in test fixtures")]

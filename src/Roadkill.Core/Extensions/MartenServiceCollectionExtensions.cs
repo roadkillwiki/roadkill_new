@@ -8,33 +8,46 @@ namespace Roadkill.Core.Extensions
 {
 	public static class MartenServiceCollectionExtensions
 	{
-		public static IServiceCollection AddMartenDocumentStore(this IServiceCollection services, string connectionString, ILogger logger)
+		public static IServiceCollection AddMartenDocumentStore(this IServiceCollection services, string connectionString, ILogger logger, bool throwOnError = false)
 		{
-			var documentStore = CreateDocumentStore(connectionString, logger);
-
-			if (documentStore != null)
+			try
 			{
-				services.AddSingleton<IDocumentStore>(documentStore);
-			}
+				var documentStore = CreateDocumentStore(connectionString, logger);
 
-			return services;
+				if (documentStore != null)
+				{
+					services.AddSingleton<IDocumentStore>(documentStore);
+				}
+
+				return services;
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw;
+				}
+
+				logger.LogError(ex, "A Postgres/Marten related error occurred. Check your database connection strings are correct (see exception for more information).");
+				return null;
+			}
 		}
 
 		private static DocumentStore CreateDocumentStore(string connectionString, ILogger logger)
 		{
-			try
-			{
 				var documentStore = DocumentStore.For(options =>
 				{
 					options.CreateDatabasesForTenants(c =>
 					{
-						c.MaintenanceDatabase(connectionString);
 						c.ForTenant()
 							.CheckAgainstPgDatabase()
 							.WithOwner("roadkill")
 							.WithEncoding("UTF-8")
 							.ConnectionLimit(-1)
-							.OnDatabaseCreated(_ => { logger.LogInformation("Postgres 'roadkill' database created"); });
+							.OnDatabaseCreated(connection =>
+							{
+								logger.LogInformation($"Postgres database created by Marten.");
+							});
 					});
 
 					options.Connection(connectionString);
@@ -45,12 +58,6 @@ namespace Roadkill.Core.Extensions
 				});
 
 				return documentStore;
-			}
-			catch (Exception exception)
-			{
-				logger.LogError(exception, "A Postgres/Marten related error occurred. Check your database connection strings are correct (see exception for more information).");
-				return null;
-			}
 		}
 	}
 }

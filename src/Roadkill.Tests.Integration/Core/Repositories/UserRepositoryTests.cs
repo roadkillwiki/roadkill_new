@@ -9,7 +9,7 @@ using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Roadkill.Tests.Integration.Repositories
+namespace Roadkill.Tests.Integration.Core.Repositories
 {
 	public class UserRepositoryTests
 	{

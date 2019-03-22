@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using Elasticsearch.Net;
 using Nest;
-using Newtonsoft.Json;
 using Roadkill.Core.Adapters;
-using Roadkill.Core.Models;
+using Roadkill.Core.Entities;
 using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Roadkill.Tests.Integration.Adapters
+namespace Roadkill.Tests.Integration.Core.Adapters
 {
 	public class ElasticSearchAdapterTests : IClassFixture<ElasticSearchAdapterFixture>
 	{
@@ -23,31 +19,34 @@ namespace Roadkill.Tests.Integration.Adapters
 		private readonly ITestOutputHelper _console;
 		private readonly ElasticSearchAdapterFixture _classFixture;
 
-		private ElasticSearchAdapter _elasticSearchAdapter;
-		private List<SearchablePage> _testPages;
+		private readonly ElasticSearchAdapter _elasticSearchAdapter;
+		private readonly List<SearchablePage> _testPages;
 
-		// These tests need ElasticSearch installed locally, you can do this
-		// by running the ElasticSearch Docker image:
-		//
-		// docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.2.4
-		//
-		// ~~~~~~~~~~~~~
-		// More details:
-		//
-		// https://www.docker.elastic.co/
-		// https://www.elastic.co/guide/en/elasticsearch/reference/6.2/docker.html
-		// https://github.com/elastic/elasticsearch-net
-		//
-		// RESTful api examples:
-		// https://github.com/sittinash/elasticsearch-postman
-		// http://{{url}}:{{port}}/pages/_search?pretty=true&q=*:*
-		// http://localhost:9200/pages/_search?pretty=true&q=*:*
-		// GET /_cat/indices?v
+/*
+		These tests need ElasticSearch installed locally, you can do this
+		by running the ElasticSearch Docker image:
+
+		docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		More details:
+
+		https://www.docker.elastic.co/
+		https://www.elastic.co/guide/en/elasticsearch/reference/6.2/docker.html
+		https://github.com/elastic/elasticsearch-net
+
+		RESTful api examples:
+		https://github.com/sittinash/elasticsearch-postman
+		http://{{url}}:{{port}}/pages/_search?pretty=true&q=*:*
+		http://localhost:9200/pages/_search?pretty=true&q=*:*
+		GET /_cat/indices?v
+*/
 
 		public ElasticSearchAdapterTests(ITestOutputHelper console, ElasticSearchAdapterFixture classFixture)
 		{
 			_fixture = new Fixture();
 			_console = console;
+			_classFixture = classFixture;
 
 			var uri = new Uri("http://localhost:9200");
 			var connectionPool = new StaticConnectionPool(new List<Node>() { uri });
@@ -109,12 +108,12 @@ namespace Roadkill.Tests.Integration.Adapters
 			firstResult.Text.ShouldBe(newText);
 		}
 
-		//[Theory]
-		//[InlineData("Id", "id:{0}")]
-		//[InlineData("Title", "title:{0}")]
-		//[InlineData("Text", "text:{0}")]
-		//[InlineData("Tags", "tags:{0}")]
-		//[InlineData("Author", "author:{0}")]
+		[Theory(Skip = "Currently flakey")]
+		[InlineData("Id", "id:{0}")]
+		[InlineData("Title", "title:{0}")]
+		[InlineData("Text", "text:{0}")]
+		[InlineData("Tags", "tags:{0}")]
+		[InlineData("Author", "author:{0}")]
 		public async Task Find(string property, string query)
 		{
 			// given

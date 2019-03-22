@@ -39,7 +39,7 @@ namespace Roadkill.Api.Controllers
             RoadkillUser user = await _userManager.FindByEmailAsync(authenticationModel.Email);
             if (user == null)
             {
-	            return NotFound();
+	            return NotFound($"The user with the email {authenticationModel.Email} could not be found.");
             }
 
             SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);

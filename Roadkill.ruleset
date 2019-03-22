@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="Roadkill Rules" Description="This rule set contains rules for the Roadkill solution." ToolsVersion="15.0">
-  <IncludeAll Action="Warning" />
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
-	<Rule Id="AD0001" Action="None" />
-	<Rule Id="SA1100" Action="None" />
-	<Rule Id="SA1129" Action="None" />
-	<Rule Id="SA1609" Action="None" />
-	<Rule Id="SA1633" Action="None" />
-	<Rule Id="SA1652" Action="None" />
+		<IncludeAll Action="Warning" />
+		<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+			<Rule Id="AD0001" Action="None" />
+			<Rule Id="SA1100" Action="None" />
+			<Rule Id="SA1129" Action="None" />
+			<Rule Id="SA1609" Action="None" />
+			<Rule Id="SA1633" Action="None" />
+			<Rule Id="SA1652" Action="None" />
 
-	<Rule Id="SA1027" Action="None" /> <!-- Tabs must not be used -->
-	<Rule Id="SA1649" Action="None" /> <!-- Filename must match first type name -->
-	<Rule Id="CA2007" Action="None" /> <!-- Must use ConfigureAwait -->
-	<Rule Id="CA1040" Action="None" /> <!-- Avoid empty interfaces -->
-	<Rule Id="CA1707" Action="None" /> <!-- Remove the underscores from member name -->
-	<Rule Id="SA1122" Action="None" /> <!-- Use String.Empty -->
-	<Rule Id="SA1300" Action="None" /> <!-- Element must begin with underscores -->
-	<Rule Id="SA1309" Action="None" /> <!-- Fieldnames must begin with underscores -->
-	<Rule Id="SA1101" Action="None" /> <!-- Pepper your code with "this" -->
-	<Rule Id="SA1119" Action="None" /> <!-- Statement must not use unnecessary parenthesis (e.g. tertiary) -->
-	<Rule Id="CA1052" Action="None" /> <!-- Make the class static, however it can't because of DI -->
-	<Rule Id="CA1724" Action="None" /> <!-- Types names should match namespace -->
-	<Rule Id="CA1822" Action="None" /> <!-- Mark members as static -->
-	<Rule Id="SA1118" Action="None" /> <!-- ParameterMustNotSpanMultipleLines -->
-  </Rules>
+			<Rule Id="SA1027" Action="None" /> <!-- Tabs must not be used -->
+			<Rule Id="SA1649" Action="None" /> <!-- Filename must match first type name -->
+			<Rule Id="CA2007" Action="None" /> <!-- Must use ConfigureAwait -->
+			<Rule Id="CA1040" Action="None" /> <!-- Avoid empty interfaces -->
+			<Rule Id="CA1707" Action="None" /> <!-- Remove the underscores from member name -->
+			<Rule Id="SA1122" Action="None" /> <!-- Use String.Empty -->
+			<Rule Id="SA1300" Action="None" /> <!-- Element must begin with underscores -->
+			<Rule Id="SA1309" Action="None" /> <!-- Fieldnames must begin with underscores -->
+			<Rule Id="SA1101" Action="None" /> <!-- Pepper your code with "this" -->
+			<Rule Id="SA1119" Action="None" /> <!-- Statement must not use unnecessary parenthesis (e.g. tertiary) -->
+			<Rule Id="CA1052" Action="None" /> <!-- Make the class static, however it can't because of DI -->
+			<Rule Id="CA1724" Action="None" /> <!-- Types names should match namespace -->
+			<Rule Id="CA1822" Action="None" /> <!-- Mark members as static -->
+			<Rule Id="SA1118" Action="None" /> <!-- ParameterMustNotSpanMultipleLines -->
+			<Rule Id="CA1063" Action="None" /> <!-- IDisposable advice -->
+			<Rule Id="CA1816" Action="None" /> <!-- IDisposable advice -->
+			<Rule Id="CA2234" Action="None" /> <!-- Use a Uri not string -->
+			<Rule Id="CA1305" Action="None" /> <!-- Use a culture with String.format -->
+			<Rule Id="CA1801" Action="None" /> <!-- Parameter is never used (even if DI might use it) -->
+  	</Rules>
 </RuleSet>
