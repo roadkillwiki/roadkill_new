@@ -55,6 +55,7 @@ namespace Roadkill.Core.Extensions
 					options.Schema.For<Page>().Identity(x => x.Id);
 					options.Schema.For<Page>().Index(x => x.Id);
 					options.Schema.For<PageVersion>().Index(x => x.Id);
+					options.Schema.For<SearchablePage>().FullTextIndex();
 				});
 
 				return documentStore;

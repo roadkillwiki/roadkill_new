@@ -5,13 +5,11 @@ using System.Linq;
 using AutoFixture;
 using Elasticsearch.Net;
 using Nest;
-using Roadkill.Core.Adapters;
 using Roadkill.Core.Entities;
+using Roadkill.Core.Search.Adapters;
 
 namespace Roadkill.Tests.Integration.Core.Adapters
 {
-	[SuppressMessage("ReSharper", "CA1063", Justification = "Dispose rules don't apply in test fixtures")]
-	[SuppressMessage("ReSharper", "CA1816", Justification = "Dispose rules don't apply in test fixtures")]
 	public class ElasticSearchAdapterFixture : IDisposable
 	{
 		public ElasticSearchAdapterFixture()
@@ -20,7 +18,7 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			var connectionPool = new SingleNodeConnectionPool(uri);
 			var connectionSettings = new ConnectionSettings(connectionPool);
 			ElasticClient = new ElasticClient(connectionSettings);
-			ElasticSearchAdapter = new ElasticSearchAdapter(ElasticClient);
+			SearchAdapter = new ElasticSearchAdapter(ElasticClient);
 
 			AddDummyData();
 		}
@@ -29,7 +27,7 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 
 		public ElasticClient ElasticClient { get; set; }
 
-		public ElasticSearchAdapter ElasticSearchAdapter { get; set; }
+		public ElasticSearchAdapter SearchAdapter { get; set; }
 
 		public void Dispose()
 		{
@@ -44,8 +42,8 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			TestPages = fixture.CreateMany<SearchablePage>(10).ToList();
 			foreach (SearchablePage page in TestPages)
 			{
-				page.Id = ++id;
-				ElasticSearchAdapter.Add(page).ConfigureAwait(false).GetAwaiter().GetResult();
+				page.PageId = ++id;
+				SearchAdapter.Add(page).ConfigureAwait(false).GetAwaiter().GetResult();
 			}
 		}
 	}

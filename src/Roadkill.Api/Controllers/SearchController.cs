@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Common.Models;
 using Roadkill.Api.Common.Services;
-using Roadkill.Core.Adapters;
+using Roadkill.Core.Search.Adapters;
 
 namespace Roadkill.Api.Controllers
 {
@@ -13,9 +13,9 @@ namespace Roadkill.Api.Controllers
 	[Route("[controller]")]
 	public class SearchController : Controller, ISearchService
 	{
-		private readonly IElasticSearchAdapter _searchAdapter;
+		private readonly ISearchAdapter _searchAdapter;
 
-		public SearchController(IElasticSearchAdapter searchAdapter)
+		public SearchController(ISearchAdapter searchAdapter)
 		{
 			_searchAdapter = searchAdapter;
 		}

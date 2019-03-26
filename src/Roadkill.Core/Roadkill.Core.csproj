@@ -10,6 +10,11 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
     <PackageReference Include="NEST" Version="6.4.0" />
     <PackageReference Include="Scrutor" Version="3.0.2" />
+    <PackageReference Include="Sprache" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Search" />
   </ItemGroup>
 
 </Project>

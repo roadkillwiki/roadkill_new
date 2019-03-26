@@ -5,24 +5,15 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Elasticsearch.Net;
 using Nest;
-using Roadkill.Core.Adapters;
 using Roadkill.Core.Entities;
+using Roadkill.Core.Search.Adapters;
 using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Roadkill.Tests.Integration.Core.Adapters
 {
-	public class ElasticSearchAdapterTests : IClassFixture<ElasticSearchAdapterFixture>
-	{
-		private readonly Fixture _fixture;
-		private readonly ITestOutputHelper _console;
-		private readonly ElasticSearchAdapterFixture _classFixture;
-
-		private readonly ElasticSearchAdapter _elasticSearchAdapter;
-		private readonly List<SearchablePage> _testPages;
-
-/*
+	/*
 		These tests need ElasticSearch installed locally, you can do this
 		by running the ElasticSearch Docker image:
 
@@ -41,6 +32,14 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 		http://localhost:9200/pages/_search?pretty=true&q=*:*
 		GET /_cat/indices?v
 */
+	public class ElasticSearchAdapterTests : IClassFixture<ElasticSearchAdapterFixture>
+	{
+		private readonly Fixture _fixture;
+		private readonly ITestOutputHelper _console;
+		private readonly ElasticSearchAdapterFixture _classFixture;
+
+		private readonly ElasticSearchAdapter _searchAdapter;
+		private readonly List<SearchablePage> _testPages;
 
 		public ElasticSearchAdapterTests(ITestOutputHelper console, ElasticSearchAdapterFixture classFixture)
 		{
@@ -52,34 +51,34 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			var connectionPool = new StaticConnectionPool(new List<Node>() { uri });
 			var connectionSettings = new ConnectionSettings(connectionPool);
 			var elasticClient = new ElasticClient(connectionSettings);
-			_elasticSearchAdapter = new ElasticSearchAdapter(elasticClient);
+			_searchAdapter = new ElasticSearchAdapter(elasticClient);
 			_testPages = classFixture.TestPages;
 		}
 
-		[Fact]
+		[Fact(Skip = "ES isn't supported yet")]
 		public async Task Add()
 		{
 			// given
 			string title = _fixture.Create<string>();
 			int id = (int)DateTime.Now.Ticks;
-			var page = new SearchablePage() { Id = id, Title = title };
+			var page = new SearchablePage() { PageId = id, Title = title };
 
 			// when
-			bool success = await _elasticSearchAdapter.Add(page);
+			bool success = await _searchAdapter.Add(page);
 
 			// then
 			success.ShouldBeTrue();
 
 			long count = _classFixture.ElasticClient.Count<SearchablePage>().Count;
 			count.ShouldBe(11);
-			var results = await _elasticSearchAdapter.Find($"{title}");
+			var results = await _searchAdapter.Find($"{title}");
 			var firstResult = results.FirstOrDefault();
 			firstResult.ShouldNotBeNull();
 			firstResult.Title.ShouldBe(title);
 			firstResult.Id.ShouldBe(page.Id);
 		}
 
-		[Fact]
+		[Fact(Skip = "ES isn't supported yet")]
 		public async Task Update()
 		{
 			// given
@@ -94,12 +93,12 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			existingPage.Text = newText;
 
 			// when
-			bool success = await _elasticSearchAdapter.Update(existingPage);
+			bool success = await _searchAdapter.Update(existingPage);
 
 			// then
 			success.ShouldBeTrue();
 
-			var results = await _elasticSearchAdapter.Find($"{newTitle}");
+			var results = await _searchAdapter.Find($"{newTitle}");
 
 			var firstResult = results.FirstOrDefault();
 			firstResult.ShouldNotBeNull();
@@ -125,7 +124,7 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			query = string.Format(query, propertyValue);
 
 			// when
-			IEnumerable<SearchablePage> results = await _elasticSearchAdapter.Find(query);
+			IEnumerable<SearchablePage> results = await _searchAdapter.Find(query);
 
 			// then
 			var firstResult = results.FirstOrDefault();

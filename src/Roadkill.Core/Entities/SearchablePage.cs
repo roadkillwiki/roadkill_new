@@ -4,7 +4,9 @@ namespace Roadkill.Core.Entities
 {
 	public class SearchablePage
 	{
-		public int Id { get; set; }
+		public Guid Id { get; set; }
+
+		public int PageId { get; set; }
 
 		public string Title { get; set; }
 

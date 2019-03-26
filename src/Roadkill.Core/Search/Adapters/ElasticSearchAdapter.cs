@@ -1,23 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nest;
 using Roadkill.Core.Entities;
 
-namespace Roadkill.Core.Adapters
+namespace Roadkill.Core.Search.Adapters
 {
-	public interface IElasticSearchAdapter
-	{
-		Task<bool> Add(SearchablePage page);
-
-		Task<bool> Update(SearchablePage page);
-
-		Task RecreateIndex();
-
-		Task<IEnumerable<SearchablePage>> Find(string query);
-	}
-
-	public class ElasticSearchAdapter : IElasticSearchAdapter
+	public class ElasticSearchAdapter : ISearchAdapter
 	{
 		public const string PagesIndexName = "pages";
 		private readonly IElasticClient _elasticClient;

@@ -122,7 +122,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actionResult.ShouldNotBeNull();
-			actionResult.Result.ShouldBeOfType<NotFoundResult>();
+			actionResult.Result.ShouldBeOfType<NotFoundObjectResult>();
 		}
 
 		[Fact]
