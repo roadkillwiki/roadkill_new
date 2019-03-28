@@ -27,7 +27,7 @@ namespace Roadkill.Tests.Unit.Core.Search.Parsers
 		public void should_parse_multiple_fields()
 		{
 			// given
-			string text = "author:donald date:now tags:make,brexit,great,again";
+			string text = "author:donald date:now title:headache some text";
 			SearchQueryParser searchQueryParser = CreateParser();
 
 			// when
@@ -35,15 +35,35 @@ namespace Roadkill.Tests.Unit.Core.Search.Parsers
 
 			// then
 			queryResult.OriginalText.ShouldBe(text);
-			queryResult.TextWithoutFields.ShouldBe("");
+			queryResult.TextWithoutFields.ShouldBe("some text");
 			queryResult.Fields.Count().ShouldBe(3);
+
+			var tagsField = queryResult.Fields.First(x => x.Name == "title");
+			tagsField.ShouldNotBeNull();
+			tagsField.Value.ShouldBe("headache");
+		}
+
+		[Fact]
+		public void should_parse_fields_with_quotes()
+		{
+			// given
+			string text = "some text tags:\"make,brexit,great,again\"";
+			SearchQueryParser searchQueryParser = CreateParser();
+
+			// when
+			ParsedQueryResult queryResult = searchQueryParser.ParseQuery(text);
+
+			// then
+			queryResult.OriginalText.ShouldBe(text);
+			queryResult.TextWithoutFields.ShouldBe("some text");
+			queryResult.Fields.Count().ShouldBe(1);
 
 			var tagsField = queryResult.Fields.First(x => x.Name == "tags");
 			tagsField.ShouldNotBeNull();
-			tagsField.Value.ShouldBe("make,brexit,great,again");
+			tagsField.Value.ShouldBe("\"make,brexit,great,again\"");
 		}
 
-		[Fact(Skip = "TODO")]
+		[Fact]
 		public void should_parse_free_text_and_fields()
 		{
 			// given

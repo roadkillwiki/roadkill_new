@@ -18,11 +18,11 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 
 			// Use a different schema for each test class, so their data is isolated
 			if (testClassType != null)
-            {
-                documentStoreSchemaName = testClassType.Name;
-            }
+			{
+				documentStoreSchemaName = testClassType.Name;
+			}
 
-            if (_documentStores.ContainsKey(documentStoreSchemaName))
+			if (_documentStores.ContainsKey(documentStoreSchemaName))
 			{
 				outputHelper.WriteLine("DocumentStoreManager: found doc store in cache {0}", documentStoreSchemaName);
 				return _documentStores[documentStoreSchemaName];
@@ -30,7 +30,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 
 			IDocumentStore docStore = CreateDocumentStore(ConnectionString, documentStoreSchemaName, outputHelper);
 			_documentStores.AddOrUpdate(documentStoreSchemaName, docStore, (s, store) => store);
-		    outputHelper.WriteLine($"DocumentStoreManager: created doc store {documentStoreSchemaName} using {ConnectionString}");
+			outputHelper.WriteLine($"DocumentStoreManager: created doc store {documentStoreSchemaName} using {ConnectionString}");
 
 			return _documentStores[documentStoreSchemaName];
 		}

@@ -62,7 +62,7 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			success.ShouldBeTrue();
 		}
 
-		[Fact(Skip="TODO")]
+		[Fact(Skip = "TODO")]
 		public async Task Update()
 		{
 			// given

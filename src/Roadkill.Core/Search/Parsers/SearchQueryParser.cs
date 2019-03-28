@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Sprache;
 
 namespace Roadkill.Core.Search.Parsers
@@ -11,40 +12,10 @@ namespace Roadkill.Core.Search.Parsers
 
 	public class SearchQueryParser : ISearchQueryParser
 	{
-		private readonly Parser<IEnumerable<FieldDefinition>> _fieldOnlyParser;
-		private readonly Parser<IEnumerable<FieldDefinition>> _combinedParser;
-
-		public SearchQueryParser()
-		{
-			// https://github.com/yetanotherchris/spruce/blob/master/Spruce.Core/Search/Grammar/spruce.grm
-			// TODO: find out how to combine these two parsers.
-			// Remembering that it's recursive, so "whitespace" will be used
-			// after name, colon, value when it recurses
-			_fieldOnlyParser =
-			(
-				from whitespace in Parse.WhiteSpace.Many()
-				from name in Parse.CharExcept(new char[] { ':', ' ' }).Many().Text()
-				from colon in Parse.Char(':')
-				from value in Parse.CharExcept(' ').Many().Text()
-				select new FieldDefinition()
-				{
-					Name = name,
-					Value = value
-				}).Many().Token();
-
-			_combinedParser =
-			(
-				from anytext in Parse.CharExcept(' ').Many()
-				from whitespace in Parse.Char(' ').AtLeastOnce()
-				from name in Parse.CharExcept(new char[] { ':', ' ' }).Many().Text()
-				from colon in Parse.Char(':')
-				from value in Parse.CharExcept(' ').Many().Text()
-				select new FieldDefinition()
-				{
-					Name = name,
-					Value = value
-				}).Many().Token();
-		}
+		// Gold and ANTLR parsers to integrate in future:
+		// https://github.com/yetanotherchris/spruce/blob/master/Spruce.Core/Search/Grammar/spruce.grm
+		// https://github.com/lucastorri/query-parser/blob/master/antlr4/Query.g4
+		private static readonly Regex _parserRegex = new Regex(@"(?<name>\w+?):(?<value>""[^""]+""|[\w]+)", RegexOptions.Compiled);
 
 		public ParsedQueryResult ParseQuery(string queryText)
 		{
@@ -55,27 +26,33 @@ namespace Roadkill.Core.Search.Parsers
 				Fields = Enumerable.Empty<FieldDefinition>()
 			};
 
-			IResult<IEnumerable<FieldDefinition>> results = _fieldOnlyParser.TryParse(queryText);
-
-			if (!results.WasSuccessful || !results.Value.Any())
+			if (_parserRegex.IsMatch(queryText))
 			{
-				results = _combinedParser.TryParse(queryText);
-			}
+				MatchCollection matches = _parserRegex.Matches(queryText);
 
-			if (results.WasSuccessful)
-			{
-				if (results.Value.Any())
+				var definitions = new List<FieldDefinition>();
+				foreach (Match match in matches)
 				{
-					searchQuery.Fields = results.Value;
-
-					foreach (FieldDefinition definition in results.Value)
+					definitions.Add(new FieldDefinition()
 					{
-						string pair = $"{definition.Name}:{definition.Value}";
-						searchQuery.TextWithoutFields = searchQuery.TextWithoutFields.Replace(pair, "");
-					}
-
-					searchQuery.TextWithoutFields = searchQuery.TextWithoutFields.Trim();
+						Name = match.Groups["name"]?.Value,
+						Value = match.Groups["value"]?.Value,
+					});
 				}
+
+				searchQuery.Fields = definitions;
+
+				foreach (var definition in definitions)
+				{
+					string pair = $"{definition.Name}:{definition.Value}";
+
+					// Remove the field/value definition and surrounding spaces
+					searchQuery.TextWithoutFields = Regex.Replace(searchQuery.TextWithoutFields, $@"(\s{{2,}})*{pair}(\s{{2,}})*", "");
+				}
+
+				// Remove excess spacing, including multiple spaces into a single space
+				searchQuery.TextWithoutFields = Regex.Replace(searchQuery.TextWithoutFields, @"\s{2,}", " ");
+				searchQuery.TextWithoutFields = searchQuery.TextWithoutFields.Trim();
 			}
 
 			return searchQuery;
