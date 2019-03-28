@@ -29,7 +29,7 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 		public PostgresSearchAdapterTests(ITestOutputHelper outputHelper)
 		{
 			_fixture = new Fixture();
-			_testPages = new List<SearchablePage>();
+			_testPages = _fixture.CreateMany<SearchablePage>().ToList();
 			_outputHelper = outputHelper;
 
 			string connectionString =
@@ -45,6 +45,12 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			_documentStore.Advanced.Clean.DeleteAllDocuments();
 
 			_searchAdapter = new PostgresSearchAdapter(_documentStore);
+
+			_testPages = _fixture.CreateMany<SearchablePage>().ToList();
+			foreach (SearchablePage page in _testPages)
+			{
+				_searchAdapter.Add(page).GetAwaiter().GetResult();
+			}
 		}
 
 		[Fact]
@@ -62,7 +68,7 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			success.ShouldBeTrue();
 		}
 
-		[Fact(Skip = "TODO")]
+		[Fact]
 		public async Task Update()
 		{
 			// given
@@ -82,7 +88,7 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			// then
 			success.ShouldBeTrue();
 
-			var results = await _searchAdapter.Find($"{newTitle}");
+			var results = await _searchAdapter.Find($"title:\"{newTitle}\"");
 
 			var firstResult = results.FirstOrDefault();
 			firstResult.ShouldNotBeNull();
@@ -91,12 +97,12 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 			firstResult.Text.ShouldBe(newText);
 		}
 
-		[Theory(Skip = "TODO: parser")]
-		[InlineData("Id", "id:{0}")]
-		[InlineData("Title", "title:{0}")]
-		[InlineData("Text", "text:{0}")]
-		[InlineData("Tags", "tags:{0}")]
-		[InlineData("Author", "author:{0}")]
+		[Theory]
+		[InlineData("PageId", "id:{0}")]
+		[InlineData("Title", "title:\"{0}\"")]
+		[InlineData("Text", "text:\"{0}\"")]
+		[InlineData("Tags", "tags:\"{0}\"")]
+		[InlineData("Author", "author:\"{0}\"")]
 		public async Task Find(string property, string query)
 		{
 			// given
@@ -106,6 +112,27 @@ namespace Roadkill.Tests.Integration.Core.Adapters
 									.GetProperty(property)
 									.GetValue(page, null);
 			query = string.Format(query, propertyValue);
+
+			// when
+			IEnumerable<SearchablePage> results = await _searchAdapter.Find(query);
+
+			// then
+			var firstResult = results.FirstOrDefault();
+			firstResult.ShouldNotBeNull();
+			firstResult.Id.ShouldBe(page.Id);
+			firstResult.Text.ShouldBe(page.Text);
+			firstResult.Title.ShouldBe(page.Title);
+			firstResult.Tags.ShouldBe(page.Tags);
+			firstResult.Author.ShouldBe(page.Author);
+			firstResult.DateTime.ShouldBe(page.DateTime);
+		}
+
+		[Fact]
+		public async Task Find_text()
+		{
+			// given
+			var page = _testPages.First();
+			string query = page.Text;
 
 			// when
 			IEnumerable<SearchablePage> results = await _searchAdapter.Find(query);

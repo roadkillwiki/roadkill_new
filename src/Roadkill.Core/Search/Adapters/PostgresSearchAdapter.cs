@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Marten;
 using Roadkill.Core.Entities;
+using Roadkill.Core.Search.Parsers;
 
 namespace Roadkill.Core.Search.Adapters
 {
@@ -62,11 +63,43 @@ namespace Roadkill.Core.Search.Adapters
 
 		public async Task<IEnumerable<SearchablePage>> Find(string query)
 		{
+			var p = new SearchQueryParser();
+			ParsedQueryResult queryResult = p.ParseQuery(query);
+
 			using (var session = _documentStore.QuerySession())
 			{
-				return await session.Query<SearchablePage>()
-					.Where(x => x.Text.Contains(query))
-					.ToListAsync();
+				var martenQuery = session.Query<SearchablePage>().Where(x => true);
+
+				if (!string.IsNullOrEmpty(queryResult.TextWithoutFields))
+				{
+					martenQuery = martenQuery.Where(x => x.PlainTextSearch(queryResult.TextWithoutFields));
+				}
+
+				string title = queryResult.GetFieldValue("title");
+				if (!string.IsNullOrEmpty(title))
+				{
+					martenQuery = martenQuery.Where(x => x.Title.PlainTextSearch(title));
+				}
+
+				string tags = queryResult.GetFieldValue("tags");
+				if (!string.IsNullOrEmpty(tags))
+				{
+					martenQuery = martenQuery.Where(x => x.PlainTextSearch(tags));
+				}
+
+				string pageId = queryResult.GetFieldValue("pageId");
+				if (!string.IsNullOrEmpty(pageId))
+				{
+					martenQuery = martenQuery.Where(x => x.PageId.PlainTextSearch(pageId));
+				}
+
+				string author = queryResult.GetFieldValue("author");
+				if (!string.IsNullOrEmpty(pageId))
+				{
+					martenQuery = martenQuery.Where(x => x.Author.PlainTextSearch(author));
+				}
+
+				return await martenQuery.ToListAsync();
 			}
 		}
 	}
