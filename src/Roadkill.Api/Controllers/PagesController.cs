@@ -12,11 +12,13 @@ using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
-    [Authorize]
-    [Route("[controller]")]
+	[Authorize]
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
     public class PagesController : ControllerBase
     {
-	    // [ApiController] // this adds [FromBody] by default and model validation
+	    // [ApiController] adds [FromBody] by default and model validation
         private readonly IPageRepository _pageRepository;
 
         private readonly IPageModelConverter _pageModelConverter;
@@ -27,9 +29,22 @@ namespace Roadkill.Api.Controllers
             _pageModelConverter = pageModelConverter;
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("{id}")]
+        public async Task<ActionResult<PageModel>> Get(int id)
+        {
+	        Page page = await _pageRepository.GetPageById(id);
+	        if (page == null)
+	        {
+		        return NotFound();
+	        }
+
+	        return _pageModelConverter.ConvertToViewModel(page);
+        }
+
         [HttpPost]
         [Authorize(Policy = PolicyNames.Editor)]
-        [Route(nameof(Add))]
         public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
         {
             // TODO: fill createdon property
@@ -40,7 +55,9 @@ namespace Roadkill.Api.Controllers
 	        }
 
             Page newPage = await _pageRepository.AddNewPage(page);
-            return _pageModelConverter.ConvertToViewModel(newPage);
+            PageModel newModel = _pageModelConverter.ConvertToViewModel(newPage);
+
+            return CreatedAtAction(nameof(Add), nameof(PagesController), newModel);
         }
 
         [HttpPut]
@@ -62,19 +79,6 @@ namespace Roadkill.Api.Controllers
         public async Task Delete(int pageId)
         {
             await _pageRepository.DeletePage(pageId);
-        }
-
-        [HttpGet]
-		[AllowAnonymous]
-        public async Task<ActionResult<PageModel>> Get(int id)
-        {
-            Page page = await _pageRepository.GetPageById(id);
-	        if (page == null)
-	        {
-		        return NotFound();
-	        }
-
-            return _pageModelConverter.ConvertToViewModel(page);
         }
 
         [HttpGet]

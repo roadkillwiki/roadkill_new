@@ -73,9 +73,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			ActionResult<PageModel> actionResult = await _pagesController.Add(inputPageViewModel);
 
 			// then
-		    actionResult.Value.ShouldNotBeNull("ActionResult's ViewModel was null");
-			actionResult.Value.Id.ShouldBe(autoIncrementedId);
-			actionResult.Value.Title.ShouldBe(inputPageViewModel.Title);
+			actionResult.ShouldBeCreatedAtActionResult();
+			PageModel pageModel = actionResult.CreatedAtActionResultValue();
+			pageModel.ShouldNotBeNull("ActionResult's ViewModel was null");
+			pageModel.Id.ShouldBe(autoIncrementedId);
+			pageModel.Title.ShouldBe(inputPageViewModel.Title);
 
 			_pageRepositoryMock
 				.Verify(x => x.AddNewPage(It.Is<Page>(p => p.Id == inputPageViewModel.Id)), Times.Once);

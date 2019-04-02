@@ -23,22 +23,22 @@ namespace Roadkill.Tests.Unit.Api
 			return (T)okResult.Value;
 		}
 
-		public static void ShouldBeCreatedAtRouteResult<T>(this ActionResult<T> actionResult)
+		public static void ShouldBeCreatedAtActionResult<T>(this ActionResult<T> actionResult)
 		{
-			var createdAtRouteResult = actionResult.Result as CreatedAtRouteResult;
-			createdAtRouteResult.ShouldNotBeNull($"No CreatedAtRouteResult returned for {typeof(T).Name}");
+			var createdAtRouteResult = actionResult.Result as CreatedAtActionResult;
+			createdAtRouteResult.ShouldNotBeNull($"No CreatedAtActionResult returned for {typeof(T).Name}");
 		}
 
-		public static T CreatedAtRouteResultValue<T>(this ActionResult<T> actionResult)
+		public static T CreatedAtActionResultValue<T>(this ActionResult<T> actionResult)
 		{
-			var createdAtRouteResult = (CreatedAtRouteResult)actionResult.Result;
+			var createdAtActionResult = (CreatedAtActionResult)actionResult.Result;
 
-			if (createdAtRouteResult.Value is Task<T> taskValue)
+			if (createdAtActionResult.Value is Task<T> taskValue)
 			{
 				return (T)taskValue.GetAwaiter().GetResult();
 			}
 
-			return (T)createdAtRouteResult.Value;
+			return (T)createdAtActionResult.Value;
 		}
 
 		public static void ShouldBeNotFoundObjectResult<T>(this ActionResult<T> actionResult)

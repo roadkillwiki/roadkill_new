@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Roadkill.Api;
 using Roadkill.Api.JWT;
 using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities;
 using Xunit.Abstractions;
 
 namespace Roadkill.Tests.Integration.Api.Controllers
@@ -31,6 +32,8 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			{ "Jwt:Password", "12345678901234567890" },
 			{ "Jwt:ExpiresDays", "7" }
 		};
+
+		public ILogger<IDocumentStore> Logger { get; set; }
 
 		/// <summary>
 		/// Gets or sets the ITestOutputHelper which enables logging to the XUnit console
@@ -51,8 +54,20 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			var server = base.CreateServer(builder);
 			var provider = server.Host.Services;
 
+			Logger = provider.GetService<ILogger<IDocumentStore>>();
+
 			// Clean the postgres database
 			var documentStore = provider.GetService<IDocumentStore>();
+
+			using (var session = documentStore.LightweightSession())
+			{
+				int count = session.Query<RoadkillUser>().Count();
+				Logger.LogInformation($"Found {count} RoadkillUsers");
+
+				count = session.Query<Page>().Count();
+				Logger.LogInformation($"Found {count} Pages");
+			}
+
 			documentStore.Advanced.Clean.DeleteAllDocuments();
 
 			// Create two users
@@ -72,8 +87,8 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			var builder = new WebHostBuilder()
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
-				.UseConfiguration(config)
 				.ConfigureLogging(loggingBuilder => loggingBuilder.AddXUnit(TestOutputHelper))
+				.UseConfiguration(config)
 				.UseStartup<Startup>();
 
 			return builder;

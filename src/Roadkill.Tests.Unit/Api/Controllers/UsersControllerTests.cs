@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.JWT;
+using Roadkill.Api.RequestModels;
 using Roadkill.Core.Authorization;
 using Shouldly;
 using Xunit;
@@ -136,12 +137,18 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 						     u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
+			var requestModel = new UserRequestModel()
+			{
+				Email = email,
+				Password = password
+			};
+
 			// when
-			var actionResult = await _usersController.CreateAdmin(email, password);
+			var actionResult = await _usersController.CreateAdmin(requestModel);
 
 			// then
-			actionResult.ShouldBeCreatedAtRouteResult();
-			string actualEmailAddress = actionResult.CreatedAtRouteResultValue();
+			actionResult.ShouldBeCreatedAtActionResult();
+			string actualEmailAddress = actionResult.CreatedAtActionResultValue();
 			actualEmailAddress.ShouldBe(email);
 
 			await _userManagerMock
@@ -170,12 +177,18 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 						     u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
+			var requestModel = new UserRequestModel()
+			{
+				Email = email,
+				Password = password
+			};
+
 			// when
-			var actionResult = await _usersController.CreateEditor(email, password);
+			var actionResult = await _usersController.CreateEditor(requestModel);
 
 			// then
-			actionResult.ShouldBeCreatedAtRouteResult();
-			string actualEmailAddress = actionResult.CreatedAtRouteResultValue();
+			actionResult.ShouldBeCreatedAtActionResult();
+			string actualEmailAddress = actionResult.CreatedAtActionResultValue();
 			actualEmailAddress.ShouldBe(email);
 
 			await _userManagerMock
@@ -201,8 +214,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.FindByEmailAsync(email)
 				.Returns(new RoadkillUser() { Email = email });
 
+			var requestModel = new UserRequestModel()
+			{
+				Email = email,
+				Password = password
+			};
+
 			// when
-			var actionResult = await _usersController.CreateAdmin(email, password);
+			var actionResult = await _usersController.CreateAdmin(requestModel);
 
 			// then
 			actionResult.ShouldBeBadRequestObjectResult();
@@ -221,8 +240,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.FindByEmailAsync(email)
 				.Returns(new RoadkillUser() { Email = email });
 
+			var requestModel = new UserRequestModel()
+			{
+				Email = email,
+				Password = password
+			};
+
 			// when
-			var actionResult = await _usersController.CreateEditor(email, password);
+			var actionResult = await _usersController.CreateEditor(requestModel);
 
 			// then
 			actionResult.ShouldBeBadRequestObjectResult();
