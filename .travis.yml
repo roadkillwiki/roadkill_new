@@ -23,8 +23,8 @@ before_script:
 script:
    - dotnet restore
    - dotnet build -c Release
-   - pushd src/Roadkill.Tests.Unit -c Release
+   - pushd src/Roadkill.Tests.Unit
    - dotnet test -c Release
    - popd
-   - pushd src/Roadkill.Tests.Integration -c Release
-   - dotnet test
+   - pushd src/Roadkill.Tests.Integration
+   - dotnet test -c Release
