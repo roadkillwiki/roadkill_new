@@ -60,7 +60,7 @@ namespace Roadkill.Tests.Unit.Api.JWT
 				.Received()
 				.CreateToken(Arg.Is<SecurityTokenDescriptor>(
 					x => x.Subject.Claims.Any(y => y.Type == roleClaim.Type && y.Value == roleClaim.Value) &&
-					     x.Subject.Claims.Any(y => y.Type == ClaimTypes.Name && y.Value == email)));
+						 x.Subject.Claims.Any(y => y.Type == ClaimTypes.Name && y.Value == email)));
 		}
 
 		[Fact]

@@ -51,11 +51,11 @@ namespace Roadkill.Text.TextMiddleware
 		public TextMiddlewareBuilder Use(Middleware middleware)
 		{
 			if (middleware == null)
-            {
-                throw new ArgumentNullException(nameof(middleware));
-            }
+			{
+				throw new ArgumentNullException(nameof(middleware));
+			}
 
-            MiddlewareItems.Add(middleware);
+			MiddlewareItems.Add(middleware);
 			return this;
 		}
 

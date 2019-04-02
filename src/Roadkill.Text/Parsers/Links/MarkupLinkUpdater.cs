@@ -24,11 +24,11 @@ namespace Roadkill.Text.Parsers.Links
 		public bool ContainsPageLink(string text, string pageName)
 		{
 			if (string.IsNullOrEmpty(text))
-            {
-                return false;
-            }
+			{
+				return false;
+			}
 
-            pageName = AddDashesForMarkdownTitle(pageName);
+			pageName = AddDashesForMarkdownTitle(pageName);
 			string customRegex = GetRegexForTitle(pageName);
 
 			Regex regex = new Regex(customRegex, RegexOptions.IgnoreCase);
@@ -72,10 +72,10 @@ namespace Roadkill.Text.Parsers.Links
 			if (match.Success && match.Groups.Count == 3)
 			{
 				if (!string.IsNullOrEmpty(match.Groups["url"].Value))
-                {
-                    return match.Value.Replace(match.Groups["url"].Value, newPageName);
-                }
-            }
+				{
+					return match.Value.Replace(match.Groups["url"].Value, newPageName);
+				}
+			}
 
 			return match.Value;
 		}
@@ -98,14 +98,14 @@ namespace Roadkill.Text.Parsers.Links
 			if (_parser is object)
 			{
 				if (escape)
-                {
-                    title = title.Replace(" ", @"\-");
-                }
-                else
-                {
-                    title = title.Replace(" ", "-");
-                }
-            }
+				{
+					title = title.Replace(" ", @"\-");
+				}
+				else
+				{
+					title = title.Replace(" ", "-");
+				}
+			}
 
 			return title;
 		}

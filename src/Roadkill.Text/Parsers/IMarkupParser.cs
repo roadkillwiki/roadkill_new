@@ -10,15 +10,15 @@ namespace Roadkill.Text.Parsers
 	/// </summary>
 	public interface IMarkupParser
 	{
-        /// <summary>
-        /// Gets or sets a callback that's called when an image tag is parsed.
-        /// </summary>
-	    Func<HtmlImageTag, HtmlImageTag> ImageParsed { get; set; }
+		/// <summary>
+		/// Gets or sets a callback that's called when an image tag is parsed.
+		/// </summary>
+		Func<HtmlImageTag, HtmlImageTag> ImageParsed { get; set; }
 
-        /// <summary>
-        /// Gets or sets a callback when a link tag is parsed.
-        /// </summary>
-        Func<HtmlLinkTag, HtmlLinkTag> LinkParsed { get; set; }
+		/// <summary>
+		/// Gets or sets a callback when a link tag is parsed.
+		/// </summary>
+		Func<HtmlLinkTag, HtmlLinkTag> LinkParsed { get; set; }
 
 		/// <summary>
 		/// Transforms the provided specific markup text to HTML

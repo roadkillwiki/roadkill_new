@@ -64,7 +64,7 @@ namespace Roadkill.Api
 			// Configure services for Test environment
 		}
 
-	    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public override void Configure(IApplicationBuilder app)
 		{
 			// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory

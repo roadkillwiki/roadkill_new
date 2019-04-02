@@ -35,30 +35,30 @@ namespace Roadkill.Core.Extensions
 
 		private static DocumentStore CreateDocumentStore(string connectionString, ILogger logger)
 		{
-				var documentStore = DocumentStore.For(options =>
+			var documentStore = DocumentStore.For(options =>
+			{
+				options.CreateDatabasesForTenants(c =>
 				{
-					options.CreateDatabasesForTenants(c =>
-					{
-						c.ForTenant()
-							.CheckAgainstPgDatabase()
-							.WithOwner("roadkill")
-							.WithEncoding("UTF-8")
-							.ConnectionLimit(-1)
-							.OnDatabaseCreated(connection =>
-							{
-								logger.LogInformation($"Postgres database created by Marten.");
-							});
-					});
-
-					options.Connection(connectionString);
-					options.Schema.For<User>().Index(x => x.Id);
-					options.Schema.For<Page>().Identity(x => x.Id);
-					options.Schema.For<Page>().Index(x => x.Id);
-					options.Schema.For<PageVersion>().Index(x => x.Id);
-					options.Schema.For<SearchablePage>().FullTextIndex();
+					c.ForTenant()
+						.CheckAgainstPgDatabase()
+						.WithOwner("roadkill")
+						.WithEncoding("UTF-8")
+						.ConnectionLimit(-1)
+						.OnDatabaseCreated(connection =>
+						{
+							logger.LogInformation($"Postgres database created by Marten.");
+						});
 				});
 
-				return documentStore;
+				options.Connection(connectionString);
+				options.Schema.For<User>().Index(x => x.Id);
+				options.Schema.For<Page>().Identity(x => x.Id);
+				options.Schema.For<Page>().Index(x => x.Id);
+				options.Schema.For<PageVersion>().Index(x => x.Id);
+				options.Schema.For<SearchablePage>().FullTextIndex();
+			});
+
+			return documentStore;
 		}
 	}
 }

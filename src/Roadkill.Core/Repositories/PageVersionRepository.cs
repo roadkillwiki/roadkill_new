@@ -41,11 +41,11 @@ namespace Roadkill.Core.Repositories
 			using (var session = _store.LightweightSession())
 			{
 				if (dateTime == null)
-                {
-                    dateTime = DateTime.UtcNow;
-                }
+				{
+					dateTime = DateTime.UtcNow;
+				}
 
-                var pageVersion = new PageVersion
+				var pageVersion = new PageVersion
 				{
 					Id = Guid.NewGuid(),
 					Author = author,

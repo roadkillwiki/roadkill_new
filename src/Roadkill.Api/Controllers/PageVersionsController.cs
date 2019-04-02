@@ -85,11 +85,11 @@ namespace Roadkill.Api.Controllers
 		{
 			PageVersion latestPageVersion = await _pageVersionRepository.GetLatestVersion(pageId);
 			if (latestPageVersion == null)
-            {
-                return null;
-            }
+			{
+				return null;
+			}
 
-            return _modelConverter.ConvertToViewModel(latestPageVersion);
+			return _modelConverter.ConvertToViewModel(latestPageVersion);
 		}
 	}
 }

@@ -64,11 +64,11 @@ namespace Roadkill.Text.Parsers.Links
 			get
 			{
 				if (string.IsNullOrEmpty(Href))
-                {
-                    return true;
-                }
+				{
+					return true;
+				}
 
-                return !_externalLinkPrefixes.Any(x => Href.StartsWith(x, StringComparison.Ordinal));
+				return !_externalLinkPrefixes.Any(x => Href.StartsWith(x, StringComparison.Ordinal));
 			}
 		}
 	}

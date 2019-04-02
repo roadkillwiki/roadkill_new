@@ -36,28 +36,28 @@ namespace Roadkill.Text.Parsers.Markdig
 
 						var descendentForAltTag = child.Descendants().FirstOrDefault();
 						if (descendentForAltTag != null)
-                        {
-                            altText = descendentForAltTag.ToString();
-                        }
+						{
+							altText = descendentForAltTag.ToString();
+						}
 
-                        string title = altText;
+						string title = altText;
 
 						if (_imageDelegate != null)
 						{
 							HtmlImageTag args = InvokeImageParsedEvent(linkInline.Url, altText);
 
 							if (!string.IsNullOrEmpty(args.Alt))
-                            {
-                                altText = args.Alt;
-                            }
+							{
+								altText = args.Alt;
+							}
 
-                            if (!string.IsNullOrEmpty(args.Title))
-                            {
-                                title = args.Title;
-                            }
+							if (!string.IsNullOrEmpty(args.Title))
+							{
+								title = args.Title;
+							}
 
-                            // Update the HTML from the data the event gives back
-                            linkInline.Url = args.Src;
+							// Update the HTML from the data the event gives back
+							linkInline.Url = args.Src;
 						}
 
 						// Replace to alt= attribute, it's a literal
@@ -80,11 +80,11 @@ namespace Roadkill.Text.Parsers.Markdig
 							string text = linkInline.Title;
 							var descendentForAltTag = child.Descendants().FirstOrDefault();
 							if (descendentForAltTag != null)
-                            {
-                                text = descendentForAltTag.ToString();
-                            }
+							{
+								text = descendentForAltTag.ToString();
+							}
 
-                            HtmlLinkTag args = InvokeLinkParsedEvent(linkInline.Url, text, linkInline.Label);
+							HtmlLinkTag args = InvokeLinkParsedEvent(linkInline.Url, text, linkInline.Label);
 
 							// Update the HTML from the data the event gives back
 							linkInline.Url = args.Href;
@@ -109,8 +109,8 @@ namespace Roadkill.Text.Parsers.Markdig
 						{
 							string upperUrl = linkInline.Url.ToUpperInvariant();
 							if (upperUrl.StartsWith("HTTP://", StringComparison.Ordinal) ||
-							    upperUrl.StartsWith("HTTPS://", StringComparison.Ordinal) ||
-							    upperUrl.StartsWith("MAILTO:", StringComparison.Ordinal))
+								upperUrl.StartsWith("HTTPS://", StringComparison.Ordinal) ||
+								upperUrl.StartsWith("MAILTO:", StringComparison.Ordinal))
 							{
 								AddAttribute(linkInline, "rel", "nofollow");
 							}

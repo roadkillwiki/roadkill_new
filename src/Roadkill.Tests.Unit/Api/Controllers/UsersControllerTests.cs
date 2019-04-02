@@ -133,8 +133,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.CreateAsync(
 					Arg.Is<RoadkillUser>(
 						u => u.Email == email &&
-						     u.EmailConfirmed &&
-						     u.UserName == email), password)
+							 u.EmailConfirmed &&
+							 u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			var requestModel = new UserRequestModel()
@@ -173,8 +173,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.CreateAsync(
 					Arg.Is<RoadkillUser>(
 						u => u.Email == email &&
-						     u.EmailConfirmed &&
-						     u.UserName == email), password)
+							 u.EmailConfirmed &&
+							 u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			var requestModel = new UserRequestModel()
@@ -277,8 +277,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Received(1)
 				.UpdateAsync(Arg.Is<RoadkillUser>(
 					u => u.Email == email &&
-					     u.LockoutEnabled == true &&
-					     u.LockoutEnd == DateTime.MaxValue));
+						 u.LockoutEnabled == true &&
+						 u.LockoutEnd == DateTime.MaxValue));
 		}
 
 		[Fact]

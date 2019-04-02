@@ -8,18 +8,18 @@ using Roadkill.Api.Common.Services;
 
 namespace Roadkill.Web.Controllers
 {
-    public class HomeController : Controller
-    {
-        private readonly IPagesService _pageService;
+	public class HomeController : Controller
+	{
+		private readonly IPagesService _pageService;
 
-        public HomeController(IPagesService pageService)
-        {
-            _pageService = pageService;
-        }
+		public HomeController(IPagesService pageService)
+		{
+			_pageService = pageService;
+		}
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-    }
+		public IActionResult Index()
+		{
+			return View();
+		}
+	}
 }
