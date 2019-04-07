@@ -1,0 +1,18 @@
+version: "3.3"
+
+services:
+  roadkill-api:
+    image: anotherchris/roadkill-api
+    ports:
+      - 80:5000
+    environment:
+        - Postgres:ConnectionString=host=postgres;port=5432;database=roadkill;username=roadkill;password=roadkill;
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=roadkill
+      - POSTGRES_PASSWORD=roadkill
