@@ -17,7 +17,9 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers
 {
-	[Route("[controller]")]
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
 	public class InstallController : ControllerBase
 	{
 		private readonly UserManager<RoadkillUser> _userManager;
@@ -41,7 +43,7 @@ namespace Roadkill.Api.Controllers
 			await _userManager.CreateAsync(newUser, "password");
 			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Admin));
 
-			return CreatedAtRoute(nameof(UsersController.GetByEmail), newUser.Email);
+			return CreatedAtAction(nameof(InstallController.CreateTestUser), newUser.Email);
 		}
 	}
 }

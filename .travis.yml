@@ -19,6 +19,7 @@ before_script:
   - psql -c "CREATE USER roadkill WITH PASSWORD 'roadkill';" -U postgres
   - psql -c "ALTER USER roadkill WITH SUPERUSER;" -U postgres
 
+# TODO: add version bumping to the assembly
 script:
    - dotnet restore
    - dotnet build -c Release
