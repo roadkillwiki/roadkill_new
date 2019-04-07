@@ -30,6 +30,8 @@ script:
    - dotnet test -c Release
    - popd
    - pushd src/Roadkill.Api
+   - export DOCKER_TAG="2.0.$TRAVIS_BUILD_NUMBER"
+   - echo "Using $DOCKER_TAG for the Docker tag"
    - dotnet publish -c Release
    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
    - docker build -t "anotherchris/roadkill-api:latest" -t "anotherchris/roadkill-api:$DOCKER_TAG" .
