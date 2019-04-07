@@ -1,0 +1,18 @@
+FROM microsoft/dotnet
+LABEL Author Chris Small
+
+RUN mkdir /app
+COPY ./bin/Release/netcoreapp2.2/publish /app
+WORKDIR /app
+
+ENTRYPOINT ["dotnet", "/app/Roadkill.Api.dll"]
+
+# ASP.NET Core: make sure views use the production versions
+ENV ASPNETCORE_ENVIRONMENT="Production"
+
+# ASP.NET Core: Kestrel should listen on all IPs
+ENV ASPNETCORE_URLS="http://0.0.0.0:5000"
+
+# Postgres database connection string
+# (For current testing, this is hardcoded here)
+ENV Postgres__ConnectionString="host=localhost;port=5432;database=roadkill;username=roadkill;password=roadkill;"

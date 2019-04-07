@@ -28,3 +28,10 @@ script:
    - popd
    - pushd src/Roadkill.Tests.Integration
    - dotnet test -c Release
+   - popd
+   - pushd src/Roadkill.Api
+   - dotnet publish -c Release
+   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+   - docker build -t "anotherchris/roadkill-api:latest" -t "anotherchris/roadkill-api:$DOCKER_TAG" .
+   - docker push "anotherchris/roadkill-api:$DOCKER_TAG"
+   - docker push "anotherchris/roadkill-api:latest"
