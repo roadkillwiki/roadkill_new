@@ -9,28 +9,28 @@ namespace Roadkill.Core.Repositories
 {
 	public interface IPageRepository
 	{
-		Task<Page> AddNewPage(Page page);
+		Task<Page> AddNewPageAsync(Page page);
 
-		Task<IEnumerable<Page>> AllPages();
+		Task<IEnumerable<Page>> AllPagesAsync();
 
-		Task<IEnumerable<string>> AllTags();
+		Task<IEnumerable<string>> AllTagsAsync();
 
-		Task DeletePage(int id);
+		Task DeletePageAsync(int id);
 
-		Task DeleteAllPages();
+		Task DeleteAllPagesAsync();
 
-		Task<IEnumerable<Page>> FindPagesCreatedBy(string username);
+		Task<IEnumerable<Page>> FindPagesCreatedByAsync(string username);
 
-		Task<IEnumerable<Page>> FindPagesLastModifiedBy(string username);
+		Task<IEnumerable<Page>> FindPagesLastModifiedByAsync(string username);
 
-		Task<IEnumerable<Page>> FindPagesContainingTag(string tag);
+		Task<IEnumerable<Page>> FindPagesContainingTagAsync(string tag);
 
-		Task<Page> GetPageById(int id);
+		Task<Page> GetPageByIdAsync(int id);
 
 		// Case insensitive search by page title
-		Task<Page> GetPageByTitle(string title);
+		Task<Page> GetPageByTitleAsync(string title);
 
-		Task<Page> UpdateExisting(Page page);
+		Task<Page> UpdateExistingAsync(Page page);
 	}
 
 	public class PageRepository : IPageRepository
@@ -42,7 +42,7 @@ namespace Roadkill.Core.Repositories
 			_store = store ?? throw new ArgumentNullException(nameof(store));
 		}
 
-		public async Task<Page> AddNewPage(Page page)
+		public async Task<Page> AddNewPageAsync(Page page)
 		{
 			page.Id = 0; // reset so it's autoincremented
 
@@ -55,7 +55,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<Page>> AllPages()
+		public async Task<IEnumerable<Page>> AllPagesAsync()
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -65,7 +65,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<string>> AllTags()
+		public async Task<IEnumerable<string>> AllTagsAsync()
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -76,7 +76,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task DeletePage(int pageId)
+		public async Task DeletePageAsync(int pageId)
 		{
 			using (var session = _store.LightweightSession())
 			{
@@ -85,7 +85,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task DeleteAllPages()
+		public async Task DeleteAllPagesAsync()
 		{
 			using (var session = _store.LightweightSession())
 			{
@@ -96,7 +96,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<Page>> FindPagesCreatedBy(string username)
+		public async Task<IEnumerable<Page>> FindPagesCreatedByAsync(string username)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -107,7 +107,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<Page>> FindPagesLastModifiedBy(string username)
+		public async Task<IEnumerable<Page>> FindPagesLastModifiedByAsync(string username)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -118,7 +118,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<Page>> FindPagesContainingTag(string tag)
+		public async Task<IEnumerable<Page>> FindPagesContainingTagAsync(string tag)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -129,7 +129,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<Page> GetPageById(int id)
+		public async Task<Page> GetPageByIdAsync(int id)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -139,7 +139,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<Page> GetPageByTitle(string title)
+		public async Task<Page> GetPageByTitleAsync(string title)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -149,7 +149,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<Page> UpdateExisting(Page page)
+		public async Task<Page> UpdateExistingAsync(Page page)
 		{
 			using (var session = _store.LightweightSession())
 			{

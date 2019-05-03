@@ -48,14 +48,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			int expectedTagCount = tags.Count - (duplicateTags.Count - 1);
 
-			_pageRepositoryMock.Setup(x => x.AllTags())
+			_pageRepositoryMock.Setup(x => x.AllTagsAsync())
 				.ReturnsAsync(tags);
 
 			// when
 			IEnumerable<TagModel> tagViewModels = await _tagsController.AllTags();
 
 			// then
-			_pageRepositoryMock.Verify(x => x.AllTags(), Times.Once);
+			_pageRepositoryMock.Verify(x => x.AllTagsAsync(), Times.Once);
 			tagViewModels.Count().ShouldBe(expectedTagCount);
 
 			tagViewModels.First(x => x.Name == "duplicate-tag").Count.ShouldBe(3);
@@ -73,19 +73,19 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			List<Page> pagesWithTags = _fixture.CreateMany<Page>().ToList();
 			pagesWithTags.ForEach(p => { p.Tags = existingTags; });
 
-			_pageRepositoryMock.Setup(x => x.FindPagesContainingTag(tagToSearch))
+			_pageRepositoryMock.Setup(x => x.FindPagesContainingTagAsync(tagToSearch))
 				.ReturnsAsync(pagesWithTags);
 
 			_pageRepositoryMock
-				.Setup(x => x.UpdateExisting(It.IsAny<Page>()))
+				.Setup(x => x.UpdateExistingAsync(It.IsAny<Page>()))
 				.ReturnsAsync(It.IsAny<Page>());
 
 			// when
 			await _tagsController.Rename(tagToSearch, newTag);
 
 			// then
-			_pageRepositoryMock.Verify(x => x.FindPagesContainingTag(tagToSearch), Times.Once);
-			_pageRepositoryMock.Verify(x => x.UpdateExisting(It.Is<Page>(p => p.Tags == expectedTags)), Times.Exactly(pagesWithTags.Count));
+			_pageRepositoryMock.Verify(x => x.FindPagesContainingTagAsync(tagToSearch), Times.Once);
+			_pageRepositoryMock.Verify(x => x.UpdateExistingAsync(It.Is<Page>(p => p.Tags == expectedTags)), Times.Exactly(pagesWithTags.Count));
 		}
 
 		[Fact]
@@ -98,7 +98,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			pages[2].Tags += ", gutentag";
 
 			_pageRepositoryMock
-				.Setup(x => x.FindPagesContainingTag("gutentag"))
+				.Setup(x => x.FindPagesContainingTagAsync("gutentag"))
 				.ReturnsAsync(pages);
 
 			// when
@@ -107,7 +107,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			pageViewModelsWithTag.Count().ShouldBe(pages.Count());
 
-			_pageRepositoryMock.Verify(x => x.FindPagesContainingTag("gutentag"), Times.Once);
+			_pageRepositoryMock.Verify(x => x.FindPagesContainingTagAsync("gutentag"), Times.Once);
 			_pageViewModelConverterMock.Verify(x => x.ConvertToViewModel(It.IsAny<Page>()));
 		}
 	}

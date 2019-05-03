@@ -211,7 +211,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 				string author = _fixture.Create<string>();
 				DateTime dateTime = DateTime.Today;
 
-				Page newPage = pageRepository.AddNewPage(page).GetAwaiter().GetResult();
+				Page newPage = pageRepository.AddNewPageAsync(page).GetAwaiter().GetResult();
 				PageVersion pageVersion = repository.AddNewVersion(newPage.Id, text, author, dateTime).GetAwaiter().GetResult();
 				pageVersions.Add(pageVersion);
 			}

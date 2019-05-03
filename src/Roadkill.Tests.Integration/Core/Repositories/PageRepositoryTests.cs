@@ -61,15 +61,15 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			page.LastModifiedOn = createdOn;
 
 			// when
-			await repository.AddNewPage(page);
-			Page actualPage = await repository.AddNewPage(page);
+			await repository.AddNewPageAsync(page);
+			Page actualPage = await repository.AddNewPageAsync(page);
 
 			// then
 			actualPage.ShouldNotBeNull();
 			actualPage.CreatedOn.ShouldBe(createdOn);
 			actualPage.CreatedBy.ShouldBe(createdBy);
 
-			Page savedVersion = await repository.GetPageById(actualPage.Id);
+			Page savedVersion = await repository.GetPageByIdAsync(actualPage.Id);
 			savedVersion.ShouldNotBeNull();
 			savedVersion.Id.ShouldBeGreaterThanOrEqualTo(1);
 		}
@@ -82,7 +82,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			List<Page> pages = CreateTenPages(repository);
 
 			// when
-			IEnumerable<Page> actualPages = await repository.AllPages();
+			IEnumerable<Page> actualPages = await repository.AllPagesAsync();
 
 			// then
 			actualPages.Count().ShouldBe(pages.Count());
@@ -98,7 +98,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			CreateTenPages(repository, pages);
 
 			// when
-			IEnumerable<string> actualTags = await repository.AllTags();
+			IEnumerable<string> actualTags = await repository.AllTagsAsync();
 
 			// then
 			actualTags.Count().ShouldBe(pages.Count());
@@ -113,13 +113,13 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			CreateTenPages(repository);
 
 			var pageToDelete = _fixture.Create<Page>();
-			await repository.AddNewPage(pageToDelete);
+			await repository.AddNewPageAsync(pageToDelete);
 
 			// when
-			await repository.DeletePage(pageToDelete.Id);
+			await repository.DeletePageAsync(pageToDelete.Id);
 
 			// then
-			var deletedPage = await repository.GetPageById(pageToDelete.Id);
+			var deletedPage = await repository.GetPageByIdAsync(pageToDelete.Id);
 			deletedPage.ShouldBeNull();
 		}
 
@@ -131,10 +131,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			CreateTenPages(repository);
 
 			// when
-			await repository.DeleteAllPages();
+			await repository.DeleteAllPagesAsync();
 
 			// then
-			IEnumerable<Page> allPages = await repository.AllPages();
+			IEnumerable<Page> allPages = await repository.AllPagesAsync();
 			allPages.ShouldBeEmpty();
 		}
 
@@ -150,11 +150,11 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			page1.CreatedBy = "myself";
 			page2.CreatedBy = "MYSELf";
 
-			await repository.AddNewPage(page1);
-			await repository.AddNewPage(page2);
+			await repository.AddNewPageAsync(page1);
+			await repository.AddNewPageAsync(page2);
 
 			// when
-			IEnumerable<Page> actualPages = await repository.FindPagesCreatedBy("myself");
+			IEnumerable<Page> actualPages = await repository.FindPagesCreatedByAsync("myself");
 
 			// then
 			actualPages.Count().ShouldBe(2);
@@ -174,11 +174,11 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			page1.LastModifiedBy = "THAT guy";
 			page2.LastModifiedBy = "That Guy";
 
-			await repository.AddNewPage(page1);
-			await repository.AddNewPage(page2);
+			await repository.AddNewPageAsync(page1);
+			await repository.AddNewPageAsync(page2);
 
 			// when
-			IEnumerable<Page> actualPages = await repository.FindPagesLastModifiedBy("that guy");
+			IEnumerable<Page> actualPages = await repository.FindPagesLastModifiedByAsync("that guy");
 
 			// then
 			actualPages.Count().ShouldBe(2);
@@ -195,12 +195,12 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 
 			List<Page> pages = _fixture.CreateMany<Page>(3).ToList();
 			pages.ForEach(p => p.Tags = _fixture.Create<string>() + ", facebook-data-leak");
-			await repository.AddNewPage(pages[0]);
-			await repository.AddNewPage(pages[1]);
-			await repository.AddNewPage(pages[2]);
+			await repository.AddNewPageAsync(pages[0]);
+			await repository.AddNewPageAsync(pages[1]);
+			await repository.AddNewPageAsync(pages[2]);
 
 			// when
-			var actualPages = await repository.FindPagesContainingTag("facebook-data-leak");
+			var actualPages = await repository.FindPagesContainingTagAsync("facebook-data-leak");
 
 			// then
 			actualPages.Count().ShouldBe(3);
@@ -219,7 +219,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			Page expectedPage = pages[0];
 
 			// when
-			Page actualPage = await repository.GetPageById(expectedPage.Id);
+			Page actualPage = await repository.GetPageByIdAsync(expectedPage.Id);
 
 			// then
 			actualPage.ShouldNotBeNull();
@@ -236,7 +236,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			Page expectedPage = pages[0];
 
 			// when
-			Page actualPage = await repository.GetPageByTitle(expectedPage.Title);
+			Page actualPage = await repository.GetPageByTitleAsync(expectedPage.Title);
 
 			// then
 			actualPage.ShouldNotBeNull();
@@ -255,10 +255,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			expectedPage.Title = "new title";
 
 			// when
-			await repository.UpdateExisting(expectedPage);
+			await repository.UpdateExistingAsync(expectedPage);
 
 			// then
-			Page actualPage = await repository.GetPageById(expectedPage.Id);
+			Page actualPage = await repository.GetPageByIdAsync(expectedPage.Id);
 			actualPage.ShouldBeEquivalent(expectedPage);
 		}
 
@@ -272,7 +272,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			var newPages = new List<Page>();
 			foreach (Page page in pages)
 			{
-				Page newPage = repository.AddNewPage(page).GetAwaiter().GetResult();
+				Page newPage = repository.AddNewPageAsync(page).GetAwaiter().GetResult();
 				newPages.Add(newPage);
 			}
 

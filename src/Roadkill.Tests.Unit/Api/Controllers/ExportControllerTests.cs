@@ -34,7 +34,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// given
 			List<Page> actualPages = _fixture.CreateMany<Page>().ToList();
 
-			_pageRepositoryMock.Setup(x => x.AllPages())
+			_pageRepositoryMock.Setup(x => x.AllPagesAsync())
 				.ReturnsAsync(actualPages);
 
 			XmlSerializer serializer = new XmlSerializer(typeof(List<Page>));

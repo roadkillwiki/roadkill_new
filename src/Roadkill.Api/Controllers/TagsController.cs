@@ -32,12 +32,12 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(Rename))]
 		public async Task Rename(string oldTagName, string newTagName)
 		{
-			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTag(oldTagName);
+			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTagAsync(oldTagName);
 
 			foreach (Page page in pages)
 			{
 				page.Tags = Regex.Replace(page.Tags, $@"\s{oldTagName}\s", newTagName);
-				await _pageRepository.UpdateExisting(page);
+				await _pageRepository.UpdateExistingAsync(page);
 			}
 		}
 
@@ -45,7 +45,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(AllTags))]
 		public async Task<IEnumerable<TagModel>> AllTags()
 		{
-			IEnumerable<string> allTags = await _pageRepository.AllTags();
+			IEnumerable<string> allTags = await _pageRepository.AllTagsAsync();
 
 			var viewModels = new List<TagModel>();
 			foreach (string tag in allTags)
@@ -68,7 +68,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(FindPageWithTag))]
 		public async Task<IEnumerable<PageModel>> FindPageWithTag(string tag)
 		{
-			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTag(tag);
+			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTagAsync(tag);
 			return pages.Select(_pageModelConverter.ConvertToViewModel);
 		}
 	}

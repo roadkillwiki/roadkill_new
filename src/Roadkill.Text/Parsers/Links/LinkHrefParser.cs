@@ -187,7 +187,7 @@ namespace Roadkill.Text.Parsers.Links
 			title = title.Replace("-", " ");
 
 			// Find the page, or if it doesn't exist point to the new page url
-			Page page = _pageRepository.GetPageByTitle(title).GetAwaiter().GetResult();
+			Page page = _pageRepository.GetPageByTitleAsync(title).GetAwaiter().GetResult();
 			if (page != null)
 			{
 				string encodedTitle = EncodePageTitle(page.Title);

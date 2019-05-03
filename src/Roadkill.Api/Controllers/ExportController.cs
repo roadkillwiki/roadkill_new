@@ -29,7 +29,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(ExportPagesToXml))]
 		public async Task<string> ExportPagesToXml()
 		{
-			IEnumerable<Page> allPages = await _pageRepository.AllPages();
+			IEnumerable<Page> allPages = await _pageRepository.AllPagesAsync();
 			XmlSerializer serializer = new XmlSerializer(typeof(List<Page>));
 
 			StringBuilder builder = new StringBuilder();

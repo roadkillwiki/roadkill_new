@@ -158,7 +158,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			_urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>()))
 						  .Returns<UrlActionContext>(s => "/wiki/" + urlValues.id + "/" + urlValues.title);
 
-			_pageRepository.Setup(x => x.GetPageByTitle(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("foo-page?blah=xyz#myanchor", "foo-page?blah=xyz#myanchor", "text", "");
 
@@ -191,7 +191,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitle(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("foo#myanchor", "foo#myanchor", "text", "");
 
@@ -211,7 +211,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitle(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
 			HtmlLinkTag linkTag = new HtmlLinkTag("my-page-on-engineering", "my-page-on-engineering", "text", "");
 
 			// Act
@@ -231,7 +231,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitle(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("football", "foo-page", "text", "");
 
@@ -264,7 +264,7 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitle(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("despair", "", "text", "new");
 

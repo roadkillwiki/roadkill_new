@@ -37,7 +37,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			foreach (Page page in pages)
 			{
 				page.Title += " some kind of £ encoding is <needed> for this src=\"i think\"";
-				Page newPage = repository.AddNewPage(page).GetAwaiter().GetResult();
+				Page newPage = repository.AddNewPageAsync(page).GetAwaiter().GetResult();
 				newPages.Add(newPage);
 			}
 

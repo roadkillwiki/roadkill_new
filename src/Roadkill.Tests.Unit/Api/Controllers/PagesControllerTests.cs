@@ -105,7 +105,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			int autoIncrementedId = 99;
 
 			_pageRepositoryMock
-				.AddNewPage(Arg.Any<Page>())
+				.AddNewPageAsync(Arg.Any<Page>())
 				.Returns(c =>
 				{
 					var page = c.Arg<Page>();
@@ -124,7 +124,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			await _pageRepositoryMock
 				.Received(1)
-				.AddNewPage(Arg.Is<Page>(p => p.Id == inputPageViewModel.Id));
+				.AddNewPageAsync(Arg.Is<Page>(p => p.Id == inputPageViewModel.Id));
 
 			actionResult.ShouldBeCreatedAtActionResult();
 			PageModel pageModel = actionResult.CreatedAtActionResultValue();
@@ -149,7 +149,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			};
 
 			_pageRepositoryMock
-				.UpdateExisting(Arg.Any<Page>())
+				.UpdateExistingAsync(Arg.Any<Page>())
 				.Returns(changedPage);
 
 			// when
@@ -158,7 +158,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			await _pageRepositoryMock
 				.Received(1)
-				.UpdateExisting(Arg.Is<Page>(page => page.Id == changedPage.Id));
+				.UpdateExistingAsync(Arg.Is<Page>(page => page.Id == changedPage.Id));
 
 			actionResult.Value.ShouldNotBeNull("ActionResult's ViewModel was null");
 			actionResult.Value.ShouldBeEquivalent(changedPageViewModel);
@@ -172,7 +172,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			int expectedPageId = expectedPage.Id;
 
 			_pageRepositoryMock
-				.DeletePage(expectedPageId)
+				.DeletePageAsync(expectedPageId)
 				.Returns(Task.CompletedTask);
 
 			// when
@@ -181,7 +181,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			await _pageRepositoryMock
 				.Received(1)
-				.DeletePage(expectedPageId);
+				.DeletePageAsync(expectedPageId);
 		}
 
 		[Fact]
@@ -192,7 +192,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			int id = expectedPage.Id;
 
 			_pageRepositoryMock
-				.GetPageById(id)
+				.GetPageByIdAsync(id)
 				.Returns(expectedPage);
 
 			// when
@@ -204,7 +204,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			await _pageRepositoryMock
 				.Received(1)
-				.GetPageById(id);
+				.GetPageByIdAsync(id);
 
 			_viewModelConverterMock
 				.Received(1)
@@ -218,7 +218,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			IEnumerable<Page> pages = _fixture.CreateMany<Page>();
 
 			_pageRepositoryMock
-				.AllPages()
+				.AllPagesAsync()
 				.Returns(pages);
 
 			// when
@@ -232,7 +232,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			await _pageRepositoryMock
 				.Received(1)
-				.AllPages();
+				.AllPagesAsync();
 
 			_viewModelConverterMock
 				.Received(pages.Count())
@@ -247,7 +247,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			IEnumerable<Page> pages = _fixture.CreateMany<Page>();
 
 			_pageRepositoryMock
-				.FindPagesCreatedBy(username)
+				.FindPagesCreatedByAsync(username)
 				.Returns(pages);
 
 			// when
@@ -260,7 +260,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			await _pageRepositoryMock
 				.Received(1)
-				.FindPagesCreatedBy(username);
+				.FindPagesCreatedByAsync(username);
 
 			_viewModelConverterMock
 				.Received(pages.Count())
@@ -279,7 +279,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			}
 
 			_pageRepositoryMock
-				.FindPagesContainingTag("homepage")
+				.FindPagesContainingTagAsync("homepage")
 				.Returns(pages);
 
 			// when
@@ -292,7 +292,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			await _pageRepositoryMock
 				.Received(1)
-				.FindPagesContainingTag("homepage");
+				.FindPagesContainingTagAsync("homepage");
 
 			_viewModelConverterMock
 				.Received(1)
@@ -307,7 +307,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string title = expectedPage.Title;
 
 			_pageRepositoryMock
-				.GetPageByTitle(title)
+				.GetPageByTitleAsync(title)
 				.Returns(expectedPage);
 
 			// when
@@ -320,7 +320,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			await _pageRepositoryMock
 				.Received(1)
-				.GetPageByTitle(title);
+				.GetPageByTitleAsync(title);
 
 			_viewModelConverterMock
 				.Received(1)

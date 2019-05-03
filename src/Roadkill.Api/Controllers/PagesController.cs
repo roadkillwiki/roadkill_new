@@ -32,7 +32,7 @@ namespace Roadkill.Api.Controllers
 		[Route("{id}")]
 		public async Task<ActionResult<PageModel>> Get(int id)
 		{
-			Page page = await _pageRepository.GetPageById(id);
+			Page page = await _pageRepository.GetPageByIdAsync(id);
 			if (page == null)
 			{
 				return NotFound();
@@ -46,7 +46,7 @@ namespace Roadkill.Api.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult<IEnumerable<PageModel>>> AllPages()
 		{
-			IEnumerable<Page> allpages = await _pageRepository.AllPages();
+			IEnumerable<Page> allpages = await _pageRepository.AllPagesAsync();
 			return Ok(allpages.Select(_pageModelConverter.ConvertToViewModel));
 		}
 
@@ -55,7 +55,7 @@ namespace Roadkill.Api.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult<IEnumerable<PageModel>>> AllPagesCreatedBy(string username)
 		{
-			IEnumerable<Page> pagesCreatedBy = await _pageRepository.FindPagesCreatedBy(username);
+			IEnumerable<Page> pagesCreatedBy = await _pageRepository.FindPagesCreatedByAsync(username);
 
 			IEnumerable<PageModel> models = pagesCreatedBy.Select(_pageModelConverter.ConvertToViewModel);
 			return Ok(models);
@@ -66,7 +66,7 @@ namespace Roadkill.Api.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult<PageModel>> FindHomePage()
 		{
-			IEnumerable<Page> pagesWithHomePageTag = await _pageRepository.FindPagesContainingTag("homepage");
+			IEnumerable<Page> pagesWithHomePageTag = await _pageRepository.FindPagesContainingTagAsync("homepage");
 
 			if (!pagesWithHomePageTag.Any())
 			{
@@ -82,7 +82,7 @@ namespace Roadkill.Api.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult<PageModel>> FindByTitle(string title)
 		{
-			Page page = await _pageRepository.GetPageByTitle(title);
+			Page page = await _pageRepository.GetPageByTitleAsync(title);
 			if (page == null)
 			{
 				return NotFound();
@@ -104,7 +104,7 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			Page newPage = await _pageRepository.AddNewPage(page);
+			Page newPage = await _pageRepository.AddNewPageAsync(page);
 			PageModel newModel = _pageModelConverter.ConvertToViewModel(newPage);
 
 			return CreatedAtAction(nameof(Add), nameof(PagesController), newModel);
@@ -120,7 +120,7 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			Page newPage = await _pageRepository.UpdateExisting(page);
+			Page newPage = await _pageRepository.UpdateExistingAsync(page);
 			return _pageModelConverter.ConvertToViewModel(newPage);
 		}
 
@@ -128,7 +128,7 @@ namespace Roadkill.Api.Controllers
 		[Authorize(Policy = PolicyNames.Admin)]
 		public async Task Delete(int pageId)
 		{
-			await _pageRepository.DeletePage(pageId);
+			await _pageRepository.DeletePageAsync(pageId);
 		}
 	}
 }
