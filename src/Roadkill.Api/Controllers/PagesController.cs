@@ -27,6 +27,12 @@ namespace Roadkill.Api.Controllers
 			_pageModelConverter = pageModelConverter;
 		}
 
+		/// <summary>
+		/// Gets a single page by its ID.
+		/// </summary>
+		/// <param name="id">The unique ID of the page to retrieve.</param>
+		/// <returns>The page meta information, or a 404 not found if the page cannot be found.
+		/// No page text is returned, use PageVersions to get this information.</returns>
 		[HttpGet]
 		[AllowAnonymous]
 		[Route("{id}")]
@@ -41,6 +47,11 @@ namespace Roadkill.Api.Controllers
 			return _pageModelConverter.ConvertToViewModel(page);
 		}
 
+		/// <summary>
+		/// Retrieves all pages in the Roadkill database.
+		/// </summary>
+		/// <returns>Meta information for all the pages in the database.
+		/// No page text is returned, use PageVersions to get this information.</returns>
 		[HttpGet]
 		[Route(nameof(AllPages))]
 		[AllowAnonymous]
@@ -50,6 +61,13 @@ namespace Roadkill.Api.Controllers
 			return Ok(allpages.Select(_pageModelConverter.ConvertToViewModel));
 		}
 
+		/// <summary>
+		/// Retrieves all pages created by a particular user.
+		/// </summary>
+		/// <param name="username">The username (typically an email address) of the user that created
+		/// the the pages.</param>
+		/// <returns>Meta information for all the pages created by the user in the database.
+		/// No page text is returned, use PageVersions to get this information.</returns>
 		[HttpGet]
 		[Route(nameof(AllPagesCreatedBy))]
 		[AllowAnonymous]
@@ -61,6 +79,11 @@ namespace Roadkill.Api.Controllers
 			return Ok(models);
 		}
 
+		/// <summary>
+		/// Finds the first page in the database with the "homepage" tag.
+		/// </summary>
+		/// <returns>The page meta information, or a 404 not found if the page cannot be found.
+		/// No page text is returned, use PageVersions to get this information.</returns>
 		[HttpGet]
 		[Route(nameof(FindHomePage))]
 		[AllowAnonymous]
@@ -77,6 +100,12 @@ namespace Roadkill.Api.Controllers
 			return _pageModelConverter.ConvertToViewModel(firstResult);
 		}
 
+		/// <summary>
+		/// Finds the first page matching the given page title.
+		/// </summary>
+		/// <param name="title">The title of the page to search for (case-insensitive).</param>
+		/// <returns>The page meta information, or a 404 not found if the page cannot be found.
+		/// No page text is returned, use PageVersions to get this information.</returns>
 		[HttpGet]
 		[Route(nameof(FindByTitle))]
 		[AllowAnonymous]
@@ -91,13 +120,20 @@ namespace Roadkill.Api.Controllers
 			return _pageModelConverter.ConvertToViewModel(page);
 		}
 
+		/// <summary>
+		/// Add a page to the database using the provided meta information. This will only add
+		/// the meta information not the page text, use PageVersions to add text for a page.
+		/// </summary>
+		/// <param name="model">The page information to add.</param>
+		/// <returns>A 202 HTTP status with the newly created page, with its generated ID populated.</returns>
 		[HttpPost]
 		[Authorize(Policy = PolicyNames.Editor)]
 		public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
 		{
 			// TODO: add base62 ID, as Id in Marten is Hilo and starts at 1000 as the lo
-			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
 			// TODO: fill createdon property
+			// TODO: validate
+			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
 			Page page = _pageModelConverter.ConvertToPage(model);
 			if (page == null)
 			{
@@ -110,6 +146,11 @@ namespace Roadkill.Api.Controllers
 			return CreatedAtAction(nameof(Add), nameof(PagesController), newModel);
 		}
 
+		/// <summary>
+		/// Updates an existing page in the database.
+		/// </summary>
+		/// <param name="model">The page details to update, which should include the page id.</param>
+		/// <returns>The update page details, or a 404 not found if the existing page cannot be found</returns>
 		[HttpPut]
 		[Authorize(Policy = PolicyNames.Editor)]
 		public async Task<ActionResult<PageModel>> Update(PageModel model)
@@ -124,6 +165,11 @@ namespace Roadkill.Api.Controllers
 			return _pageModelConverter.ConvertToViewModel(newPage);
 		}
 
+		/// <summary>
+		/// Deletes an existing page from the database. This is an administrator-only action.
+		/// </summary>
+		/// <param name="pageId">The id of the page to remove.</param>
+		/// <returns>A 200 OK if the page successfully deleted.</returns>
 		[HttpDelete]
 		[Authorize(Policy = PolicyNames.Admin)]
 		public async Task Delete(int pageId)
