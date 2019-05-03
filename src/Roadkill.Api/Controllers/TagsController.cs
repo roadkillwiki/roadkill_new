@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Common.Models;
-using Roadkill.Api.Common.Services;
+using Roadkill.Api.JWT;
 using Roadkill.Api.ModelConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
@@ -13,8 +13,11 @@ using Roadkill.Core.Repositories;
 namespace Roadkill.Api.Controllers
 {
 	[Authorize]
-	[Route("[controller]")]
-	public class TagsController : Controller, ITagsService
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
+	[Authorize(Policy = PolicyNames.Admin)]
+	public class TagsController : ControllerBase
 	{
 		private readonly IPageRepository _pageRepository;
 		private readonly IPageModelConverter _pageModelConverter;

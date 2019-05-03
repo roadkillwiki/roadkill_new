@@ -2,16 +2,14 @@
 using MailKit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using MimeKit;
-using Roadkill.Api.Common.Services;
 using Roadkill.Core.Settings;
 
 namespace Roadkill.Api.Controllers
 {
 	[Authorize]
 	[Route("[controller]")]
-	public class EmailController : Controller, IEmailService
+	public class EmailController : ControllerBase
 	{
 		private readonly IMailTransport _mailTransport;
 		private readonly SmtpSettings _settings;

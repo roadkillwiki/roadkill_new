@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface IAuthenticationService
+	public interface IAuthenticationClient
 	{
 		Task ChangePassword(string email, string newPassword);
 

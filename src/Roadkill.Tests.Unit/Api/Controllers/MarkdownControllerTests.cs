@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	public sealed class MarkdownControllerTests : IDisposable
+	public sealed class MarkdownControllerTests
 	{
 		private readonly Mock<ITextMiddlewareBuilder> _textMiddlewareMock;
 
@@ -42,11 +42,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			actualHtml.ShouldBe(expectedHtml);
 			_textMiddlewareMock.Verify(x => x.Execute(markdown), Times.Once);
-		}
-
-		public void Dispose()
-		{
-			_markdownController?.Dispose();
 		}
 	}
 }

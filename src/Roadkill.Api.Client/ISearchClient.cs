@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Roadkill.Api.Common.Models;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface ISearchService
+	public interface ISearchClient
 	{
 		Task<IEnumerable<SearchResponseModel>> Search(string searchText);
 

@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	public sealed class TagsControllerTests : IDisposable
+	public sealed class TagsControllerTests
 	{
 		private Mock<IPageRepository> _pageRepositoryMock;
 		private TagsController _tagsController;
@@ -109,11 +109,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			_pageRepositoryMock.Verify(x => x.FindPagesContainingTag("gutentag"), Times.Once);
 			_pageViewModelConverterMock.Verify(x => x.ConvertToViewModel(It.IsAny<Page>()));
-		}
-
-		public void Dispose()
-		{
-			_tagsController?.Dispose();
 		}
 	}
 }

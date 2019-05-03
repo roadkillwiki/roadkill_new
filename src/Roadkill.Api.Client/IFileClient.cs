@@ -1,6 +1,6 @@
-﻿namespace Roadkill.Api.Common.Services
+﻿namespace Roadkill.Api.Client
 {
-	public interface IFileService
+	public interface IFileClient
 	{
 		// void Delete(string filePath, string fileName);
 		// void DeleteFolder(string folderPath);

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Common.Models;
-using Roadkill.Api.Common.Services;
 using Roadkill.Api.ModelConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
@@ -13,8 +12,10 @@ using Roadkill.Core.Repositories;
 namespace Roadkill.Api.Controllers
 {
 	[Authorize]
-	[Route("[controller]")]
-	public class PageVersionsController : Controller, IPageVersionsService
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
+	public class PageVersionsController : ControllerBase
 	{
 		private readonly IPageVersionRepository _pageVersionRepository;
 		private readonly IPageVersionModelConverter _modelConverter;

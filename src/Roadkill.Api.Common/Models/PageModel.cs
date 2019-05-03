@@ -4,8 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Roadkill.Api.Common.Models
 {
-	// TODO: add base62 ID, as Id is Hilo
-	// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
 	public class PageModel
 	{
 		public int Id { get; set; }

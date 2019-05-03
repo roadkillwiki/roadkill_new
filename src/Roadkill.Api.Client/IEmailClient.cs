@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface IEmailService
+	public interface IEmailClient
 	{
 		Task Send(string from, string to, string subject, string body);
 	}

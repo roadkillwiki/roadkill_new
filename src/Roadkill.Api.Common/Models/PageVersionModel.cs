@@ -1,6 +1,4 @@
 ﻿using System;
-using Refit;
-using Roadkill.Api.Common.Services;
 
 namespace Roadkill.Api.Common.Models
 {

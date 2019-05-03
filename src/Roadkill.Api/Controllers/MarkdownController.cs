@@ -1,15 +1,18 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Common.Services;
+using Roadkill.Api.JWT;
 using Roadkill.Text.Models;
 using Roadkill.Text.TextMiddleware;
 
 namespace Roadkill.Api.Controllers
 {
 	[Authorize]
-	[Route("[controller]")]
-	public class MarkdownController : Controller, IMarkdownService
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
+	[Authorize(Policy = PolicyNames.Editor)]
+	public class MarkdownController : ControllerBase
 	{
 		private readonly ITextMiddlewareBuilder _textMiddlewareBuilder;
 

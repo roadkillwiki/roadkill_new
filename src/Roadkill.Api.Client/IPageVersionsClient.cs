@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Roadkill.Api.Common.Models;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface IPageVersionsService
+	public interface IPageVersionsClient
 	{
 		Task<PageVersionModel> Add(int pageId, string text, string author, DateTime? dateTime = null);
 

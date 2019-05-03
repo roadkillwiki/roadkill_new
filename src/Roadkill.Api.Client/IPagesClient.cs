@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Refit;
 using Roadkill.Api.Common.Models;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface IPagesService
+	public interface IPagesClient
 	{
 		[Post("/pages/")]
 		[Headers("Authorization: Bearer")]

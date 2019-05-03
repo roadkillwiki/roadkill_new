@@ -15,9 +15,8 @@ namespace Roadkill.Core.Entities
 	{
 		private static readonly Random _random = new Random();
 
-		/// <summary>
-		///     Initializes a new instance of the <see cref="Salt" /> class, generating a new salt value.
-		/// </summary>
+		public string Value { get; }
+
 		public Salt()
 		{
 			var builder = new StringBuilder(16);
@@ -30,19 +29,7 @@ namespace Roadkill.Core.Entities
 			Value = builder.ToString();
 		}
 
-		/// <summary>
-		///     The salt value.
-		/// </summary>
-		public string Value { get; }
-
-		public static implicit operator string(Salt salt)
-		{
-			return salt.Value;
-		}
-
-		public override string ToString()
-		{
-			return Value;
-		}
+		public static implicit operator string(Salt salt) => salt.Value;
+		public override string ToString() => Value;
 	}
 }

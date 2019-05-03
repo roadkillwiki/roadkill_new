@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Roadkill.Api.Common.Models;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface IUserService
+	public interface IUserClient
 	{
 		Task<bool> ActivateUser(string activationKey);
 

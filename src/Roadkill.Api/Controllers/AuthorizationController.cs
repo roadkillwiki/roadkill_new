@@ -17,7 +17,6 @@ namespace Roadkill.Api.Controllers
 	public class AuthorizationController : ControllerBase
 	{
 		private readonly UserManager<RoadkillUser> _userManager;
-
 		private readonly SignInManager<RoadkillUser> _signInManager;
 		private readonly IJwtTokenProvider _jwtTokenProvider;
 

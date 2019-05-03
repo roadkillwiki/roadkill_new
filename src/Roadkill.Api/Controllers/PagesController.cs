@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Common.Models;
-using Roadkill.Api.Common.Services;
 using Roadkill.Api.JWT;
 using Roadkill.Api.ModelConverters;
 using Roadkill.Core.Entities;
@@ -13,12 +12,11 @@ using Roadkill.Core.Repositories;
 namespace Roadkill.Api.Controllers
 {
 	[Authorize]
-	[ApiController]
+	[ApiController] // [ApiController] adds [FromBody] by default and model validation
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
 	public class PagesController : ControllerBase
 	{
-		// [ApiController] adds [FromBody] by default and model validation
 		private readonly IPageRepository _pageRepository;
 
 		private readonly IPageModelConverter _pageModelConverter;
@@ -47,6 +45,8 @@ namespace Roadkill.Api.Controllers
 		[Authorize(Policy = PolicyNames.Editor)]
 		public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
 		{
+			// TODO: add base62 ID, as Id is Hilo
+			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
 			// TODO: fill createdon property
 			Page page = _pageModelConverter.ConvertToPage(model);
 			if (page == null)

@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Roadkill.Api.Common.Models;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface ITagsService
+	public interface ITagsClient
 	{
 		/// <summary>
 		///     Renames a tag by changing all pages that reference the tag to use the new tag name.

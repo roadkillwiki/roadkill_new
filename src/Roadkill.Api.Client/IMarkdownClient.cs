@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Roadkill.Api.Common.Services
+namespace Roadkill.Api.Client
 {
-	public interface IMarkdownService
+	public interface IMarkdownClient
 	{
 		Task<string> ConvertToHtml(string markDown);
 

@@ -14,10 +14,10 @@ using Xunit;
 
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	public sealed class ExportControllerTests : IDisposable
+	public sealed class ExportControllerTests
 	{
 		private Mock<IPageRepository> _pageRepositoryMock;
-		private ExportController _exportController;
+		private readonly ExportController _exportController;
 		private Fixture _fixture;
 
 		public ExportControllerTests()
@@ -45,11 +45,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			var deserializedPages = serializer.Deserialize(new StringReader(actualXml)) as List<Page>;
 			deserializedPages.Count.ShouldBe(actualPages.Count());
-		}
-
-		public void Dispose()
-		{
-			_exportController?.Dispose();
 		}
 	}
 }

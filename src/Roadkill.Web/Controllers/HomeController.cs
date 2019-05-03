@@ -4,17 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
-using Roadkill.Api.Common.Services;
+using Roadkill.Api.Client;
 
 namespace Roadkill.Web.Controllers
 {
 	public class HomeController : Controller
 	{
-		private readonly IPagesService _pageService;
+		private readonly IPagesClient _pageClient;
 
-		public HomeController(IPagesService pageService)
+		public HomeController(IPagesClient pageClient)
 		{
-			_pageService = pageService;
+			_pageClient = pageClient;
 		}
 
 		public IActionResult Index()
