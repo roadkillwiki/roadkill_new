@@ -41,46 +41,6 @@ namespace Roadkill.Api.Controllers
 			return _pageModelConverter.ConvertToViewModel(page);
 		}
 
-		[HttpPost]
-		[Authorize(Policy = PolicyNames.Editor)]
-		public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
-		{
-			// TODO: add base62 ID, as Id is Hilo
-			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
-			// TODO: fill createdon property
-			Page page = _pageModelConverter.ConvertToPage(model);
-			if (page == null)
-			{
-				return NotFound();
-			}
-
-			Page newPage = await _pageRepository.AddNewPage(page);
-			PageModel newModel = _pageModelConverter.ConvertToViewModel(newPage);
-
-			return CreatedAtAction(nameof(Add), nameof(PagesController), newModel);
-		}
-
-		[HttpPut]
-		[Authorize(Policy = PolicyNames.Editor)]
-		public async Task<ActionResult<PageModel>> Update(PageModel model)
-		{
-			Page page = _pageModelConverter.ConvertToPage(model);
-			if (page == null)
-			{
-				return NotFound();
-			}
-
-			Page newPage = await _pageRepository.UpdateExisting(page);
-			return _pageModelConverter.ConvertToViewModel(newPage);
-		}
-
-		[HttpDelete]
-		[Authorize(Policy = PolicyNames.Admin)]
-		public async Task Delete(int pageId)
-		{
-			await _pageRepository.DeletePage(pageId);
-		}
-
 		[HttpGet]
 		[Route(nameof(AllPages))]
 		[AllowAnonymous]
@@ -129,6 +89,46 @@ namespace Roadkill.Api.Controllers
 			}
 
 			return _pageModelConverter.ConvertToViewModel(page);
+		}
+
+		[HttpPost]
+		[Authorize(Policy = PolicyNames.Editor)]
+		public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
+		{
+			// TODO: add base62 ID, as Id is Hilo
+			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
+			// TODO: fill createdon property
+			Page page = _pageModelConverter.ConvertToPage(model);
+			if (page == null)
+			{
+				return NotFound();
+			}
+
+			Page newPage = await _pageRepository.AddNewPage(page);
+			PageModel newModel = _pageModelConverter.ConvertToViewModel(newPage);
+
+			return CreatedAtAction(nameof(Add), nameof(PagesController), newModel);
+		}
+
+		[HttpPut]
+		[Authorize(Policy = PolicyNames.Editor)]
+		public async Task<ActionResult<PageModel>> Update(PageModel model)
+		{
+			Page page = _pageModelConverter.ConvertToPage(model);
+			if (page == null)
+			{
+				return NotFound();
+			}
+
+			Page newPage = await _pageRepository.UpdateExisting(page);
+			return _pageModelConverter.ConvertToViewModel(newPage);
+		}
+
+		[HttpDelete]
+		[Authorize(Policy = PolicyNames.Admin)]
+		public async Task Delete(int pageId)
+		{
+			await _pageRepository.DeletePage(pageId);
 		}
 	}
 }

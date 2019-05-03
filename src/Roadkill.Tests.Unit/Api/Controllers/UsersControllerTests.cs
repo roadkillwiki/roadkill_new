@@ -18,8 +18,6 @@ using Xunit;
 
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	[SuppressMessage("Stylecop", "CA1063", Justification = "IDisposable overkill")]
-	[SuppressMessage("Stylecop", "CA1001", Justification = "IDisposable overkill")]
 	public sealed class UsersControllerTests
 	{
 		private readonly Fixture _fixture;
