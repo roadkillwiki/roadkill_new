@@ -53,21 +53,21 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 									  .Create();
 
 			UserRepository repository = CreateRepository();
-			await repository.SaveOrUpdateUser(adminUser);
-			await repository.SaveOrUpdateUser(editorUser);
+			await repository.SaveOrUpdateUserAsync(adminUser);
+			await repository.SaveOrUpdateUserAsync(editorUser);
 
-			IEnumerable<User> admins = await repository.FindAllAdmins();
+			IEnumerable<User> admins = await repository.FindAllAdminsAsync();
 			Assert.NotEmpty(admins);
 
-			IEnumerable<User> editors = await repository.FindAllEditors();
+			IEnumerable<User> editors = await repository.FindAllEditorsAsync();
 			Assert.NotEmpty(editors);
 
 			// when
-			await repository.DeleteAllUsers();
+			await repository.DeleteAllUsersAsync();
 
 			// then
-			admins = await repository.FindAllAdmins();
-			editors = await repository.FindAllEditors();
+			admins = await repository.FindAllAdminsAsync();
+			editors = await repository.FindAllEditorsAsync();
 
 			admins.ShouldBeEmpty();
 			editors.ShouldBeEmpty();
@@ -81,7 +81,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			List<User> remainingUsers = _fixture.CreateMany<User>().ToList();
 			remainingUsers.ForEach(async u =>
 			{
-				await repository.SaveOrUpdateUser(u);
+				await repository.SaveOrUpdateUserAsync(u);
 			});
 
 			User actualUser = _fixture.Build<User>()
@@ -89,17 +89,17 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 									  .With(x => x.IsEditor, true)
 									  .Create();
 
-			await repository.SaveOrUpdateUser(actualUser);
+			await repository.SaveOrUpdateUserAsync(actualUser);
 
 			// when
-			await repository.DeleteUser(actualUser);
+			await repository.DeleteUserAsync(actualUser);
 
 			// then
-			User deletedUser = await repository.GetUserById(actualUser.Id);
+			User deletedUser = await repository.GetUserByIdAsync(actualUser.Id);
 			deletedUser.ShouldBeNull();
 
 			Guid userId = remainingUsers.First().Id;
-			User firstRemainingUser = await repository.GetUserById(userId);
+			User firstRemainingUser = await repository.GetUserByIdAsync(userId);
 			firstRemainingUser.ShouldNotBeNull();
 		}
 
@@ -117,11 +117,11 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 
 			editorUsers.ForEach(user =>
 			{
-				repository.SaveOrUpdateUser(user).GetAwaiter().GetResult();
+				repository.SaveOrUpdateUserAsync(user).GetAwaiter().GetResult();
 			});
 
 			// when
-			IEnumerable<User> actualEditors = await repository.FindAllEditors();
+			IEnumerable<User> actualEditors = await repository.FindAllEditorsAsync();
 
 			// then
 			actualEditors.Count().ShouldBe(editorUsers.Count);
@@ -142,11 +142,11 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 
 			adminUsers.ForEach(user =>
 			{
-				repository.SaveOrUpdateUser(user).GetAwaiter().GetResult();
+				repository.SaveOrUpdateUserAsync(user).GetAwaiter().GetResult();
 			});
 
 			// when
-			IEnumerable<User> actualAdmins = await repository.FindAllAdmins();
+			IEnumerable<User> actualAdmins = await repository.FindAllAdminsAsync();
 
 			// then
 			actualAdmins.Count().ShouldBe(adminUsers.Count());
@@ -163,10 +163,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 										.With(x => x.IsEditor, false)
 										.Create();
 
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetAdminById(expectedUser.Id);
+			User actualUser = await repository.GetAdminByIdAsync(expectedUser.Id);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -179,10 +179,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			// given
 			UserRepository repository = CreateRepository();
 			User expectedUser = _fixture.Create<User>();
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetUserByActivationKey(expectedUser.ActivationKey);
+			User actualUser = await repository.GetUserByActivationKeyAsync(expectedUser.ActivationKey);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -199,10 +199,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 											.With(x => x.IsEditor, true)
 											.Create();
 
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetEditorById(expectedUser.Id);
+			User actualUser = await repository.GetEditorByIdAsync(expectedUser.Id);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -220,10 +220,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 										.With(x => x.IsActivated, isActivated)
 										.Create();
 
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetUserByEmail(expectedUser.Email, isActivated);
+			User actualUser = await repository.GetUserByEmailAsync(expectedUser.Email, isActivated);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -241,10 +241,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 				.With(x => x.IsActivated, isActivated)
 				.Create();
 
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetUserById(expectedUser.Id, isActivated);
+			User actualUser = await repository.GetUserByIdAsync(expectedUser.Id, isActivated);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -258,10 +258,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			UserRepository repository = CreateRepository();
 			User expectedUser = _fixture.Create<User>();
 
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetUserByPasswordResetKey(expectedUser.PasswordResetKey);
+			User actualUser = await repository.GetUserByPasswordResetKeyAsync(expectedUser.PasswordResetKey);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -275,10 +275,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			UserRepository repository = CreateRepository();
 			User expectedUser = _fixture.Create<User>();
 
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetUserByUsername(expectedUser.Username);
+			User actualUser = await repository.GetUserByUsernameAsync(expectedUser.Username);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -292,10 +292,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			UserRepository repository = CreateRepository();
 			User expectedUser = _fixture.Create<User>();
 
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// when
-			User actualUser = await repository.GetUserByUsernameOrEmail(expectedUser.Username, expectedUser.Email);
+			User actualUser = await repository.GetUserByUsernameOrEmailAsync(expectedUser.Username, expectedUser.Email);
 
 			// then
 			actualUser.ShouldNotBeNull();
@@ -310,10 +310,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			User expectedUser = _fixture.Create<User>();
 
 			// when
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// then
-			User actualUser = await repository.GetUserById(expectedUser.Id);
+			User actualUser = await repository.GetUserByIdAsync(expectedUser.Id);
 			actualUser.ShouldNotBeNull();
 		}
 
@@ -323,16 +323,16 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			// given
 			UserRepository repository = CreateRepository();
 			User expectedUser = _fixture.Create<User>();
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			expectedUser.Firstname = "My name";
 			expectedUser.Lastname = "A Jeff";
 
 			// when
-			await repository.SaveOrUpdateUser(expectedUser);
+			await repository.SaveOrUpdateUserAsync(expectedUser);
 
 			// then
-			User actualUser = await repository.GetUserById(expectedUser.Id);
+			User actualUser = await repository.GetUserByIdAsync(expectedUser.Id);
 			actualUser.ShouldNotBeNull();
 		}
 	}

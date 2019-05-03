@@ -95,7 +95,7 @@ namespace Roadkill.Api.Controllers
 		[Authorize(Policy = PolicyNames.Editor)]
 		public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
 		{
-			// TODO: add base62 ID, as Id is Hilo
+			// TODO: add base62 ID, as Id in Marten is Hilo and starts at 1000 as the lo
 			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
 			// TODO: fill createdon property
 			Page page = _pageModelConverter.ConvertToPage(model);

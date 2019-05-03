@@ -50,7 +50,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			int pageId = pageVersion.PageId;
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.GetLatestVersion(pageId))
+				.Setup(x => x.GetLatestVersionAsync(pageId))
 				.ReturnsAsync(pageVersion);
 
 			// when
@@ -61,7 +61,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			pageVersionViewModel.PageId.ShouldBe(pageId);
 			pageVersionViewModel.Text.ShouldBe(pageVersion.Text);
 
-			_pageVersionRepositoryMock.Verify(x => x.GetLatestVersion(pageId), Times.Once);
+			_pageVersionRepositoryMock.Verify(x => x.GetLatestVersionAsync(pageId), Times.Once);
 			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(pageVersion));
 		}
 
@@ -83,7 +83,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			};
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.AddNewVersion(pageId, text, author, dateTime))
+				.Setup(x => x.AddNewVersionAsync(pageId, text, author, dateTime))
 				.ReturnsAsync(repoPageVersion);
 
 			// when
@@ -96,7 +96,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualPageViewModel.DateTime.ShouldBe(dateTime);
 
 			_pageVersionRepositoryMock
-				.Verify(x => x.AddNewVersion(pageId, text, author, dateTime), Times.Once);
+				.Verify(x => x.AddNewVersionAsync(pageId, text, author, dateTime), Times.Once);
 		}
 
 		[Fact]
@@ -107,7 +107,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			Guid versionId = pageVersion.Id;
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.GetById(versionId))
+				.Setup(x => x.GetByIdAsync(versionId))
 				.ReturnsAsync(pageVersion);
 
 			// when
@@ -117,7 +117,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualModel.ShouldNotBeNull();
 			actualModel.Id.ShouldBe(versionId);
 
-			_pageVersionRepositoryMock.Verify(x => x.GetById(versionId), Times.Once);
+			_pageVersionRepositoryMock.Verify(x => x.GetByIdAsync(versionId), Times.Once);
 			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(pageVersion), Times.Once);
 		}
 
@@ -128,7 +128,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			Guid pageVersionId = Guid.NewGuid();
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.DeleteVersion(pageVersionId))
+				.Setup(x => x.DeleteVersionAsync(pageVersionId))
 				.Returns(Task.CompletedTask);
 
 			// when
@@ -136,7 +136,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			_pageVersionRepositoryMock
-				.Verify(x => x.DeleteVersion(pageVersionId), Times.Once);
+				.Verify(x => x.DeleteVersionAsync(pageVersionId), Times.Once);
 		}
 
 		[Fact]
@@ -165,14 +165,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pageVersion);
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.UpdateExistingVersion(pageVersion))
+				.Setup(x => x.UpdateExistingVersionAsync(pageVersion))
 				.Returns(Task.CompletedTask);
 
 			// when
 			await _pageVersionsController.Update(viewModel);
 
 			// then
-			_pageVersionRepositoryMock.Verify(x => x.UpdateExistingVersion(pageVersion), Times.Once);
+			_pageVersionRepositoryMock.Verify(x => x.UpdateExistingVersionAsync(pageVersion), Times.Once);
 			_viewModelCreatorMock.Verify(x => x.ConvertToPageVersion(viewModel));
 		}
 
@@ -183,7 +183,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			List<PageVersion> pageVersions = _fixture.CreateMany<PageVersion>().ToList();
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.AllVersions())
+				.Setup(x => x.AllVersionsAsync())
 				.ReturnsAsync(pageVersions);
 
 			// when
@@ -193,7 +193,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualViewModels.ShouldNotBeNull();
 			actualViewModels.Count().ShouldBe(pageVersions.Count);
 
-			_pageVersionRepositoryMock.Verify(x => x.AllVersions(), Times.Once);
+			_pageVersionRepositoryMock.Verify(x => x.AllVersionsAsync(), Times.Once);
 			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
 		}
 
@@ -206,7 +206,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			pageVersions.ForEach(p => p.PageId = pageId);
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.FindPageVersionsByPageId(pageId))
+				.Setup(x => x.FindPageVersionsByPageIdAsync(pageId))
 				.ReturnsAsync(pageVersions);
 
 			// when
@@ -216,7 +216,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualViewModels.ShouldNotBeNull();
 			actualViewModels.Count().ShouldBe(pageVersions.Count);
 
-			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByPageId(pageId), Times.Once);
+			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByPageIdAsync(pageId), Times.Once);
 			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
 		}
 
@@ -229,7 +229,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			pageVersions.ForEach(p => p.Author = author);
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.FindPageVersionsByAuthor(author))
+				.Setup(x => x.FindPageVersionsByAuthorAsync(author))
 				.ReturnsAsync(pageVersions);
 
 			// when
@@ -239,7 +239,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualViewModels.ShouldNotBeNull();
 			actualViewModels.Count().ShouldBe(pageVersions.Count);
 
-			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByAuthor(author), Times.Once);
+			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByAuthorAsync(author), Times.Once);
 			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
 		}
 	}

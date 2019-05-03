@@ -29,7 +29,7 @@ namespace Roadkill.Api.Controllers
 		[HttpPost]
 		public async Task<PageVersionModel> Add(int pageId, string text, string author, DateTime? dateTime = null)
 		{
-			PageVersion pageVersion = await _pageVersionRepository.AddNewVersion(pageId, text, author, dateTime);
+			PageVersion pageVersion = await _pageVersionRepository.AddNewVersionAsync(pageId, text, author, dateTime);
 
 			return _modelConverter.ConvertToViewModel(pageVersion);
 		}
@@ -38,7 +38,7 @@ namespace Roadkill.Api.Controllers
 		[Route("Get")]
 		public async Task<PageVersionModel> GetById(Guid id)
 		{
-			PageVersion pageVersion = await _pageVersionRepository.GetById(id);
+			PageVersion pageVersion = await _pageVersionRepository.GetByIdAsync(id);
 
 			return _modelConverter.ConvertToViewModel(pageVersion);
 		}
@@ -46,21 +46,21 @@ namespace Roadkill.Api.Controllers
 		[HttpDelete]
 		public async Task Delete(Guid id)
 		{
-			await _pageVersionRepository.DeleteVersion(id);
+			await _pageVersionRepository.DeleteVersionAsync(id);
 		}
 
 		[HttpPut]
 		public async Task Update(PageVersionModel pageVersionModel)
 		{
 			PageVersion pageVersion = _modelConverter.ConvertToPageVersion(pageVersionModel);
-			await _pageVersionRepository.UpdateExistingVersion(pageVersion);
+			await _pageVersionRepository.UpdateExistingVersionAsync(pageVersion);
 		}
 
 		[HttpGet]
 		[Route(nameof(AllVersions))]
 		public async Task<IEnumerable<PageVersionModel>> AllVersions()
 		{
-			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.AllVersions();
+			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.AllVersionsAsync();
 			return pageVersions.Select(_modelConverter.ConvertToViewModel);
 		}
 
@@ -68,7 +68,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(FindPageVersionsByPageId))]
 		public async Task<IEnumerable<PageVersionModel>> FindPageVersionsByPageId(int pageId)
 		{
-			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.FindPageVersionsByPageId(pageId);
+			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.FindPageVersionsByPageIdAsync(pageId);
 			return pageVersions.Select(_modelConverter.ConvertToViewModel);
 		}
 
@@ -76,7 +76,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(FindPageVersionsByAuthor))]
 		public async Task<IEnumerable<PageVersionModel>> FindPageVersionsByAuthor(string username)
 		{
-			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.FindPageVersionsByAuthor(username);
+			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.FindPageVersionsByAuthorAsync(username);
 			return pageVersions.Select(_modelConverter.ConvertToViewModel);
 		}
 
@@ -84,7 +84,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(GetLatestVersion))]
 		public async Task<PageVersionModel> GetLatestVersion(int pageId)
 		{
-			PageVersion latestPageVersion = await _pageVersionRepository.GetLatestVersion(pageId);
+			PageVersion latestPageVersion = await _pageVersionRepository.GetLatestVersionAsync(pageId);
 			if (latestPageVersion == null)
 			{
 				return null;

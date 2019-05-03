@@ -9,31 +9,31 @@ namespace Roadkill.Core.Repositories
 {
 	public interface IUserRepository
 	{
-		Task DeleteAllUsers();
+		Task DeleteAllUsersAsync();
 
-		Task DeleteUser(User user);
+		Task DeleteUserAsync(User user);
 
-		Task<IEnumerable<User>> FindAllEditors();
+		Task<IEnumerable<User>> FindAllEditorsAsync();
 
-		Task<IEnumerable<User>> FindAllAdmins();
+		Task<IEnumerable<User>> FindAllAdminsAsync();
 
-		Task<User> GetAdminById(Guid id);
+		Task<User> GetAdminByIdAsync(Guid id);
 
-		Task<User> GetUserByActivationKey(string key);
+		Task<User> GetUserByActivationKeyAsync(string key);
 
-		Task<User> GetEditorById(Guid id);
+		Task<User> GetEditorByIdAsync(Guid id);
 
-		Task<User> GetUserByEmail(string email, bool? isActivated = null);
+		Task<User> GetUserByEmailAsync(string email, bool? isActivated = null);
 
-		Task<User> GetUserById(Guid id, bool? isActivated = null);
+		Task<User> GetUserByIdAsync(Guid id, bool? isActivated = null);
 
-		Task<User> GetUserByPasswordResetKey(string key);
+		Task<User> GetUserByPasswordResetKeyAsync(string key);
 
-		Task<User> GetUserByUsername(string username);
+		Task<User> GetUserByUsernameAsync(string username);
 
-		Task<User> GetUserByUsernameOrEmail(string username, string email);
+		Task<User> GetUserByUsernameOrEmailAsync(string username, string email);
 
-		Task SaveOrUpdateUser(User user);
+		Task SaveOrUpdateUserAsync(User user);
 	}
 
 	public class UserRepository : IUserRepository
@@ -45,7 +45,7 @@ namespace Roadkill.Core.Repositories
 			_store = store ?? throw new ArgumentNullException(nameof(store));
 		}
 
-		public async Task DeleteAllUsers()
+		public async Task DeleteAllUsersAsync()
 		{
 			using (var session = _store.LightweightSession())
 			{
@@ -54,7 +54,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task DeleteUser(User user)
+		public async Task DeleteUserAsync(User user)
 		{
 			using (var session = _store.LightweightSession())
 			{
@@ -63,7 +63,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<User>> FindAllEditors()
+		public async Task<IEnumerable<User>> FindAllEditorsAsync()
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -74,7 +74,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<User>> FindAllAdmins()
+		public async Task<IEnumerable<User>> FindAllAdminsAsync()
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -85,7 +85,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetAdminById(Guid id)
+		public async Task<User> GetAdminByIdAsync(Guid id)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -95,7 +95,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetUserByActivationKey(string key)
+		public async Task<User> GetUserByActivationKeyAsync(string key)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -105,7 +105,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetEditorById(Guid id)
+		public async Task<User> GetEditorByIdAsync(Guid id)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -115,7 +115,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetUserByEmail(string email, bool? isActivated = null)
+		public async Task<User> GetUserByEmailAsync(string email, bool? isActivated = null)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -125,7 +125,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetUserById(Guid id, bool? isActivated = null)
+		public async Task<User> GetUserByIdAsync(Guid id, bool? isActivated = null)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -135,7 +135,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetUserByPasswordResetKey(string key)
+		public async Task<User> GetUserByPasswordResetKeyAsync(string key)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -145,7 +145,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetUserByUsername(string username)
+		public async Task<User> GetUserByUsernameAsync(string username)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -155,7 +155,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<User> GetUserByUsernameOrEmail(string username, string email)
+		public async Task<User> GetUserByUsernameOrEmailAsync(string username, string email)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -165,7 +165,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task SaveOrUpdateUser(User user)
+		public async Task SaveOrUpdateUserAsync(User user)
 		{
 			using (var session = _store.LightweightSession())
 			{

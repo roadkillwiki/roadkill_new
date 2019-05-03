@@ -9,22 +9,22 @@ namespace Roadkill.Core.Repositories
 {
 	public interface IPageVersionRepository
 	{
-		Task<PageVersion> AddNewVersion(int pageId, string text, string author, DateTime? dateTime = null);
+		Task<PageVersion> AddNewVersionAsync(int pageId, string text, string author, DateTime? dateTime = null);
 
-		Task<IEnumerable<PageVersion>> AllVersions();
+		Task<IEnumerable<PageVersion>> AllVersionsAsync();
 
-		Task DeleteVersion(Guid id);
+		Task DeleteVersionAsync(Guid id);
 
-		Task<IEnumerable<PageVersion>> FindPageVersionsByPageId(int pageId);
+		Task<IEnumerable<PageVersion>> FindPageVersionsByPageIdAsync(int pageId);
 
-		Task<IEnumerable<PageVersion>> FindPageVersionsByAuthor(string username);
+		Task<IEnumerable<PageVersion>> FindPageVersionsByAuthorAsync(string username);
 
-		Task<PageVersion> GetLatestVersion(int pageId);
+		Task<PageVersion> GetLatestVersionAsync(int pageId);
 
-		Task<PageVersion> GetById(Guid id);
+		Task<PageVersion> GetByIdAsync(Guid id);
 
 		// doesn't add a new version
-		Task UpdateExistingVersion(PageVersion version);
+		Task UpdateExistingVersionAsync(PageVersion version);
 	}
 
 	public class PageVersionRepository : IPageVersionRepository
@@ -36,7 +36,7 @@ namespace Roadkill.Core.Repositories
 			_store = store ?? throw new ArgumentNullException(nameof(store));
 		}
 
-		public async Task<PageVersion> AddNewVersion(int pageId, string text, string author, DateTime? dateTime = null)
+		public async Task<PageVersion> AddNewVersionAsync(int pageId, string text, string author, DateTime? dateTime = null)
 		{
 			using (var session = _store.LightweightSession())
 			{
@@ -60,7 +60,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<PageVersion>> AllVersions()
+		public async Task<IEnumerable<PageVersion>> AllVersionsAsync()
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -70,7 +70,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task DeleteVersion(Guid id)
+		public async Task DeleteVersionAsync(Guid id)
 		{
 			using (var session = _store.OpenSession())
 			{
@@ -80,7 +80,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<PageVersion>> FindPageVersionsByPageId(int pageId)
+		public async Task<IEnumerable<PageVersion>> FindPageVersionsByPageIdAsync(int pageId)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -92,7 +92,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<PageVersion>> FindPageVersionsByAuthor(string username)
+		public async Task<IEnumerable<PageVersion>> FindPageVersionsByAuthorAsync(string username)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -104,7 +104,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<PageVersion> GetLatestVersion(int pageId)
+		public async Task<PageVersion> GetLatestVersionAsync(int pageId)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -115,7 +115,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task<PageVersion> GetById(Guid id)
+		public async Task<PageVersion> GetByIdAsync(Guid id)
 		{
 			using (var session = _store.QuerySession())
 			{
@@ -125,7 +125,7 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task UpdateExistingVersion(PageVersion version)
+		public async Task UpdateExistingVersionAsync(PageVersion version)
 		{
 			using (var session = _store.LightweightSession())
 			{

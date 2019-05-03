@@ -48,15 +48,15 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			PageVersionRepository repository = CreateRepository();
 			List<PageVersion> pages = CreateTenPages(repository);
 			PageVersion expectedPage = pages.Last();
-			await repository.AddNewVersion(expectedPage.PageId, "v2 text", "brian");
+			await repository.AddNewVersionAsync(expectedPage.PageId, "v2 text", "brian");
 
 			// when
-			PageVersion thirdVersion = await repository.AddNewVersion(expectedPage.PageId, "v3 text", "author2");
+			PageVersion thirdVersion = await repository.AddNewVersionAsync(expectedPage.PageId, "v3 text", "author2");
 
 			// then
 			thirdVersion.ShouldNotBeNull();
 
-			PageVersion savedVersion = await repository.GetById(thirdVersion.Id);
+			PageVersion savedVersion = await repository.GetByIdAsync(thirdVersion.Id);
 			savedVersion.ShouldNotBeNull();
 			savedVersion.ShouldBeEquivalent(thirdVersion);
 		}
@@ -69,7 +69,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			List<PageVersion> pages = CreateTenPages(repository);
 
 			// when
-			IEnumerable<PageVersion> allVersions = await repository.AllVersions();
+			IEnumerable<PageVersion> allVersions = await repository.AllVersionsAsync();
 
 			// then
 			allVersions.Count().ShouldBe(pages.Count);
@@ -84,17 +84,17 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			List<PageVersion> pages = CreateTenPages(repository);
 
 			var expectedPage = pages[0];
-			var version2 = await repository.AddNewVersion(expectedPage.PageId, "v2", "author2");
-			var version3 = await repository.AddNewVersion(expectedPage.PageId, "v3", "author2");
+			var version2 = await repository.AddNewVersionAsync(expectedPage.PageId, "v2", "author2");
+			var version3 = await repository.AddNewVersionAsync(expectedPage.PageId, "v3", "author2");
 
 			// when
-			await repository.DeleteVersion(version3.Id);
+			await repository.DeleteVersionAsync(version3.Id);
 
 			// then
-			var deletedVersion = await repository.GetById(version3.Id);
+			var deletedVersion = await repository.GetByIdAsync(version3.Id);
 			deletedVersion.ShouldBeNull();
 
-			var latestVersion = await repository.GetById(version2.Id);
+			var latestVersion = await repository.GetByIdAsync(version2.Id);
 			latestVersion.ShouldNotBeNull();
 		}
 
@@ -110,10 +110,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			newVersion.Author = "blake";
 
 			// when
-			await repository.UpdateExistingVersion(newVersion);
+			await repository.UpdateExistingVersionAsync(newVersion);
 
 			// then
-			PageVersion savedVersion = await repository.GetById(newVersion.Id);
+			PageVersion savedVersion = await repository.GetByIdAsync(newVersion.Id);
 			savedVersion.ShouldNotBeNull();
 			savedVersion.ShouldBeEquivalent(newVersion);
 		}
@@ -126,12 +126,12 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			List<PageVersion> pages = CreateTenPages(repository);
 
 			var firstPage = pages[0];
-			var version2 = await repository.AddNewVersion(firstPage.PageId, "v2", "author1", DateTime.Today.AddMinutes(10));
-			var version3 = await repository.AddNewVersion(firstPage.PageId, "v3", "author2", DateTime.Today.AddMinutes(20));
-			var version4 = await repository.AddNewVersion(firstPage.PageId, "v4", "author3", DateTime.Today.AddMinutes(30));
+			var version2 = await repository.AddNewVersionAsync(firstPage.PageId, "v2", "author1", DateTime.Today.AddMinutes(10));
+			var version3 = await repository.AddNewVersionAsync(firstPage.PageId, "v3", "author2", DateTime.Today.AddMinutes(20));
+			var version4 = await repository.AddNewVersionAsync(firstPage.PageId, "v4", "author3", DateTime.Today.AddMinutes(30));
 
 			// when
-			IEnumerable<PageVersion> versions = await repository.FindPageVersionsByPageId(firstPage.PageId);
+			IEnumerable<PageVersion> versions = await repository.FindPageVersionsByPageIdAsync(firstPage.PageId);
 
 			// then
 			versions.ShouldNotBeNull();
@@ -149,11 +149,11 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			List<PageVersion> pageVersions = CreateTenPages(repository);
 
 			string editedBy = "shakespeare jr";
-			PageVersion version2 = await repository.AddNewVersion(pageVersions[0].PageId, "v2 text", editedBy);
-			PageVersion version3 = await repository.AddNewVersion(pageVersions[1].PageId, "v3 text", editedBy);
+			PageVersion version2 = await repository.AddNewVersionAsync(pageVersions[0].PageId, "v2 text", editedBy);
+			PageVersion version3 = await repository.AddNewVersionAsync(pageVersions[1].PageId, "v3 text", editedBy);
 
 			// when
-			IEnumerable<PageVersion> actualPageVersions = await repository.FindPageVersionsByAuthor("SHAKESPEARE jr");
+			IEnumerable<PageVersion> actualPageVersions = await repository.FindPageVersionsByAuthorAsync("SHAKESPEARE jr");
 
 			// then
 			actualPageVersions.Count().ShouldBe(2);
@@ -169,11 +169,11 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			List<PageVersion> pageVersions = CreateTenPages(repository);
 
 			int pageId = pageVersions[0].PageId;
-			PageVersion version2 = await repository.AddNewVersion(pageId, "v2 text", "editedBy", DateTime.Today.AddMinutes(10));
-			PageVersion version3 = await repository.AddNewVersion(pageId, "v3 text", "editedBy", DateTime.Today.AddMinutes(30));
+			PageVersion version2 = await repository.AddNewVersionAsync(pageId, "v2 text", "editedBy", DateTime.Today.AddMinutes(10));
+			PageVersion version3 = await repository.AddNewVersionAsync(pageId, "v3 text", "editedBy", DateTime.Today.AddMinutes(30));
 
 			// when
-			PageVersion latestVersion = await repository.GetLatestVersion(pageId);
+			PageVersion latestVersion = await repository.GetLatestVersionAsync(pageId);
 
 			// then
 			latestVersion.ShouldNotBeNull();
@@ -189,7 +189,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			PageVersion pageVersion = pageVersions[0];
 
 			// when
-			PageVersion latestVersion = await repository.GetById(pageVersion.Id);
+			PageVersion latestVersion = await repository.GetByIdAsync(pageVersion.Id);
 
 			// then
 			Assert.NotNull(latestVersion);
@@ -212,7 +212,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 				DateTime dateTime = DateTime.Today;
 
 				Page newPage = pageRepository.AddNewPageAsync(page).GetAwaiter().GetResult();
-				PageVersion pageVersion = repository.AddNewVersion(newPage.Id, text, author, dateTime).GetAwaiter().GetResult();
+				PageVersion pageVersion = repository.AddNewVersionAsync(newPage.Id, text, author, dateTime).GetAwaiter().GetResult();
 				pageVersions.Add(pageVersion);
 			}
 
