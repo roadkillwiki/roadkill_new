@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Core.Entities;
 
 namespace Roadkill.Api.ModelConverters
 {
-	public interface IPageModelConverter
+	public interface IPageObjectsConverter
 	{
-		PageModel ConvertToViewModel(Page page);
+		PageResponse ConvertToPageResponse(Page page);
 
-		Page ConvertToPage(PageModel model);
+		Page ConvertToPage(PageRequest pageRequest);
 	}
 
-	public class PageModelConverter : IPageModelConverter
+	public class PageObjectsConverter : IPageObjectsConverter
 	{
-		public PageModel ConvertToViewModel(Page page)
+		public PageResponse ConvertToPageResponse(Page page)
 		{
-			return new PageModel()
+			return new PageResponse()
 			{
 				Id = page.Id,
 				Title = page.Title,
@@ -32,18 +33,18 @@ namespace Roadkill.Api.ModelConverters
 			};
 		}
 
-		public Page ConvertToPage(PageModel model)
+		public Page ConvertToPage(PageRequest pageRequest)
 		{
 			return new Page()
 			{
-				Id = model.Id,
-				Title = model.Title,
-				LastModifiedBy = model.LastModifiedBy,
-				LastModifiedOn = model.LastModifiedOn,
-				CreatedBy = model.CreatedBy,
-				CreatedOn = model.CreatedOn,
-				IsLocked = model.IsLocked,
-				Tags = model.TagsAsCsv
+				Id = pageRequest.Id,
+				Title = pageRequest.Title,
+				LastModifiedBy = pageRequest.LastModifiedBy,
+				LastModifiedOn = pageRequest.LastModifiedOn,
+				CreatedBy = pageRequest.CreatedBy,
+				CreatedOn = pageRequest.CreatedOn,
+				IsLocked = pageRequest.IsLocked,
+				Tags = pageRequest.TagsAsCsv
 			};
 		}
 

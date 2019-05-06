@@ -13,9 +13,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	public sealed class MarkdownControllerTests
 	{
 		private readonly Mock<ITextMiddlewareBuilder> _textMiddlewareMock;
-
 		private readonly MarkdownController _markdownController;
-
 		private Fixture _fixture;
 
 		public MarkdownControllerTests()

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.JWT;
 using Roadkill.Api.ModelConverters;
 using Roadkill.Core.Entities;
@@ -20,12 +20,14 @@ namespace Roadkill.Api.Controllers
 	public class TagsController : ControllerBase
 	{
 		private readonly IPageRepository _pageRepository;
-		private readonly IPageModelConverter _pageModelConverter;
+		private readonly IPageObjectsConverter _pageObjectsConverter;
 
-		public TagsController(IPageRepository pageRepository, IPageModelConverter pageModelConverter)
+		public TagsController(
+			IPageRepository pageRepository,
+			IPageObjectsConverter pageObjectsConverter)
 		{
 			_pageRepository = pageRepository;
-			_pageModelConverter = pageModelConverter;
+			_pageObjectsConverter = pageObjectsConverter;
 		}
 
 		[HttpPost]
@@ -43,11 +45,11 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(AllTags))]
-		public async Task<IEnumerable<TagModel>> AllTags()
+		public async Task<IEnumerable<TagResponse>> AllTags()
 		{
 			IEnumerable<string> allTags = await _pageRepository.AllTagsAsync();
 
-			var viewModels = new List<TagModel>();
+			var viewModels = new List<TagResponse>();
 			foreach (string tag in allTags)
 			{
 				var existingModel = viewModels.FirstOrDefault(x => x.Name == tag);
@@ -57,7 +59,7 @@ namespace Roadkill.Api.Controllers
 				}
 				else
 				{
-					viewModels.Add(new TagModel() { Name = tag, Count = 1 });
+					viewModels.Add(new TagResponse() { Name = tag, Count = 1 });
 				}
 			}
 
@@ -66,10 +68,10 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(FindPageWithTag))]
-		public async Task<IEnumerable<PageModel>> FindPageWithTag(string tag)
+		public async Task<IEnumerable<PageResponse>> FindPageWithTag(string tag)
 		{
 			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTagAsync(tag);
-			return pages.Select(_pageModelConverter.ConvertToViewModel);
+			return pages.Select(_pageObjectsConverter.ConvertToPageResponse);
 		}
 	}
 }

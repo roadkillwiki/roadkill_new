@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.JWT;
 using Roadkill.Api.ModelConverters;
 using Roadkill.Core.Entities;
@@ -11,20 +12,25 @@ using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
+	/// <summary>
+	/// Actions related to pages in the wiki, such as creation and retrieval.
+	/// </summary>
 	[Authorize]
-	[ApiController] // [ApiController] adds [FromBody] by default and model validation
+	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
 	public class PagesController : ControllerBase
 	{
+		// [ApiController] adds [FromBody] by default and model validation
 		private readonly IPageRepository _pageRepository;
+		private readonly IPageObjectsConverter _pageObjectsConverter;
 
-		private readonly IPageModelConverter _pageModelConverter;
-
-		public PagesController(IPageRepository pageRepository, IPageModelConverter pageModelConverter)
+		public PagesController(
+			IPageRepository pageRepository,
+			IPageObjectsConverter pageObjectsConverter)
 		{
 			_pageRepository = pageRepository;
-			_pageModelConverter = pageModelConverter;
+			_pageObjectsConverter = pageObjectsConverter;
 		}
 
 		/// <summary>
@@ -36,7 +42,7 @@ namespace Roadkill.Api.Controllers
 		[HttpGet]
 		[AllowAnonymous]
 		[Route("{id}")]
-		public async Task<ActionResult<PageModel>> Get(int id)
+		public async Task<ActionResult<PageResponse>> Get(int id)
 		{
 			Page page = await _pageRepository.GetPageByIdAsync(id);
 			if (page == null)
@@ -44,7 +50,7 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			return _pageModelConverter.ConvertToViewModel(page);
+			return _pageObjectsConverter.ConvertToPageResponse(page);
 		}
 
 		/// <summary>
@@ -55,10 +61,10 @@ namespace Roadkill.Api.Controllers
 		[HttpGet]
 		[Route(nameof(AllPages))]
 		[AllowAnonymous]
-		public async Task<ActionResult<IEnumerable<PageModel>>> AllPages()
+		public async Task<ActionResult<IEnumerable<PageResponse>>> AllPages()
 		{
 			IEnumerable<Page> allpages = await _pageRepository.AllPagesAsync();
-			return Ok(allpages.Select(_pageModelConverter.ConvertToViewModel));
+			return Ok(allpages.Select(_pageObjectsConverter.ConvertToPageResponse));
 		}
 
 		/// <summary>
@@ -71,11 +77,11 @@ namespace Roadkill.Api.Controllers
 		[HttpGet]
 		[Route(nameof(AllPagesCreatedBy))]
 		[AllowAnonymous]
-		public async Task<ActionResult<IEnumerable<PageModel>>> AllPagesCreatedBy(string username)
+		public async Task<ActionResult<IEnumerable<PageResponse>>> AllPagesCreatedBy(string username)
 		{
 			IEnumerable<Page> pagesCreatedBy = await _pageRepository.FindPagesCreatedByAsync(username);
 
-			IEnumerable<PageModel> models = pagesCreatedBy.Select(_pageModelConverter.ConvertToViewModel);
+			IEnumerable<PageResponse> models = pagesCreatedBy.Select(_pageObjectsConverter.ConvertToPageResponse);
 			return Ok(models);
 		}
 
@@ -87,7 +93,7 @@ namespace Roadkill.Api.Controllers
 		[HttpGet]
 		[Route(nameof(FindHomePage))]
 		[AllowAnonymous]
-		public async Task<ActionResult<PageModel>> FindHomePage()
+		public async Task<ActionResult<PageResponse>> FindHomePage()
 		{
 			IEnumerable<Page> pagesWithHomePageTag = await _pageRepository.FindPagesContainingTagAsync("homepage");
 
@@ -97,7 +103,7 @@ namespace Roadkill.Api.Controllers
 			}
 
 			Page firstResult = pagesWithHomePageTag.First();
-			return _pageModelConverter.ConvertToViewModel(firstResult);
+			return _pageObjectsConverter.ConvertToPageResponse(firstResult);
 		}
 
 		/// <summary>
@@ -109,7 +115,7 @@ namespace Roadkill.Api.Controllers
 		[HttpGet]
 		[Route(nameof(FindByTitle))]
 		[AllowAnonymous]
-		public async Task<ActionResult<PageModel>> FindByTitle(string title)
+		public async Task<ActionResult<PageResponse>> FindByTitle(string title)
 		{
 			Page page = await _pageRepository.GetPageByTitleAsync(title);
 			if (page == null)
@@ -117,52 +123,52 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			return _pageModelConverter.ConvertToViewModel(page);
+			return _pageObjectsConverter.ConvertToPageResponse(page);
 		}
 
 		/// <summary>
 		/// Add a page to the database using the provided meta information. This will only add
 		/// the meta information not the page text, use PageVersions to add text for a page.
 		/// </summary>
-		/// <param name="model">The page information to add.</param>
+		/// <param name="pageRequest">The page information to add.</param>
 		/// <returns>A 202 HTTP status with the newly created page, with its generated ID populated.</returns>
 		[HttpPost]
 		[Authorize(Policy = PolicyNames.Editor)]
-		public async Task<ActionResult<PageModel>> Add([FromBody] PageModel model)
+		public async Task<ActionResult<PageResponse>> Add([FromBody] PageRequest pageRequest)
 		{
 			// TODO: add base62 ID, as Id in Marten is Hilo and starts at 1000 as the lo
 			// TODO: fill createdon property
 			// TODO: validate
 			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/
-			Page page = _pageModelConverter.ConvertToPage(model);
+			Page page = _pageObjectsConverter.ConvertToPage(pageRequest);
 			if (page == null)
 			{
 				return NotFound();
 			}
 
 			Page newPage = await _pageRepository.AddNewPageAsync(page);
-			PageModel newModel = _pageModelConverter.ConvertToViewModel(newPage);
+			PageResponse newResponse = _pageObjectsConverter.ConvertToPageResponse(newPage);
 
-			return CreatedAtAction(nameof(Add), nameof(PagesController), newModel);
+			return CreatedAtAction(nameof(Add), nameof(PagesController), newResponse);
 		}
 
 		/// <summary>
 		/// Updates an existing page in the database.
 		/// </summary>
-		/// <param name="model">The page details to update, which should include the page id.</param>
+		/// <param name="pageRequest">The page details to update, which should include the page id.</param>
 		/// <returns>The update page details, or a 404 not found if the existing page cannot be found</returns>
 		[HttpPut]
 		[Authorize(Policy = PolicyNames.Editor)]
-		public async Task<ActionResult<PageModel>> Update(PageModel model)
+		public async Task<ActionResult<PageResponse>> Update(PageRequest pageRequest)
 		{
-			Page page = _pageModelConverter.ConvertToPage(model);
+			Page page = _pageObjectsConverter.ConvertToPage(pageRequest);
 			if (page == null)
 			{
 				return NotFound();
 			}
 
 			Page newPage = await _pageRepository.UpdateExistingAsync(page);
-			return _pageModelConverter.ConvertToViewModel(newPage);
+			return _pageObjectsConverter.ConvertToPageResponse(newPage);
 		}
 
 		/// <summary>

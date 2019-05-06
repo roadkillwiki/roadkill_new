@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Roadkill.Api.Common.Models
+namespace Roadkill.Api.Common.Request
 {
-	public class SearchRequestModel
+	public class SearchRequest
 	{
 		public int Id { get; set; }
 

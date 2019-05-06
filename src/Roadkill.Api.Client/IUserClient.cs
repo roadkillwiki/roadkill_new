@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 
 namespace Roadkill.Api.Client
 {
@@ -13,27 +14,27 @@ namespace Roadkill.Api.Client
 
 		Task<bool> DeleteUser(string email);
 
-		Task<UserModel> GetUserById(Guid id, bool? isActivated = null);
+		Task<UserResponse> GetUserById(Guid id, bool? isActivated = null);
 
-		Task<UserModel> GetUser(string email, bool? isActivated = null);
+		Task<UserResponse> GetUser(string email, bool? isActivated = null);
 
-		Task<UserModel> GetUserByResetKey(string resetKey);
+		Task<UserResponse> GetUserByResetKey(string resetKey);
 
 		Task<bool> IsAdmin(string cookieValue);
 
 		Task<bool> IsEditor(string cookieValue);
 
-		Task<IEnumerable<UserModel>> ListAdmins();
+		Task<IEnumerable<UserResponse>> ListAdmins();
 
-		Task<IEnumerable<UserModel>> ListEditors();
+		Task<IEnumerable<UserResponse>> ListEditors();
 
-		Task<string> Signup(UserModel model, Action completed);
+		Task<string> Signup(UserRequest request, Action completed);
 
 		Task ToggleAdmin(string email);
 
 		Task ToggleEditor(string email);
 
-		Task<bool> UpdateUser(UserModel model);
+		Task<bool> UpdateUser(UserRequest request);
 
 		Task<bool> UserExists(string email);
 
@@ -41,6 +42,6 @@ namespace Roadkill.Api.Client
 
 		Task<string> GetLoggedInUserName();
 
-		Task<UserModel> GetLoggedInUser(string cookieValue);
+		Task<UserRequest> GetLoggedInUser(string cookieValue);
 	}
 }

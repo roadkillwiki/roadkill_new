@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Roadkill.Api.Common.Models
+namespace Roadkill.Api.Common.Response
 {
 	/// <summary>
 	/// Represents page information in Roadkill.
 	/// </summary>
-	public class PageModel
+	public class PageResponse
 	{
 		/// <summary>
-		/// The unique Id of the page.
+		/// The unique Id of the page. This is generated on the server.
 		/// </summary>
 		public int Id { get; set; }
 
@@ -49,7 +49,7 @@ namespace Roadkill.Api.Common.Models
 		public DateTime LastModifiedOn { get; set; }
 
 		/// <summary>
-		/// Whether the page is locked so no edits can be made, except by admins.
+		/// Whether the page is locked so no edits can be made (except by admins).
 		/// </summary>
 		[Required]
 		public bool IsLocked { get; set; }
@@ -61,7 +61,7 @@ namespace Roadkill.Api.Common.Models
 		public string TagsAsCsv { get; set; }
 
 		/// <summary>
-		/// The tags for page as an array.
+		/// The tags for the page as an array.
 		/// </summary>
 		public IEnumerable<string> TagList { get; set; }
 	}

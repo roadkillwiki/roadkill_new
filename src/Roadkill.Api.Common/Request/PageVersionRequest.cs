@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Roadkill.Api.Common.Models
+namespace Roadkill.Api.Common.Request
 {
-	public class PageVersionModel
+	public class PageVersionRequest
 	{
 		public Guid Id { get; set; }
 

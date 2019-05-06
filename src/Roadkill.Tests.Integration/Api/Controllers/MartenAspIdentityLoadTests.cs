@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.RequestModels;
 using Shouldly;
 using Xunit;
@@ -95,7 +95,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			_factory.Logger.LogInformation($"Created {userData.Email}.");
 
 			// Create a page in the API
-			var pageData = new PageModel
+			var pageData = new PageResponse
 			{
 				Title = $"page {i}",
 				CreatedBy = userData.Email,
@@ -109,7 +109,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 			// Get the page from the API
 			string json = await response.Content.ReadAsStringAsync();
-			var model = JsonConvert.DeserializeObject<PageModel>(json);
+			var model = JsonConvert.DeserializeObject<PageResponse>(json);
 
 			string pagePath = string.Format(_getPagePath, model.Id);
 			response = await GetReturnsStatusCode(pagePath, HttpStatusCode.OK);

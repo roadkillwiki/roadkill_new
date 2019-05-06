@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Response;
 
 namespace Roadkill.Api.Client
 {
@@ -15,13 +15,13 @@ namespace Roadkill.Api.Client
 		///     Retrieves a list of all tags in the system.
 		/// </summary>
 		/// <returns>A <see cref="IEnumerable{TagViewModel}" /> for the tags.</returns>
-		Task<IEnumerable<TagModel>> AllTags();
+		Task<IEnumerable<TagResponse>> AllTags();
 
 		/// <summary>
 		///     Finds all pages with the given tag.
 		/// </summary>
 		/// <param name="tag">The tag to search for.</param>
 		/// <returns>A <see cref="IEnumerable{PageViewModel}" /> of pages tagged with the provided tag.</returns>
-		Task<IEnumerable<PageModel>> FindPageWithTag(string tag);
+		Task<IEnumerable<PageResponse>> FindPageWithTag(string tag);
 	}
 }

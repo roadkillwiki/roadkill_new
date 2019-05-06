@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NSubstitute;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.JWT;
 using Roadkill.Core.Authorization;
@@ -72,7 +72,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				RoleClaims = new List<string>()
 			};
 
-			var model = new AuthenticationModel()
+			var model = new AuthenticationRequest()
 			{
 				Email = email,
 				Password = password
@@ -108,7 +108,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string email = "admin@example.org";
 			string password = "Passw0rd9000";
 
-			var model = new AuthenticationModel()
+			var model = new AuthenticationRequest()
 			{
 				Email = email,
 				Password = password
@@ -140,7 +140,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				NormalizedEmail = email.ToUpperInvariant()
 			};
 
-			var model = new AuthenticationModel()
+			var model = new AuthenticationRequest()
 			{
 				Email = email,
 				Password = password

@@ -1,9 +1,9 @@
-﻿namespace Roadkill.Api.Common.Models
+﻿namespace Roadkill.Api.Common.Response
 {
 	/// <summary>
 	/// Provides data for the tag cloud.
 	/// </summary>
-	public class TagModel
+	public class TagResponse
 	{
 		public string Name { get; set; }
 

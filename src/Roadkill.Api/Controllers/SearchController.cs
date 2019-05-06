@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Core.Search.Adapters;
 
 namespace Roadkill.Api.Controllers
@@ -21,14 +22,14 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(Search))]
-		public Task<IEnumerable<SearchResponseModel>> Search(string searchText)
+		public Task<IEnumerable<SearchResponse>> Search(string searchText)
 		{
 			throw new NotImplementedException();
 		}
 
 		[HttpPost]
 		[Route(nameof(Add))]
-		public Task<string> Add(SearchRequestModel searchRequest)
+		public Task<string> Add(SearchRequest searchRequest)
 		{
 			throw new NotImplementedException();
 		}
@@ -42,7 +43,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpPut]
 		[Route(nameof(Update))]
-		public void Update(SearchRequestModel searchRequest)
+		public void Update(SearchRequest searchRequest)
 		{
 			throw new NotImplementedException();
 		}

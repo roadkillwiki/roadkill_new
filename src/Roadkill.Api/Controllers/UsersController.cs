@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Roadkill.Api.Common.Models;
 using Roadkill.Api.Exceptions;
 using Roadkill.Api.JWT;
 using Roadkill.Api.RequestModels;
@@ -27,11 +26,8 @@ namespace Roadkill.Api.Controllers
 	public class UsersController : ControllerBase
 	{
 		public static readonly string EmailExistsError = "The email address already exists.";
-
 		public static readonly string EmailDoesNotExistError = "The email address does not exist.";
-
 		public static readonly string UserIsLockedOutError = "The user with the email address is already locked out.";
-
 		private readonly UserManager<RoadkillUser> _userManager;
 
 		public UsersController(UserManager<RoadkillUser> userManager)

@@ -1,6 +1,6 @@
-﻿namespace Roadkill.Api.Common.Models
+﻿namespace Roadkill.Api.Common.Request
 {
-	public class AuthenticationModel
+	public class AuthenticationRequest
 	{
 		public string Email { get; set; }
 

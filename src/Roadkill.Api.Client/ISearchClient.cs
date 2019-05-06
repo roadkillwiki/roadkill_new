@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 
 namespace Roadkill.Api.Client
 {
 	public interface ISearchClient
 	{
-		Task<IEnumerable<SearchResponseModel>> Search(string searchText);
+		Task<IEnumerable<SearchResponse>> Search(string searchText);
 
-		Task<string> Add(SearchRequestModel searchRequest);
+		Task<string> Add(SearchRequest searchRequest);
 
 		int Delete(int id);
 
-		void Update(SearchRequestModel searchRequest);
+		void Update(SearchRequest searchRequest);
 	}
 }

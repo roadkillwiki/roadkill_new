@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
 using Roadkill.Api.JWT;
 using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -33,15 +33,15 @@ namespace Roadkill.Api.Controllers
 		[HttpPost]
 		[Route(nameof(Authenticate))]
 		[AllowAnonymous]
-		public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticationModel authenticationModel)
+		public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticationRequest authenticationRequest)
 		{
-			RoadkillUser user = await _userManager.FindByEmailAsync(authenticationModel.Email);
+			RoadkillUser user = await _userManager.FindByEmailAsync(authenticationRequest.Email);
 			if (user == null)
 			{
-				return NotFound($"The user with the email {authenticationModel.Email} could not be found.");
+				return NotFound($"The user with the email {authenticationRequest.Email} could not be found.");
 			}
 
-			SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationModel.Password, true, false);
+			SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationRequest.Password, true, false);
 			if (result.Succeeded)
 			{
 				IList<Claim> existingClaims = await _userManager.GetClaimsAsync(user);

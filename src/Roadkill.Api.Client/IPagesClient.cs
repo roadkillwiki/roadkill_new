@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Refit;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Response;
 
 namespace Roadkill.Api.Client
 {
@@ -9,29 +9,29 @@ namespace Roadkill.Api.Client
 	{
 		[Post("/pages/")]
 		[Headers("Authorization: Bearer")]
-		Task<PageModel> Add([Body] PageModel model);
+		Task<PageResponse> Add([Body] PageResponse response);
 
 		[Put("/pages/")]
 		[Headers("Authorization: Bearer")]
-		Task<PageModel> Update([Body] PageModel model);
+		Task<PageResponse> Update([Body] PageResponse response);
 
 		[Delete("/pages/{pageId}")]
 		[Headers("Authorization: Bearer")]
 		Task Delete(int pageId);
 
 		[Get("/pages/{pageId}")]
-		Task<PageModel> Get(int pageId);
+		Task<PageResponse> Get(int pageId);
 
 		[Get("/pages/allpages")]
-		Task<IEnumerable<PageModel>> AllPages();
+		Task<IEnumerable<PageResponse>> AllPages();
 
 		[Get("/pages/allpagescreatedby")]
-		Task<IEnumerable<PageModel>> AllPagesCreatedBy(string username);
+		Task<IEnumerable<PageResponse>> AllPagesCreatedBy(string username);
 
 		[Get("/pages/findhomepage")]
-		Task<PageModel> FindHomePage();
+		Task<PageResponse> FindHomePage();
 
 		[Get("/pages/findbytitle")]
-		Task<PageModel> FindByTitle(string title);
+		Task<PageResponse> FindByTitle(string title);
 	}
 }

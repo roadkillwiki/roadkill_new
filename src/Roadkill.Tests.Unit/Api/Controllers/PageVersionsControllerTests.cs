@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
-using Roadkill.Api.Common.Models;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.ModelConverters;
 using Roadkill.Core.Entities;
@@ -17,7 +18,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	public sealed class PageVersionsControllerTests
 	{
 		private readonly Fixture _fixture;
-		private readonly Mock<IPageVersionModelConverter> _viewModelCreatorMock;
+		private readonly Mock<IPageVersionObjectsConverter> _objectsConverterMock;
 		private readonly Mock<IPageVersionRepository> _pageVersionRepositoryMock;
 		private PageVersionsController _pageVersionsController;
 
@@ -27,10 +28,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			_pageVersionRepositoryMock = new Mock<IPageVersionRepository>();
 
-			_viewModelCreatorMock = new Mock<IPageVersionModelConverter>();
-			_viewModelCreatorMock
-				.Setup(x => x.ConvertToViewModel(It.IsAny<PageVersion>()))
-				.Returns<PageVersion>(pageVersion => new PageVersionModel()
+			_objectsConverterMock = new Mock<IPageVersionObjectsConverter>();
+			_objectsConverterMock
+				.Setup(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()))
+				.Returns<PageVersion>(pageVersion => new PageVersionResponse()
 				{
 					Id = pageVersion.Id,
 					Text = pageVersion.Text,
@@ -39,7 +40,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 					PageId = pageVersion.PageId
 				});
 
-			_pageVersionsController = new PageVersionsController(_pageVersionRepositoryMock.Object, _viewModelCreatorMock.Object);
+			_pageVersionsController = new PageVersionsController(_pageVersionRepositoryMock.Object, _objectsConverterMock.Object);
 		}
 
 		[Fact]
@@ -54,15 +55,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.ReturnsAsync(pageVersion);
 
 			// when
-			var pageVersionViewModel = await _pageVersionsController.GetLatestVersion(pageId);
+			PageVersionResponse response = await _pageVersionsController.GetLatestVersion(pageId);
 
 			// then
-			pageVersionViewModel.ShouldNotBeNull();
-			pageVersionViewModel.PageId.ShouldBe(pageId);
-			pageVersionViewModel.Text.ShouldBe(pageVersion.Text);
+			response.ShouldNotBeNull();
+			response.PageId.ShouldBe(pageId);
+			response.Text.ShouldBe(pageVersion.Text);
 
 			_pageVersionRepositoryMock.Verify(x => x.GetLatestVersionAsync(pageId), Times.Once);
-			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(pageVersion));
+			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(pageVersion));
 		}
 
 		[Fact]
@@ -87,13 +88,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.ReturnsAsync(repoPageVersion);
 
 			// when
-			var actualPageViewModel = await _pageVersionsController.Add(pageId, text, author, dateTime);
+			PageVersionResponse actualResponse = await _pageVersionsController.Add(pageId, text, author, dateTime);
 
 			// then
-			actualPageViewModel.PageId.ShouldBe(pageId);
-			actualPageViewModel.Text.ShouldBe(text);
-			actualPageViewModel.Author.ShouldBe(author);
-			actualPageViewModel.DateTime.ShouldBe(dateTime);
+			actualResponse.PageId.ShouldBe(pageId);
+			actualResponse.Text.ShouldBe(text);
+			actualResponse.Author.ShouldBe(author);
+			actualResponse.DateTime.ShouldBe(dateTime);
 
 			_pageVersionRepositoryMock
 				.Verify(x => x.AddNewVersionAsync(pageId, text, author, dateTime), Times.Once);
@@ -111,14 +112,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.ReturnsAsync(pageVersion);
 
 			// when
-			PageVersionModel actualModel = await _pageVersionsController.GetById(versionId);
+			PageVersionResponse actualResponse = await _pageVersionsController.GetById(versionId);
 
 			// then
-			actualModel.ShouldNotBeNull();
-			actualModel.Id.ShouldBe(versionId);
+			actualResponse.ShouldNotBeNull();
+			actualResponse.Id.ShouldBe(versionId);
 
 			_pageVersionRepositoryMock.Verify(x => x.GetByIdAsync(versionId), Times.Once);
-			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(pageVersion), Times.Once);
+			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(pageVersion), Times.Once);
 		}
 
 		[Fact]
@@ -143,7 +144,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		public async Task Update()
 		{
 			// given
-			var viewModel = new PageVersionModel()
+			var request = new PageVersionRequest()
 			{
 				Id = Guid.NewGuid(),
 				Author = "buxton",
@@ -154,14 +155,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			var pageVersion = new PageVersion()
 			{
-				Id = viewModel.Id,
-				Author = viewModel.Author,
-				DateTime = viewModel.DateTime,
-				PageId = viewModel.PageId,
-				Text = viewModel.Text,
+				Id = request.Id,
+				Author = request.Author,
+				DateTime = request.DateTime,
+				PageId = request.PageId,
+				Text = request.Text,
 			};
 
-			_viewModelCreatorMock.Setup(x => x.ConvertToPageVersion(viewModel))
+			_objectsConverterMock.Setup(x => x.ConvertToPageVersion(request))
 				.Returns(pageVersion);
 
 			_pageVersionRepositoryMock
@@ -169,11 +170,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.CompletedTask);
 
 			// when
-			await _pageVersionsController.Update(viewModel);
+			await _pageVersionsController.Update(request);
 
 			// then
 			_pageVersionRepositoryMock.Verify(x => x.UpdateExistingVersionAsync(pageVersion), Times.Once);
-			_viewModelCreatorMock.Verify(x => x.ConvertToPageVersion(viewModel));
+			_objectsConverterMock.Verify(x => x.ConvertToPageVersion(request));
 		}
 
 		[Fact]
@@ -187,14 +188,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.ReturnsAsync(pageVersions);
 
 			// when
-			IEnumerable<PageVersionModel> actualViewModels = await _pageVersionsController.AllVersions();
+			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.AllVersions();
 
 			// then
-			actualViewModels.ShouldNotBeNull();
-			actualViewModels.Count().ShouldBe(pageVersions.Count);
+			actualResponses.ShouldNotBeNull();
+			actualResponses.Count().ShouldBe(pageVersions.Count);
 
 			_pageVersionRepositoryMock.Verify(x => x.AllVersionsAsync(), Times.Once);
-			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
+			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
 		}
 
 		[Fact]
@@ -210,14 +211,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.ReturnsAsync(pageVersions);
 
 			// when
-			IEnumerable<PageVersionModel> actualViewModels = await _pageVersionsController.FindPageVersionsByPageId(pageId);
+			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.FindPageVersionsByPageId(pageId);
 
 			// then
-			actualViewModels.ShouldNotBeNull();
-			actualViewModels.Count().ShouldBe(pageVersions.Count);
+			actualResponses.ShouldNotBeNull();
+			actualResponses.Count().ShouldBe(pageVersions.Count);
 
 			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByPageIdAsync(pageId), Times.Once);
-			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
+			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
 		}
 
 		[Fact]
@@ -233,14 +234,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.ReturnsAsync(pageVersions);
 
 			// when
-			IEnumerable<PageVersionModel> actualViewModels = await _pageVersionsController.FindPageVersionsByAuthor(author);
+			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.FindPageVersionsByAuthor(author);
 
 			// then
-			actualViewModels.ShouldNotBeNull();
-			actualViewModels.Count().ShouldBe(pageVersions.Count);
+			actualResponses.ShouldNotBeNull();
+			actualResponses.Count().ShouldBe(pageVersions.Count);
 
 			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByAuthorAsync(author), Times.Once);
-			_viewModelCreatorMock.Verify(x => x.ConvertToViewModel(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
+			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
 		}
 	}
 }

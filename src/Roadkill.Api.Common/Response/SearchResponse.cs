@@ -1,16 +1,14 @@
 ﻿using System;
 
-namespace Roadkill.Api.Common.Models
+namespace Roadkill.Api.Common.Response
 {
 	/// <summary>
 	/// Contains data for a single search result from a search query.
 	/// </summary>
-	public class SearchResponseModel
+	public class SearchResponse
 	{
 		public int Id { get; set; }
-
 		public string Title { get; set; }
-
 		public string EncodedTitle { get; set; }
 
 		/// <summary>
@@ -42,9 +40,7 @@ namespace Roadkill.Api.Common.Models
 		}
 
 		public string CreatedBy { get; set; }
-
 		public DateTime CreatedOn { get; set; }
-
 		public string Tags { get; set; }
 
 		/// <summary>
