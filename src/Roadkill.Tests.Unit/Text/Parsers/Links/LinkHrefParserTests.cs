@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Moq;
+using NSubstitute;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 using Roadkill.Text;
@@ -15,19 +15,20 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 	{
 		// Many of these tests were converted from the v1.7 MarkdownConverter tests.
 		private TextSettings _textSettings;
-
 		private LinkHrefParser _linkHrefParser;
-		private Mock<IUrlHelper> _urlHelperMock;
-		private Mock<IPageRepository> _pageRepository;
+		private IUrlHelper _urlHelperMock;
+		private IPageRepository _pageRepository;
 
 		public LinkHrefParserTests()
 		{
-			_pageRepository = new Mock<IPageRepository>();
+			_pageRepository = Substitute.For<IPageRepository>();
 			_textSettings = new TextSettings();
-			_urlHelperMock = new Mock<IUrlHelper>();
-			_urlHelperMock.Setup(x => x.Content(It.IsAny<string>())).Returns<string>(s => s);
+			_urlHelperMock = Substitute.For<IUrlHelper>();
+			_urlHelperMock
+				.Content(Arg.Any<string>())
+				.Returns<string>(callInfo => callInfo.Arg<string>());
 
-			_linkHrefParser = new LinkHrefParser(_pageRepository.Object, _textSettings, _urlHelperMock.Object);
+			_linkHrefParser = new LinkHrefParser(_pageRepository, _textSettings, _urlHelperMock);
 		}
 
 		[Fact]
@@ -111,7 +112,8 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 		{
 			// Arrange
 			HtmlLinkTag linkTag = new HtmlLinkTag("Special:blah", "Special:blah", "text", "");
-			_urlHelperMock.Setup(x => x.Content(It.IsAny<string>()))
+			_urlHelperMock
+				.Content(Arg.Any<string>())
 				.Returns("~/wiki/Special:blah/url-helper");
 
 			// Act
@@ -155,10 +157,13 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
 			dynamic urlValues = new { id = dummyPage.Id, title = "foo-page" };
 
-			_urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>()))
-						  .Returns<UrlActionContext>(s => "/wiki/" + urlValues.id + "/" + urlValues.title);
+			_urlHelperMock
+				.Action(Arg.Any<UrlActionContext>())
+				.Returns(callInfo => { return "/wiki/" + urlValues.id + "/" + urlValues.title; });
 
-			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository
+				.GetPageByTitleAsync(pageTitle)
+				.Returns(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("foo-page?blah=xyz#myanchor", "foo-page?blah=xyz#myanchor", "text", "");
 
@@ -187,11 +192,15 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 		{
 			// Arrange
 			string expectedHref = "/wiki/1/foo";
-			_urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>())).Returns(expectedHref);
+			_urlHelperMock
+				.Action(Arg.Any<UrlActionContext>())
+				.Returns(expectedHref);
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository
+				.GetPageByTitleAsync(pageTitle)
+				.Returns(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("foo#myanchor", "foo#myanchor", "text", "");
 
@@ -207,11 +216,15 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 		{
 			// Arrange
 			string expectedHref = "/wiki/1/my-page-on-engineering";
-			_urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>())).Returns(expectedHref);
+			_urlHelperMock
+				.Action(Arg.Any<UrlActionContext>())
+				.Returns(expectedHref);
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository
+				.GetPageByTitleAsync(pageTitle)
+				.Returns(dummyPage);
 			HtmlLinkTag linkTag = new HtmlLinkTag("my-page-on-engineering", "my-page-on-engineering", "text", "");
 
 			// Act
@@ -227,11 +240,15 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 		{
 			// Arrange
 			string expectedHref = "/wiki/1/football";
-			_urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>())).Returns(expectedHref);
+			_urlHelperMock
+				.Action(Arg.Any<UrlActionContext>())
+				.Returns(expectedHref);
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository
+				.GetPageByTitleAsync(pageTitle)
+				.Returns(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("football", "foo-page", "text", "");
 
@@ -260,11 +277,15 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links
 		{
 			// Arrange
 			string expectedHref = "/wiki/1/despair";
-			_urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>())).Returns(expectedHref);
+			_urlHelperMock
+				.Action(Arg.Any<UrlActionContext>())
+				.Returns(expectedHref);
 
 			string pageTitle = "foo";
 			Page dummyPage = new Page() { Id = 1, Title = pageTitle };
-			_pageRepository.Setup(x => x.GetPageByTitleAsync(pageTitle)).ReturnsAsync(dummyPage);
+			_pageRepository
+				.GetPageByTitleAsync(pageTitle)
+				.Returns(dummyPage);
 
 			HtmlLinkTag linkTag = new HtmlLinkTag("despair", "", "text", "new");
 

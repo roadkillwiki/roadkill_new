@@ -1,6 +1,6 @@
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Shouldly;
@@ -15,7 +15,7 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 
 		public HtmlWhiteListProviderTests()
 		{
-			var logger = Mock.Of<ILogger<HtmlWhiteListProvider>>();
+			var logger = Substitute.For<ILogger<HtmlWhiteListProvider>>();
 			_textSettings = new TextSettings();
 			_htmlWhiteListProvider = new HtmlWhiteListProvider(_textSettings, logger);
 		}

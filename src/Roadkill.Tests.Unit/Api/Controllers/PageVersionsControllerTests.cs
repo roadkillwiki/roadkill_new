@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
-using Moq;
+using NSubstitute;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
@@ -15,32 +15,37 @@ using Xunit;
 
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	public sealed class PageVersionsControllerTests
+	public class PageVersionsControllerTests
 	{
 		private readonly Fixture _fixture;
-		private readonly Mock<IPageVersionObjectsConverter> _objectsConverterMock;
-		private readonly Mock<IPageVersionRepository> _pageVersionRepositoryMock;
+		private readonly IPageVersionObjectsConverter _objectsConverterMock;
+		private readonly IPageVersionRepository _pageVersionRepositoryMock;
 		private PageVersionsController _pageVersionsController;
 
 		public PageVersionsControllerTests()
 		{
 			_fixture = new Fixture();
 
-			_pageVersionRepositoryMock = new Mock<IPageVersionRepository>();
+			_pageVersionRepositoryMock = Substitute.For<IPageVersionRepository>();
 
-			_objectsConverterMock = new Mock<IPageVersionObjectsConverter>();
+			_objectsConverterMock = Substitute.For<IPageVersionObjectsConverter>();
 			_objectsConverterMock
-				.Setup(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()))
-				.Returns<PageVersion>(pageVersion => new PageVersionResponse()
+				.ConvertToPageVersionResponse(Arg.Any<PageVersion>())
+				.Returns(callInfo =>
 				{
-					Id = pageVersion.Id,
-					Text = pageVersion.Text,
-					Author = pageVersion.Author,
-					DateTime = pageVersion.DateTime,
-					PageId = pageVersion.PageId
+					var pageVersion = callInfo.Arg<PageVersion>();
+
+					return new PageVersionResponse()
+					{
+						Id = pageVersion.Id,
+						Text = pageVersion.Text,
+						Author = pageVersion.Author,
+						DateTime = pageVersion.DateTime,
+						PageId = pageVersion.PageId
+					};
 				});
 
-			_pageVersionsController = new PageVersionsController(_pageVersionRepositoryMock.Object, _objectsConverterMock.Object);
+			_pageVersionsController = new PageVersionsController(_pageVersionRepositoryMock, _objectsConverterMock);
 		}
 
 		[Fact]
@@ -51,8 +56,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			int pageId = pageVersion.PageId;
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.GetLatestVersionAsync(pageId))
-				.ReturnsAsync(pageVersion);
+				.GetLatestVersionAsync(pageId)
+				.Returns(pageVersion);
 
 			// when
 			PageVersionResponse response = await _pageVersionsController.GetLatestVersion(pageId);
@@ -62,8 +67,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			response.PageId.ShouldBe(pageId);
 			response.Text.ShouldBe(pageVersion.Text);
 
-			_pageVersionRepositoryMock.Verify(x => x.GetLatestVersionAsync(pageId), Times.Once);
-			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(pageVersion));
+			_pageVersionRepositoryMock
+				.Received(1)
+				.GetLatestVersionAsync(pageId);
+
+			_objectsConverterMock
+				.Received(1)
+				.ConvertToPageVersionResponse(pageVersion);
 		}
 
 		[Fact]
@@ -84,8 +94,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			};
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.AddNewVersionAsync(pageId, text, author, dateTime))
-				.ReturnsAsync(repoPageVersion);
+				.AddNewVersionAsync(pageId, text, author, dateTime)
+				.Returns(repoPageVersion);
 
 			// when
 			PageVersionResponse actualResponse = await _pageVersionsController.Add(pageId, text, author, dateTime);
@@ -96,8 +106,9 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualResponse.Author.ShouldBe(author);
 			actualResponse.DateTime.ShouldBe(dateTime);
 
-			_pageVersionRepositoryMock
-				.Verify(x => x.AddNewVersionAsync(pageId, text, author, dateTime), Times.Once);
+			await _pageVersionRepositoryMock
+				.Received(1)
+				.AddNewVersionAsync(pageId, text, author, dateTime);
 		}
 
 		[Fact]
@@ -108,8 +119,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			Guid versionId = pageVersion.Id;
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.GetByIdAsync(versionId))
-				.ReturnsAsync(pageVersion);
+				.GetByIdAsync(versionId)
+				.Returns(pageVersion);
 
 			// when
 			PageVersionResponse actualResponse = await _pageVersionsController.GetById(versionId);
@@ -118,8 +129,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualResponse.ShouldNotBeNull();
 			actualResponse.Id.ShouldBe(versionId);
 
-			_pageVersionRepositoryMock.Verify(x => x.GetByIdAsync(versionId), Times.Once);
-			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(pageVersion), Times.Once);
+			await _pageVersionRepositoryMock
+				.Received(1)
+				.GetByIdAsync(versionId);
+
+			_objectsConverterMock
+				.Received(1)
+				.ConvertToPageVersionResponse(pageVersion);
 		}
 
 		[Fact]
@@ -129,15 +145,16 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			Guid pageVersionId = Guid.NewGuid();
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.DeleteVersionAsync(pageVersionId))
+				.DeleteVersionAsync(pageVersionId)
 				.Returns(Task.CompletedTask);
 
 			// when
 			await _pageVersionsController.Delete(pageVersionId);
 
 			// then
-			_pageVersionRepositoryMock
-				.Verify(x => x.DeleteVersionAsync(pageVersionId), Times.Once);
+			await _pageVersionRepositoryMock
+				.Received(1)
+				.DeleteVersionAsync(pageVersionId);
 		}
 
 		[Fact]
@@ -162,19 +179,25 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				Text = request.Text,
 			};
 
-			_objectsConverterMock.Setup(x => x.ConvertToPageVersion(request))
+			_objectsConverterMock
+				.ConvertToPageVersion(request)
 				.Returns(pageVersion);
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.UpdateExistingVersionAsync(pageVersion))
+				.UpdateExistingVersionAsync(pageVersion)
 				.Returns(Task.CompletedTask);
 
 			// when
 			await _pageVersionsController.Update(request);
 
 			// then
-			_pageVersionRepositoryMock.Verify(x => x.UpdateExistingVersionAsync(pageVersion), Times.Once);
-			_objectsConverterMock.Verify(x => x.ConvertToPageVersion(request));
+			await _pageVersionRepositoryMock
+				.Received(1)
+				.UpdateExistingVersionAsync(pageVersion);
+
+			_objectsConverterMock
+				.Received(1)
+				.ConvertToPageVersion(request);
 		}
 
 		[Fact]
@@ -184,8 +207,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			List<PageVersion> pageVersions = _fixture.CreateMany<PageVersion>().ToList();
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.AllVersionsAsync())
-				.ReturnsAsync(pageVersions);
+				.AllVersionsAsync()
+				.Returns(pageVersions);
 
 			// when
 			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.AllVersions();
@@ -194,8 +217,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualResponses.ShouldNotBeNull();
 			actualResponses.Count().ShouldBe(pageVersions.Count);
 
-			_pageVersionRepositoryMock.Verify(x => x.AllVersionsAsync(), Times.Once);
-			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
+			await _pageVersionRepositoryMock
+				.Received(1)
+				.AllVersionsAsync();
+
+			_objectsConverterMock
+				.Received(pageVersions.Count)
+				.ConvertToPageVersionResponse(Arg.Any<PageVersion>());
 		}
 
 		[Fact]
@@ -207,8 +235,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			pageVersions.ForEach(p => p.PageId = pageId);
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.FindPageVersionsByPageIdAsync(pageId))
-				.ReturnsAsync(pageVersions);
+				.FindPageVersionsByPageIdAsync(pageId)
+				.Returns(pageVersions);
 
 			// when
 			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.FindPageVersionsByPageId(pageId);
@@ -217,8 +245,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualResponses.ShouldNotBeNull();
 			actualResponses.Count().ShouldBe(pageVersions.Count);
 
-			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByPageIdAsync(pageId), Times.Once);
-			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
+			await _pageVersionRepositoryMock
+				.Received(1)
+				.FindPageVersionsByPageIdAsync(pageId);
+
+			_objectsConverterMock
+				.Received(pageVersions.Count)
+				.ConvertToPageVersionResponse(Arg.Any<PageVersion>());
 		}
 
 		[Fact]
@@ -230,8 +263,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			pageVersions.ForEach(p => p.Author = author);
 
 			_pageVersionRepositoryMock
-				.Setup(x => x.FindPageVersionsByAuthorAsync(author))
-				.ReturnsAsync(pageVersions);
+				.FindPageVersionsByAuthorAsync(author)
+				.Returns(pageVersions);
 
 			// when
 			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.FindPageVersionsByAuthor(author);
@@ -240,8 +273,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualResponses.ShouldNotBeNull();
 			actualResponses.Count().ShouldBe(pageVersions.Count);
 
-			_pageVersionRepositoryMock.Verify(x => x.FindPageVersionsByAuthorAsync(author), Times.Once);
-			_objectsConverterMock.Verify(x => x.ConvertToPageVersionResponse(It.IsAny<PageVersion>()), Times.Exactly(pageVersions.Count));
+			await _pageVersionRepositoryMock
+				.Received(1)
+				.FindPageVersionsByAuthorAsync(author);
+
+			_objectsConverterMock
+				.Received(pageVersions.Count)
+				.ConvertToPageVersionResponse(Arg.Any<PageVersion>());
 		}
 	}
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Ganss.XSS;
-using Moq;
+using NSubstitute;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Shouldly;
@@ -34,8 +34,10 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 				AllowedAttributes = new List<string> { "cheesecake" }
 			};
 
-			var whiteListProviderMock = new Mock<IHtmlWhiteListProvider>();
-			whiteListProviderMock.Setup(x => x.Deserialize()).Returns(whiteListSettings);
+			var whiteListProviderMock = Substitute.For<IHtmlWhiteListProvider>();
+			whiteListProviderMock
+				.Deserialize()
+				.Returns(whiteListSettings);
 
 			HtmlSanitizerFactory factory = CreateFactory(null, whiteListProviderMock);
 
@@ -70,7 +72,7 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 			expectedHtml.ShouldBe(actualHtml);
 		}
 
-		private HtmlSanitizerFactory CreateFactory(TextSettings textSettings = null, Mock<IHtmlWhiteListProvider> whiteListProviderMock = null)
+		private HtmlSanitizerFactory CreateFactory(TextSettings textSettings = null, IHtmlWhiteListProvider whiteListProviderMock = null)
 		{
 			if (textSettings == null)
 			{
@@ -79,15 +81,17 @@ namespace Roadkill.Tests.Unit.Text.Sanitizer
 
 			if (whiteListProviderMock == null)
 			{
-				whiteListProviderMock = new Mock<IHtmlWhiteListProvider>();
-				whiteListProviderMock.Setup(x => x.Deserialize()).Returns(new HtmlWhiteListSettings()
-				{
-					AllowedElements = new List<string>(),
-					AllowedAttributes = new List<string>()
-				});
+				whiteListProviderMock = Substitute.For<IHtmlWhiteListProvider>();
+				whiteListProviderMock
+					.Deserialize()
+					.Returns(new HtmlWhiteListSettings()
+					{
+						AllowedElements = new List<string>(),
+						AllowedAttributes = new List<string>()
+					});
 			}
 
-			return new HtmlSanitizerFactory(textSettings, whiteListProviderMock.Object);
+			return new HtmlSanitizerFactory(textSettings, whiteListProviderMock);
 		}
 	}
 }

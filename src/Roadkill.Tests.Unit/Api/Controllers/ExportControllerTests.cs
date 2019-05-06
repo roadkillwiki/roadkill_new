@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using AutoFixture;
-using Moq;
+using NSubstitute;
 using Roadkill.Api.Controllers;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
@@ -16,7 +15,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 {
 	public sealed class ExportControllerTests
 	{
-		private Mock<IPageRepository> _pageRepositoryMock;
+		private IPageRepository _pageRepositoryMock;
 		private readonly ExportController _exportController;
 		private Fixture _fixture;
 
@@ -24,8 +23,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		{
 			_fixture = new Fixture();
 
-			_pageRepositoryMock = new Mock<IPageRepository>();
-			_exportController = new ExportController(_pageRepositoryMock.Object);
+			_pageRepositoryMock = Substitute.For<IPageRepository>();
+			_exportController = new ExportController(_pageRepositoryMock);
 		}
 
 		[Fact]
@@ -34,8 +33,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// given
 			List<Page> actualPages = _fixture.CreateMany<Page>().ToList();
 
-			_pageRepositoryMock.Setup(x => x.AllPagesAsync())
-				.ReturnsAsync(actualPages);
+			_pageRepositoryMock.AllPagesAsync()
+				.Returns(actualPages);
 
 			XmlSerializer serializer = new XmlSerializer(typeof(List<Page>));
 

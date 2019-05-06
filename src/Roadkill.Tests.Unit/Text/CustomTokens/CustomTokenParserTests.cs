@@ -1,6 +1,6 @@
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using Roadkill.Text;
 using Roadkill.Text.CustomTokens;
 using Shouldly;
@@ -19,7 +19,7 @@ namespace Roadkill.Tests.Unit.Text.CustomTokens
 
 		public CustomTokenParserTests()
 		{
-			_logger = Mock.Of<ILogger>();
+			_logger = Substitute.For<ILogger>();
 		}
 
 		[Fact]

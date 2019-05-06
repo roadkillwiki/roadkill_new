@@ -1,6 +1,5 @@
 using Ganss.XSS;
-using Moq;
-using Roadkill.Text;
+using NSubstitute;
 using Roadkill.Text.Models;
 using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;
@@ -17,10 +16,12 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 			string html = "<div onclick=\"javascript:alert('ouch');\">test</div>";
 			var pagehtml = new PageHtml() { Html = html };
 
-			var factoryMock = new Mock<IHtmlSanitizerFactory>();
-			factoryMock.Setup(x => x.CreateHtmlSanitizer()).Returns(() => null);
+			var factoryMock = Substitute.For<IHtmlSanitizerFactory>();
+			factoryMock
+				.CreateHtmlSanitizer()
+				.Returns(callInfo => null);
 
-			var middleware = new HarmfulTagMiddleware(factoryMock.Object);
+			var middleware = new HarmfulTagMiddleware(factoryMock);
 
 			// Act
 			PageHtml actualPageHtml = middleware.Invoke(pagehtml);
@@ -36,19 +37,22 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 			string html = "<div onclick=\"javascript:alert('ouch');\">test</div>";
 			var pagehtml = new PageHtml() { Html = html };
 
-			var htmlSanitizerMock = new Mock<IHtmlSanitizer>();
-			htmlSanitizerMock.Setup(x => x.Sanitize(html, "", null)).Verifiable();
+			var htmlSanitizerMock = Substitute.For<IHtmlSanitizer>();
 
-			var factoryMock = new Mock<IHtmlSanitizerFactory>();
-			factoryMock.Setup(x => x.CreateHtmlSanitizer()).Returns(htmlSanitizerMock.Object);
+			var factoryMock = Substitute.For<IHtmlSanitizerFactory>();
+			factoryMock
+				.CreateHtmlSanitizer()
+				.Returns(htmlSanitizerMock);
 
-			var middleware = new HarmfulTagMiddleware(factoryMock.Object);
+			var middleware = new HarmfulTagMiddleware(factoryMock);
 
 			// Act
 			middleware.Invoke(pagehtml);
 
 			// Assert
-			htmlSanitizerMock.Verify();
+			htmlSanitizerMock
+				.Received(1)
+				.Sanitize(html, "", null);
 		}
 	}
 }

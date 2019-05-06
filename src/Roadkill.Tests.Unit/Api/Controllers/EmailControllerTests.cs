@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MailKit;
 using MimeKit;
-using Moq;
+using NSubstitute;
 using Roadkill.Api.Controllers;
 using Roadkill.Core.Settings;
 using Xunit;
@@ -11,11 +11,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 {
 	public class EmailControllerTests
 	{
-		private Mock<IMailTransport> _mailTransportMock;
+		private IMailTransport _mailTransportMock;
 
 		public EmailControllerTests()
 		{
-			_mailTransportMock = new Mock<IMailTransport>();
+			_mailTransportMock = Substitute.For<IMailTransport>();
 		}
 
 		[Fact]
@@ -32,7 +32,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				Password = "bale100",
 				UseSsl = true
 			};
-			var emailController = new EmailController(_mailTransportMock.Object, smtpSettings);
+			var emailController = new EmailController(_mailTransportMock, smtpSettings);
 
 			string to = "to@example.com";
 			string from = "from@example.com";
@@ -45,16 +45,28 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			expectedMessage.Subject = subject;
 			expectedMessage.Body = new TextPart(body);
 
-			_mailTransportMock.Setup(x => x.Send(expectedMessage, cancelToken, null));
-
 			// when
 			await emailController.Send(from, to, subject, body);
 
 			// then
-			_mailTransportMock.Verify(x => x.ConnectAsync(smtpSettings.Host, smtpSettings.Port, smtpSettings.UseSsl, cancelToken), Times.Once);
-			_mailTransportMock.Verify(x => x.AuthenticateAsync(smtpSettings.Username, smtpSettings.Password, cancelToken), Times.Once);
-			_mailTransportMock.Verify(x => x.SendAsync(It.Is<MimeMessage>(message => CheckMessageMatches(message, expectedMessage)), cancelToken, null), Times.Once);
-			_mailTransportMock.Verify(x => x.DisconnectAsync(true, cancelToken), Times.Once);
+			await _mailTransportMock
+				.Received(1)
+				.ConnectAsync(smtpSettings.Host, smtpSettings.Port, smtpSettings.UseSsl, cancelToken);
+
+			await _mailTransportMock
+				.Received(1)
+				.AuthenticateAsync(smtpSettings.Username, smtpSettings.Password, cancelToken);
+
+			await _mailTransportMock
+				.Received(1)
+				.SendAsync(Arg.Is<MimeMessage>(message =>
+						CheckMessageMatches(message, expectedMessage)),
+					cancelToken,
+					null);
+
+			await _mailTransportMock
+				.Received(1)
+				.DisconnectAsync(true, cancelToken);
 		}
 
 		private static bool CheckMessageMatches(MimeMessage message, MimeMessage expectedMessage)

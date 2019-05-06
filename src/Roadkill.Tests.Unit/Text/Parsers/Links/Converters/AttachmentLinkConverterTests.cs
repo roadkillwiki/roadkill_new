@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Moq;
+using NSubstitute;
 using Roadkill.Text;
 using Roadkill.Text.Parsers.Links;
 using Roadkill.Text.Parsers.Links.Converters;
@@ -11,14 +11,14 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links.Converters
 	public class AttachmentLinkConverterTests
 	{
 		private TextSettings _textSettings;
-		private Mock<IUrlHelper> _urlHelperMock;
+		private IUrlHelper _urlHelperMock;
 		private AttachmentLinkConverter _converter;
 
 		public AttachmentLinkConverterTests()
 		{
 			_textSettings = new TextSettings();
-			_urlHelperMock = new Mock<IUrlHelper>();
-			_converter = new AttachmentLinkConverter(_textSettings, _urlHelperMock.Object);
+			_urlHelperMock = Substitute.For<IUrlHelper>();
+			_converter = new AttachmentLinkConverter(_textSettings, _urlHelperMock);
 		}
 
 		[Fact]
@@ -62,7 +62,9 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links.Converters
 		public void Convert_should_change_expected_urls_to_full_paths(string href, string expectedHref, bool calledUrlHelper)
 		{
 			// Arrange
-			_urlHelperMock.Setup(x => x.Content(It.IsAny<string>())).Returns<string>(s => s);
+			_urlHelperMock
+				.Content(Arg.Any<string>())
+				.Returns<string>(callInfo => callInfo.Arg<string>());
 
 			_textSettings.AttachmentsUrlPath = "/myattachments/";
 			var expectedTag = new HtmlLinkTag(href, href, "text", "");
@@ -74,8 +76,11 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Links.Converters
 			expectedTag.OriginalHref.ShouldBe(actualTag.OriginalHref);
 			expectedHref.ShouldBe(actualTag.Href);
 
-			Times timesCalled = (calledUrlHelper) ? Times.Once() : Times.Never();
-			_urlHelperMock.Verify(x => x.Content(It.IsAny<string>()), timesCalled);
+			int timesCalled = (calledUrlHelper) ? 1 : 0;
+
+			_urlHelperMock
+				.Received(timesCalled)
+				.Content(Arg.Any<string>());
 		}
 	}
 }

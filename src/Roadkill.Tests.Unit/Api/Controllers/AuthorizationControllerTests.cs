@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using NSubstitute;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Controllers;
@@ -19,8 +16,6 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Tests.Unit.Api.Controllers
 {
-	[SuppressMessage("Stylecop", "CA1063", Justification = "IDisposable overkill")]
-	[SuppressMessage("Stylecop", "CA1001", Justification = "IDisposable overkill")]
 	public sealed class AuthorizationControllerTests
 	{
 		private AuthorizationController _authorizationController;
@@ -45,8 +40,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			_signinManagerMock = Substitute.For<SignInManager<RoadkillUser>>(
 				_userManagerMock,
-				new Mock<IHttpContextAccessor>().Object,
-				new Mock<IUserClaimsPrincipalFactory<RoadkillUser>>().Object,
+				Substitute.For<IHttpContextAccessor>(),
+				Substitute.For<IUserClaimsPrincipalFactory<RoadkillUser>>(),
 				null,
 				new NullLogger<SignInManager<RoadkillUser>>(),
 				null);

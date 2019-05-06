@@ -1,6 +1,6 @@
 using System;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using Roadkill.Text;
 using Roadkill.Text.CustomTokens;
 using Roadkill.Text.Models;
@@ -17,7 +17,7 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 
 		public TextMiddlewareBuilderTests()
 		{
-			_logger = Mock.Of<ILogger<TextMiddlewareBuilder>>();
+			_logger = Substitute.For<ILogger<TextMiddlewareBuilder>>();
 		}
 
 		[Fact]
@@ -83,7 +83,7 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 		{
 			var builder = new TextMiddlewareBuilder(_logger);
 			var settings = new TextSettings();
-			var whiteListProvider = Mock.Of<IHtmlWhiteListProvider>();
+			var whiteListProvider = Substitute.For<IHtmlWhiteListProvider>();
 
 			builder.Use(new CustomTokenMiddleware(new CustomTokenParser(settings, _logger)))
 				.Use(new HarmfulTagMiddleware(new HtmlSanitizerFactory(settings, whiteListProvider)))

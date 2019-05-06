@@ -1,5 +1,4 @@
-using Moq;
-using Roadkill.Text;
+using NSubstitute;
 using Roadkill.Text.Models;
 using Roadkill.Text.Parsers;
 using Roadkill.Text.TextMiddleware;
@@ -18,9 +17,12 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 
 			var pagehtml = new PageHtml() { Html = markdown };
 
-			var parser = new Mock<IMarkupParser>();
-			parser.Setup(x => x.ToHtml(markdown)).Returns(expectedHtml);
-			var middleware = new MarkupParserMiddleware(parser.Object);
+			var parser = Substitute.For<IMarkupParser>();
+			parser
+				.ToHtml(markdown)
+				.Returns(expectedHtml);
+
+			var middleware = new MarkupParserMiddleware(parser);
 
 			// Act
 			PageHtml actualPageHtml = middleware.Invoke(pagehtml);

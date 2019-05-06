@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using Roadkill.Text;
 using Roadkill.Text.CustomTokens;
 using Roadkill.Text.Models;
@@ -16,7 +16,7 @@ namespace Roadkill.Tests.Unit.Text.TextMiddleware
 
 		public CustomTokenMiddlewareTests()
 		{
-			_logger = Mock.Of<ILogger>();
+			_logger = Substitute.For<ILogger>();
 		}
 
 		[Fact]

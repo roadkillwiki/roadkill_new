@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
+using NSubstitute;
 using Roadkill.Text;
 using Roadkill.Text.Parsers.Images;
 using Shouldly;
@@ -12,14 +12,14 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Images
 	{
 		private TextSettings _textSettings;
 		private ImageSrcParser _srcParser;
-		private Mock<IUrlHelper> _urlHelper;
+		private IUrlHelper _urlHelper;
 
 		public ImageSrcParserTests()
 		{
 			_textSettings = new TextSettings();
-			_urlHelper = new Mock<IUrlHelper>();
+			_urlHelper = Substitute.For<IUrlHelper>();
 
-			_srcParser = new ImageSrcParser(_textSettings, _urlHelper.Object);
+			_srcParser = new ImageSrcParser(_textSettings, _urlHelper);
 		}
 
 		[Theory]
@@ -44,7 +44,9 @@ namespace Roadkill.Tests.Unit.Text.Parsers.Images
 		public void absolute_paths_should_be_prefixed_with_attachmentpath(string path, string expectedPath)
 		{
 			// Arrange
-			_urlHelper.Setup(x => x.Content(It.IsAny<string>())).Returns<string>(s => s);
+			_urlHelper
+				.Content(Arg.Any<string>())
+				.Returns(callInfo => callInfo.Arg<string>());
 
 			_textSettings.AttachmentsUrlPath = "/attuchments/";
 			HtmlImageTag htmlImageTag = new HtmlImageTag(path, path, "alt", "title");

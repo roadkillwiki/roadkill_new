@@ -1,7 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoFixture;
-using Moq;
+using NSubstitute;
 using Roadkill.Api.Controllers;
 using Roadkill.Text.Models;
 using Roadkill.Text.TextMiddleware;
@@ -12,7 +11,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 {
 	public sealed class MarkdownControllerTests
 	{
-		private readonly Mock<ITextMiddlewareBuilder> _textMiddlewareMock;
+		private readonly ITextMiddlewareBuilder _textMiddlewareMock;
 		private readonly MarkdownController _markdownController;
 		private Fixture _fixture;
 
@@ -20,8 +19,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		{
 			_fixture = new Fixture();
 
-			_textMiddlewareMock = new Mock<ITextMiddlewareBuilder>();
-			_markdownController = new MarkdownController(_textMiddlewareMock.Object);
+			_textMiddlewareMock = Substitute.For<ITextMiddlewareBuilder>();
+			_markdownController = new MarkdownController(_textMiddlewareMock);
 		}
 
 		[Fact]
@@ -31,7 +30,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string expectedHtml = "<html>";
 			string markdown = "a bit of markdown";
 
-			_textMiddlewareMock.Setup(x => x.Execute(markdown))
+			_textMiddlewareMock.Execute(markdown)
 				.Returns(new PageHtml(expectedHtml));
 
 			// when
@@ -39,7 +38,9 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actualHtml.ShouldBe(expectedHtml);
-			_textMiddlewareMock.Verify(x => x.Execute(markdown), Times.Once);
+			_textMiddlewareMock
+				.Received(1)
+				.Execute(markdown);
 		}
 	}
 }
