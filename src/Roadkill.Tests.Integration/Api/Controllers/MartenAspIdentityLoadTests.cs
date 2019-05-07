@@ -7,8 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
-using Roadkill.Api.RequestModels;
 using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
@@ -82,7 +82,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 		private async Task NewMethod(int i)
 		{
 			// Create an Editor user
-			var userData = new UserRequestModel
+			var userData = new UserRequest
 			{
 				Email = $"{i}@localhost",
 				Password = "Passw0rd12345"

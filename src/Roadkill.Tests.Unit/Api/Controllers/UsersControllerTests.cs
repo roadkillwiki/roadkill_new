@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.JWT;
-using Roadkill.Api.RequestModels;
 using Roadkill.Core.Authorization;
 using Shouldly;
 using Xunit;
@@ -56,7 +57,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actionResult.ShouldBeOkObjectResult();
-			RoadkillUser actualUser = actionResult.GetOkObjectResultValue();
+			UserResponse actualUser = actionResult.GetOkObjectResultValue();
 			actualUser.Email.ShouldBe(email);
 		}
 
@@ -71,11 +72,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult((RoadkillUser)null));
 
 			// when
-			ActionResult<RoadkillUser> actionResult = await _usersController.GetByEmail(email);
+			ActionResult<UserResponse> actionResult = await _usersController.GetByEmail(email);
 
 			// then
 			actionResult.ShouldBeNotFoundObjectResult();
-			string errorMessage = actionResult.GetNotFoundValue<RoadkillUser, string>();
+			string errorMessage = actionResult.GetNotFoundValue<UserResponse, string>();
 			errorMessage.ShouldBe(expectedError);
 		}
 
@@ -91,7 +92,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actionResult.ShouldBeOkObjectResult();
-			IEnumerable<RoadkillUser> actualUsers = actionResult.GetOkObjectResultValue();
+			IEnumerable<UserResponse> actualUsers = actionResult.GetOkObjectResultValue();
 			actualUsers.Count().ShouldBe(expectedAllUsers.Count());
 		}
 
@@ -102,10 +103,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string claimName = ClaimTypes.Role;
 			string claimValue = RoleNames.Admin;
 
-			var expectedUsers = new List<RoadkillUser>()
+			var expectedUsers = new List<UserResponse>()
 			{
-				_fixture.Create<RoadkillUser>(),
-				_fixture.Create<RoadkillUser>()
+				_fixture.Create<UserResponse>(),
+				_fixture.Create<UserResponse>()
 			};
 
 			_userManagerMock.GetUsersForClaimAsync(Arg.Is<Claim>(c => c.Type == claimName && c.Value == claimValue))
@@ -116,7 +117,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actionResult.ShouldBeOkObjectResult();
-			IEnumerable<RoadkillUser> actualUsers = actionResult.GetOkObjectResultValue();
+			IEnumerable<UserResponse> actualUsers = actionResult.GetOkObjectResultValue();
 			actualUsers.ShouldBe(expectedUsers);
 		}
 
@@ -134,7 +135,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 							 u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
-			var requestModel = new UserRequestModel()
+			var requestModel = new UserRequest()
 			{
 				Email = email,
 				Password = password
@@ -174,7 +175,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 							 u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
-			var requestModel = new UserRequestModel()
+			var requestModel = new UserRequest()
 			{
 				Email = email,
 				Password = password
@@ -211,7 +212,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.FindByEmailAsync(email)
 				.Returns(new RoadkillUser() { Email = email });
 
-			var requestModel = new UserRequestModel()
+			var requestModel = new UserRequest()
 			{
 				Email = email,
 				Password = password
@@ -237,7 +238,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.FindByEmailAsync(email)
 				.Returns(new RoadkillUser() { Email = email });
 
-			var requestModel = new UserRequestModel()
+			var requestModel = new UserRequest()
 			{
 				Email = email,
 				Password = password

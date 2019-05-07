@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.JWT;
-using Roadkill.Api.ModelConverters;
+using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 

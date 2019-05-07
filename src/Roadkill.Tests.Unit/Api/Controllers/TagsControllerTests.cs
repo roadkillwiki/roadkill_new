@@ -5,7 +5,7 @@ using AutoFixture;
 using NSubstitute;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
-using Roadkill.Api.ModelConverters;
+using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 using Shouldly;

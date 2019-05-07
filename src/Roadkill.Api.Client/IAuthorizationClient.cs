@@ -7,6 +7,6 @@ namespace Roadkill.Api.Client
 	public interface IAuthorizationClient
 	{
 		[Post("/authorization/authenticate")]
-		Task<string> Authenticate([Body] AuthenticationRequest request);
+		Task<string> Authenticate([Body] AuthorizationRequest request);
 	}
 }

@@ -33,15 +33,15 @@ namespace Roadkill.Api.Controllers
 		[HttpPost]
 		[Route(nameof(Authenticate))]
 		[AllowAnonymous]
-		public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticationRequest authenticationRequest)
+		public async Task<ActionResult<string>> Authenticate([FromBody] AuthorizationRequest authorizationRequest)
 		{
-			RoadkillUser user = await _userManager.FindByEmailAsync(authenticationRequest.Email);
+			RoadkillUser user = await _userManager.FindByEmailAsync(authorizationRequest.Email);
 			if (user == null)
 			{
-				return NotFound($"The user with the email {authenticationRequest.Email} could not be found.");
+				return NotFound($"The user with the email {authorizationRequest.Email} could not be found.");
 			}
 
-			SignInResult result = await _signInManager.PasswordSignInAsync(user, authenticationRequest.Password, true, false);
+			SignInResult result = await _signInManager.PasswordSignInAsync(user, authorizationRequest.Password, true, false);
 			if (result.Succeeded)
 			{
 				IList<Claim> existingClaims = await _userManager.GetClaimsAsync(user);

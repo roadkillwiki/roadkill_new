@@ -11,7 +11,7 @@ using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Roadkill.Tests.Integration.Core.Adapters
+namespace Roadkill.Tests.Integration.Core.Search.Adapters
 {
 	/*
 		These tests need ElasticSearch installed locally, you can do this

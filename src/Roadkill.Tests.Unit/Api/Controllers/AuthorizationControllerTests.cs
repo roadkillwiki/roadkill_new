@@ -67,7 +67,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				RoleClaims = new List<string>()
 			};
 
-			var model = new AuthenticationRequest()
+			var model = new AuthorizationRequest()
 			{
 				Email = email,
 				Password = password
@@ -103,7 +103,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string email = "admin@example.org";
 			string password = "Passw0rd9000";
 
-			var model = new AuthenticationRequest()
+			var model = new AuthorizationRequest()
 			{
 				Email = email,
 				Password = password
@@ -135,7 +135,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				NormalizedEmail = email.ToUpperInvariant()
 			};
 
-			var model = new AuthenticationRequest()
+			var model = new AuthorizationRequest()
 			{
 				Email = email,
 				Password = password

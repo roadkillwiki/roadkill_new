@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
 using Elasticsearch.Net;
@@ -8,7 +7,7 @@ using Nest;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Search.Adapters;
 
-namespace Roadkill.Tests.Integration.Core.Adapters
+namespace Roadkill.Tests.Integration.Core.Search.Adapters
 {
 	public class ElasticSearchAdapterFixture : IDisposable
 	{

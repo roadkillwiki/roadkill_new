@@ -10,12 +10,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Extensions;
 using Roadkill.Core.Search.Adapters;
-using Roadkill.Core.Settings;
 using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Roadkill.Tests.Integration.Core.Adapters
+namespace Roadkill.Tests.Integration.Core.Search.Adapters
 {
 	public class PostgresSearchAdapterTests
 	{

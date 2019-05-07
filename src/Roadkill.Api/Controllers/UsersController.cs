@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.Exceptions;
 using Roadkill.Api.JWT;
-using Roadkill.Api.RequestModels;
 using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -37,7 +38,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(GetByEmail), Name = nameof(GetByEmail))]
-		public async Task<ActionResult<RoadkillUser>> GetByEmail(string email)
+		public async Task<ActionResult<UserResponse>> GetByEmail(string email)
 		{
 			RoadkillUser user = await _userManager.FindByEmailAsync(email);
 			if (user == null)
@@ -50,27 +51,30 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(FindAll))]
-		public ActionResult<IEnumerable<RoadkillUser>> FindAll()
+		public ActionResult<IEnumerable<UserResponse>> FindAll()
 		{
-			IEnumerable<RoadkillUser> allUsers = _userManager.Users.ToList();
-			return Ok(allUsers);
+			IEnumerable<RoadkillUser> roadkillUsers = _userManager.Users.ToList();
+
+			var responseUsers = new List<UserResponse>();
+			return Ok(responseUsers);
 		}
 
 		[HttpGet]
 		[Route(nameof(FindUsersWithClaim))]
-		public async Task<ActionResult<IEnumerable<RoadkillUser>>> FindUsersWithClaim(string claimType, string claimValue)
+		public async Task<ActionResult<IEnumerable<UserResponse>>> FindUsersWithClaim(string claimType, string claimValue)
 		{
 			var claim = new Claim(claimType, claimValue);
 			IList<RoadkillUser> usersForClaim = await _userManager.GetUsersForClaimAsync(claim);
 
-			return Ok(Task.FromResult(usersForClaim.AsEnumerable()));
+			var responseUsers = new List<UserResponse>();
+			return Ok(responseUsers.AsEnumerable());
 		}
 
 		[HttpPost]
 		[Route(nameof(CreateAdmin))]
-		public async Task<ActionResult<string>> CreateAdmin(UserRequestModel userRequestModel)
+		public async Task<ActionResult<string>> CreateAdmin(UserRequest userRequest)
 		{
-			var user = await _userManager.FindByEmailAsync(userRequestModel.Email);
+			var user = await _userManager.FindByEmailAsync(userRequest.Email);
 			if (user != null)
 			{
 				return BadRequest(EmailExistsError);
@@ -78,27 +82,27 @@ namespace Roadkill.Api.Controllers
 
 			var newUser = new RoadkillUser()
 			{
-				UserName = userRequestModel.Email,
-				Email = userRequestModel.Email,
+				UserName = userRequest.Email,
+				Email = userRequest.Email,
 				EmailConfirmed = true
 			};
 
-			IdentityResult result = await _userManager.CreateAsync(newUser, userRequestModel.Password);
+			IdentityResult result = await _userManager.CreateAsync(newUser, userRequest.Password);
 			if (!result.Succeeded)
 			{
-				throw new ApiException($"Unable to create admin user {userRequestModel.Email} - UserManager call failed." + string.Join("\n", result.Errors));
+				throw new ApiException($"Unable to create admin user {userRequest.Email} - UserManager call failed." + string.Join("\n", result.Errors));
 			}
 
 			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Admin));
 
-			return CreatedAtAction(nameof(CreateEditor), userRequestModel.Email);
+			return CreatedAtAction(nameof(CreateEditor), userRequest.Email);
 		}
 
 		[HttpPost]
 		[Route(nameof(CreateEditor))]
-		public async Task<ActionResult<string>> CreateEditor(UserRequestModel userRequestModel)
+		public async Task<ActionResult<string>> CreateEditor(UserRequest userRequest)
 		{
-			var user = await _userManager.FindByEmailAsync(userRequestModel.Email);
+			var user = await _userManager.FindByEmailAsync(userRequest.Email);
 			if (user != null)
 			{
 				return BadRequest(EmailExistsError);
@@ -106,20 +110,20 @@ namespace Roadkill.Api.Controllers
 
 			var newUser = new RoadkillUser()
 			{
-				UserName = userRequestModel.Email,
-				Email = userRequestModel.Email,
+				UserName = userRequest.Email,
+				Email = userRequest.Email,
 				EmailConfirmed = true
 			};
 
-			IdentityResult result = await _userManager.CreateAsync(newUser, userRequestModel.Password);
+			IdentityResult result = await _userManager.CreateAsync(newUser, userRequest.Password);
 			if (!result.Succeeded)
 			{
-				throw new ApiException($"Unable to create editor user {userRequestModel.Email} - UserManager call failed." + string.Join("\n", result.Errors));
+				throw new ApiException($"Unable to create editor user {userRequest.Email} - UserManager call failed." + string.Join("\n", result.Errors));
 			}
 
 			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Editor));
 
-			return CreatedAtAction(nameof(CreateEditor), userRequestModel.Email);
+			return CreatedAtAction(nameof(CreateEditor), userRequest.Email);
 		}
 
 		[HttpPost]

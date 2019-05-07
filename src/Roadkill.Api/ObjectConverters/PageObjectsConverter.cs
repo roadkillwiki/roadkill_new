@@ -5,7 +5,7 @@ using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Core.Entities;
 
-namespace Roadkill.Api.ModelConverters
+namespace Roadkill.Api.ObjectConverters
 {
 	public interface IPageObjectsConverter
 	{
