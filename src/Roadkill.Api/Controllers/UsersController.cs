@@ -14,6 +14,7 @@ using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Exceptions;
 using Roadkill.Api.JWT;
+using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -30,10 +31,14 @@ namespace Roadkill.Api.Controllers
 		public static readonly string EmailDoesNotExistError = "The email address does not exist.";
 		public static readonly string UserIsLockedOutError = "The user with the email address is already locked out.";
 		private readonly UserManager<RoadkillUser> _userManager;
+		private readonly IUserObjectsConverter _userObjectsConverter;
 
-		public UsersController(UserManager<RoadkillUser> userManager)
+		public UsersController(
+			UserManager<RoadkillUser> userManager,
+				IUserObjectsConverter userObjectsConverter)
 		{
 			_userManager = userManager;
+			_userObjectsConverter = userObjectsConverter;
 		}
 
 		[HttpGet]
@@ -46,7 +51,9 @@ namespace Roadkill.Api.Controllers
 				return NotFound(EmailDoesNotExistError);
 			}
 
-			return Ok(user);
+			UserResponse response = _userObjectsConverter.ConvertToUserResponse(user);
+
+			return Ok(response);
 		}
 
 		[HttpGet]
@@ -54,9 +61,10 @@ namespace Roadkill.Api.Controllers
 		public ActionResult<IEnumerable<UserResponse>> FindAll()
 		{
 			IEnumerable<RoadkillUser> roadkillUsers = _userManager.Users.ToList();
+			IEnumerable<UserResponse> responses =
+				roadkillUsers.Select(u => _userObjectsConverter.ConvertToUserResponse(u));
 
-			var responseUsers = new List<UserResponse>();
-			return Ok(responseUsers);
+			return Ok(responses);
 		}
 
 		[HttpGet]
@@ -66,8 +74,10 @@ namespace Roadkill.Api.Controllers
 			var claim = new Claim(claimType, claimValue);
 			IList<RoadkillUser> usersForClaim = await _userManager.GetUsersForClaimAsync(claim);
 
-			var responseUsers = new List<UserResponse>();
-			return Ok(responseUsers.AsEnumerable());
+			IEnumerable<UserResponse> responses =
+				usersForClaim.Select(u => _userObjectsConverter.ConvertToUserResponse(u));
+
+			return Ok(responses);
 		}
 
 		[HttpPost]

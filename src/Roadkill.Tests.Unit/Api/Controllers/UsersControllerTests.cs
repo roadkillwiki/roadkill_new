@@ -12,6 +12,7 @@ using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.JWT;
+using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Authorization;
 using Shouldly;
 using Xunit;
@@ -23,6 +24,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		private readonly Fixture _fixture;
 		private UsersController _usersController;
 		private UserManager<RoadkillUser> _userManagerMock;
+		private UserObjectsConverter _objectConverter;
 
 		public UsersControllerTests()
 		{
@@ -40,7 +42,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				null,
 				new NullLogger<UserManager<RoadkillUser>>());
 
-			_usersController = new UsersController(_userManagerMock);
+			_objectConverter = new UserObjectsConverter();
+			_usersController = new UsersController(_userManagerMock, _objectConverter);
 		}
 
 		[Fact]
@@ -103,13 +106,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string claimName = ClaimTypes.Role;
 			string claimValue = RoleNames.Admin;
 
-			var expectedUsers = new List<UserResponse>()
+			var expectedUsers = new List<RoadkillUser>()
 			{
-				_fixture.Create<UserResponse>(),
-				_fixture.Create<UserResponse>()
+				_fixture.Create<RoadkillUser>(),
+				_fixture.Create<RoadkillUser>()
 			};
 
-			_userManagerMock.GetUsersForClaimAsync(Arg.Is<Claim>(c => c.Type == claimName && c.Value == claimValue))
+			_userManagerMock
+				.GetUsersForClaimAsync(Arg.Is<Claim>(c =>
+					c.Type == claimName && c.Value == claimValue))
 				.Returns(Task.FromResult((IList<RoadkillUser>)expectedUsers));
 
 			// when
@@ -118,7 +123,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			actionResult.ShouldBeOkObjectResult();
 			IEnumerable<UserResponse> actualUsers = actionResult.GetOkObjectResultValue();
-			actualUsers.ShouldBe(expectedUsers);
+			actualUsers.Count().ShouldBe(2);
 		}
 
 		[Fact]
