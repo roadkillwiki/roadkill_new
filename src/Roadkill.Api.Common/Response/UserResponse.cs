@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using AutoMapper;
+using Roadkill.Core.Authorization;
 
 namespace Roadkill.Api.Common.Response
 {
-	// This class is the same as a Microsoft.AspNetCore.Identity.IdentityUser
+	[AutoMap(typeof(RoadkillIdentityUser))]
 	public class UserResponse
 	{
+		// This class is really just a copy of RoadkillIdentityUser/IdentityUser
+
 		/// <summary>Gets or sets the primary key for this user.</summary>
 		public string Id { get; set; }
 

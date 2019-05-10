@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using MailKit;
 using MailKit.Net.Smtp;
 using Marten.AspNetIdentity;
@@ -16,9 +17,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
+using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.JWT;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities;
 using Roadkill.Core.Extensions;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
@@ -116,7 +120,7 @@ namespace Roadkill.Api.Extensions
 
 		public static IServiceCollection AddIdentityDefaults(this IServiceCollection services)
 		{
-			services.AddIdentity<RoadkillUser, IdentityRole>(
+			services.AddIdentity<RoadkillIdentityUser, IdentityRole>(
 					options =>
 					{
 						options.Password.RequireDigit = false;
@@ -126,7 +130,7 @@ namespace Roadkill.Api.Extensions
 						options.Password.RequireNonAlphanumeric = false;
 						options.Password.RequireUppercase = false;
 					})
-				.AddMartenStores<RoadkillUser, IdentityRole>()
+				.AddMartenStores<RoadkillIdentityUser, IdentityRole>()
 				.AddDefaultTokenProviders();
 
 			return services;
@@ -174,6 +178,30 @@ namespace Roadkill.Api.Extensions
 				};
 			});
 
+			return services;
+		}
+
+		public static IServiceCollection AddAutoMapperForApi(this IServiceCollection services)
+		{
+			// Automapper properties are mapped using AutoMapAttribute
+			// on the *Response* objects (but not the Request objects),
+			// as you don't map Entities to Requests, but Requests to Entities.
+			//
+			// e.g. PageRequest->Page
+			// e.g. Page->PageResponse
+			services.AddAutoMapper(
+				typeof(Page),
+				typeof(PageRequest),
+				typeof(PageResponse),
+
+				typeof(RoadkillIdentityUser),
+				typeof(UserRequest),
+				typeof(UserResponse),
+
+				typeof(PageVersion),
+				typeof(PageVersionRequest),
+				typeof(PageVersionResponse)
+			);
 			return services;
 		}
 	}

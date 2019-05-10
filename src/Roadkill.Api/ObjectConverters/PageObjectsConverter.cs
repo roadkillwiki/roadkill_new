@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using AutoMapper;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Core.Entities;
@@ -16,36 +17,25 @@ namespace Roadkill.Api.ObjectConverters
 
 	public class PageObjectsConverter : IPageObjectsConverter
 	{
+		private readonly IMapper _mapper;
+
+		public PageObjectsConverter(IMapper mapper)
+		{
+			_mapper = mapper;
+		}
+
 		public PageResponse ConvertToPageResponse(Page page)
 		{
-			return new PageResponse()
-			{
-				Id = page.Id,
-				Title = page.Title,
-				SeoFriendlyTitle = CreateSeoFriendlyPageTitle(page.Title),
-				TagsAsCsv = page.Tags,
-				TagList = TagsToList(page.Tags),
-				LastModifiedBy = page.LastModifiedBy,
-				LastModifiedOn = page.LastModifiedOn,
-				CreatedBy = page.CreatedBy,
-				CreatedOn = page.CreatedOn,
-				IsLocked = page.IsLocked
-			};
+			var pageResponse = _mapper.Map<PageResponse>(page);
+			pageResponse.SeoFriendlyTitle = CreateSeoFriendlyPageTitle(page.Title);
+			pageResponse.TagList = TagsToList(page.Tags);
+
+			return pageResponse;
 		}
 
 		public Page ConvertToPage(PageRequest pageRequest)
 		{
-			return new Page()
-			{
-				Id = pageRequest.Id,
-				Title = pageRequest.Title,
-				LastModifiedBy = pageRequest.LastModifiedBy,
-				LastModifiedOn = pageRequest.LastModifiedOn,
-				CreatedBy = pageRequest.CreatedBy,
-				CreatedOn = pageRequest.CreatedOn,
-				IsLocked = pageRequest.IsLocked,
-				Tags = pageRequest.TagsAsCsv
-			};
+			return _mapper.Map<Page>(pageRequest);
 		}
 
 		private static IEnumerable<string> TagsToList(string csvTags)

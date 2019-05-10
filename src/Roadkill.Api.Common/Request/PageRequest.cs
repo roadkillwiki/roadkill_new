@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
+using Nest;
 
 namespace Roadkill.Api.Common.Request
 {
@@ -57,6 +59,6 @@ namespace Roadkill.Api.Common.Request
 		/// The list of tags, comma separated, for the page.
 		/// </summary>
 		[Required]
-		public string TagsAsCsv { get; set; }
+		public string Tags { get; set; }
 	}
 }

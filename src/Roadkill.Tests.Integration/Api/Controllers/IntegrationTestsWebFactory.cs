@@ -41,11 +41,11 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 		/// </summary>
 		public ITestOutputHelper TestOutputHelper { get; set; }
 
-		public RoadkillUser AdminUser { get; set; }
+		public RoadkillIdentityUser AdminUser { get; set; }
 
 		public string AdminUserPassword { get; set; }
 
-		public RoadkillUser EditorUser { get; set; }
+		public RoadkillIdentityUser EditorUser { get; set; }
 
 		public string EditorUserPassword { get; set; }
 
@@ -61,7 +61,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 			using (var session = documentStore.LightweightSession())
 			{
-				int count = session.Query<RoadkillUser>().Count();
+				int count = session.Query<RoadkillIdentityUser>().Count();
 				Logger.LogInformation($"Found {count} RoadkillUsers");
 
 				count = session.Query<Page>().Count();
@@ -71,7 +71,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			documentStore.Advanced.Clean.DeleteAllDocuments();
 
 			// Create two users
-			var manager = provider.GetService<UserManager<RoadkillUser>>();
+			var manager = provider.GetService<UserManager<RoadkillIdentityUser>>();
 			CreateAdminUser(manager);
 			CreateEditorUser(manager);
 
@@ -94,9 +94,9 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			return builder;
 		}
 
-		private void CreateAdminUser(UserManager<RoadkillUser> manager)
+		private void CreateAdminUser(UserManager<RoadkillIdentityUser> manager)
 		{
-			AdminUser = new RoadkillUser()
+			AdminUser = new RoadkillIdentityUser()
 			{
 				UserName = "admin@example.org",
 				Email = "admin@example.org",
@@ -115,9 +115,9 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 				.GetResult();
 		}
 
-		private void CreateEditorUser(UserManager<RoadkillUser> manager)
+		private void CreateEditorUser(UserManager<RoadkillIdentityUser> manager)
 		{
-			EditorUser = new RoadkillUser()
+			EditorUser = new RoadkillIdentityUser()
 			{
 				UserName = "editor@example.org",
 				Email = "editor@example.org",

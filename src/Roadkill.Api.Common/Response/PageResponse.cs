@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
+using AutoMapper.Configuration.Annotations;
+using Roadkill.Core.Entities;
 
 namespace Roadkill.Api.Common.Response
 {
 	/// <summary>
 	/// Represents page information in Roadkill.
 	/// </summary>
+	[AutoMap(typeof(Page))]
 	public class PageResponse
 	{
 		/// <summary>
@@ -23,6 +27,7 @@ namespace Roadkill.Api.Common.Response
 		/// <summary>
 		/// The url-friendly slug for the page title.
 		/// </summary>
+		[Ignore]
 		public string SeoFriendlyTitle { get; set; }
 
 		/// <summary>
@@ -58,11 +63,13 @@ namespace Roadkill.Api.Common.Response
 		/// The list of tags, comma seperated, for the page.
 		/// </summary>
 		[Required]
+		[Ignore]
 		public string TagsAsCsv { get; set; }
 
 		/// <summary>
 		/// The tags for the page as an array.
 		/// </summary>
+		[Ignore]
 		public IEnumerable<string> TagList { get; set; }
 	}
 }

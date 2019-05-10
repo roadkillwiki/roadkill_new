@@ -14,9 +14,9 @@ namespace Roadkill.Api.Controllers
 	[Route("v{version:apiVersion}/[controller]")]
 	public class InstallController : ControllerBase
 	{
-		private readonly UserManager<RoadkillUser> _userManager;
+		private readonly UserManager<RoadkillIdentityUser> _userManager;
 
-		public InstallController(UserManager<RoadkillUser> userManager)
+		public InstallController(UserManager<RoadkillIdentityUser> userManager)
 		{
 			_userManager = userManager;
 		}
@@ -25,7 +25,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(CreateTestUser))]
 		public async Task<ActionResult<IdentityResult>> CreateTestUser()
 		{
-			var newUser = new RoadkillUser()
+			var newUser = new RoadkillIdentityUser()
 			{
 				UserName = "admin@localhost",
 				Email = "admin@localhost",

@@ -1,3 +1,4 @@
+using AutoMapper;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Core.Authorization;
@@ -6,44 +7,24 @@ namespace Roadkill.Api.ObjectConverters
 {
 	public interface IUserObjectsConverter
 	{
-		UserResponse ConvertToUserResponse(RoadkillUser roadkillUser);
+		UserResponse ConvertToUserResponse(RoadkillIdentityUser roadkillIdentityUser);
 
-		RoadkillUser ConvertToRoadkillUser(UserRequest userRequest);
+		// Skip conversions to RoadkillIdentityUser, as it's really an IdentityUser,
+		// with custom logic to its properties (not a simple shallow copy).
 	}
 
 	public class UserObjectsConverter : IUserObjectsConverter
 	{
-		public UserResponse ConvertToUserResponse(RoadkillUser roadkillUser)
+		private readonly IMapper _mapper;
+
+		public UserObjectsConverter(IMapper mapper)
 		{
-			return new UserResponse()
-			{
-				Id = roadkillUser.Id,
-				Email = roadkillUser.Email,
-				UserName = roadkillUser.UserName,
-				LockoutEnd = roadkillUser.LockoutEnd,
-				RoleClaims = roadkillUser.RoleClaims,
-				PhoneNumber = roadkillUser.PhoneNumber,
-				PasswordHash = roadkillUser.PasswordHash,
-				SecurityStamp = roadkillUser.SecurityStamp,
-				EmailConfirmed = roadkillUser.EmailConfirmed,
-				LockoutEnabled = roadkillUser.LockoutEnabled,
-				NormalizedEmail = roadkillUser.NormalizedEmail,
-				ConcurrencyStamp = roadkillUser.ConcurrencyStamp,
-				TwoFactorEnabled = roadkillUser.TwoFactorEnabled,
-				AccessFailedCount = roadkillUser.AccessFailedCount,
-				NormalizedUserName = roadkillUser.NormalizedUserName,
-				PhoneNumberConfirmed = roadkillUser.PhoneNumberConfirmed
-			};
+			_mapper = mapper;
 		}
 
-		public RoadkillUser ConvertToRoadkillUser(UserRequest userRequest)
+		public UserResponse ConvertToUserResponse(RoadkillIdentityUser roadkillIdentityUser)
 		{
-			return new RoadkillUser()
-			{
-				UserName = userRequest.Email,
-				Email = userRequest.Email,
-				EmailConfirmed = true
-			};
+			return _mapper.Map<UserResponse>(roadkillIdentityUser);
 		}
 	}
 }

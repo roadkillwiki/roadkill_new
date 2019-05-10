@@ -16,13 +16,13 @@ namespace Roadkill.Api.Controllers
 	[Route("v{version:apiVersion}/[controller]")]
 	public class AuthorizationController : ControllerBase
 	{
-		private readonly UserManager<RoadkillUser> _userManager;
-		private readonly SignInManager<RoadkillUser> _signInManager;
+		private readonly UserManager<RoadkillIdentityUser> _userManager;
+		private readonly SignInManager<RoadkillIdentityUser> _signInManager;
 		private readonly IJwtTokenProvider _jwtTokenProvider;
 
 		public AuthorizationController(
-			UserManager<RoadkillUser> userManager,
-			SignInManager<RoadkillUser> signInManager,
+			UserManager<RoadkillIdentityUser> userManager,
+			SignInManager<RoadkillIdentityUser> signInManager,
 			IJwtTokenProvider jwtTokenProvider)
 		{
 			_userManager = userManager;
@@ -35,22 +35,22 @@ namespace Roadkill.Api.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult<string>> Authenticate([FromBody] AuthorizationRequest authorizationRequest)
 		{
-			RoadkillUser user = await _userManager.FindByEmailAsync(authorizationRequest.Email);
-			if (user == null)
+			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(authorizationRequest.Email);
+			if (identityUser == null)
 			{
 				return NotFound($"The user with the email {authorizationRequest.Email} could not be found.");
 			}
 
-			SignInResult result = await _signInManager.PasswordSignInAsync(user, authorizationRequest.Password, true, false);
+			SignInResult result = await _signInManager.PasswordSignInAsync(identityUser, authorizationRequest.Password, true, false);
 			if (result.Succeeded)
 			{
-				IList<Claim> existingClaims = await _userManager.GetClaimsAsync(user);
+				IList<Claim> existingClaims = await _userManager.GetClaimsAsync(identityUser);
 				if (existingClaims.Count == 0)
 				{
 					return Forbid();
 				}
 
-				string token = _jwtTokenProvider.CreateToken(existingClaims, user.Email);
+				string token = _jwtTokenProvider.CreateToken(existingClaims, identityUser.Email);
 
 				return Ok(token);
 			}

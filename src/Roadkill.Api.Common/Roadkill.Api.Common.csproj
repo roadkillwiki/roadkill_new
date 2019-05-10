@@ -4,4 +4,14 @@
         <TargetFramework>netcoreapp2.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Reference Include="AutoMapper, Version=8.1.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005">
+        <HintPath>..\..\..\..\..\.nuget\packages\automapper\8.1.0\lib\netstandard2.0\AutoMapper.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Roadkill.Core\Roadkill.Core.csproj" />
+    </ItemGroup>
+
 </Project>

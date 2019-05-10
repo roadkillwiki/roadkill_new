@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Roadkill.Core.Authorization
 {
-	public class RoadkillUser : IdentityUser, IClaimsUser
+	public class RoadkillIdentityUser : IdentityUser, IClaimsUser
 	{
 		public IList<string> RoleClaims { get; set; }
 	}

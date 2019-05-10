@@ -23,15 +23,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	{
 		private readonly Fixture _fixture;
 		private UsersController _usersController;
-		private UserManager<RoadkillUser> _userManagerMock;
-		private UserObjectsConverter _objectConverter;
+		private UserManager<RoadkillIdentityUser> _userManagerMock;
+		private IUserObjectsConverter _objectConverterMock;
 
 		public UsersControllerTests()
 		{
 			_fixture = new Fixture();
-			var fakeStore = Substitute.For<IUserStore<RoadkillUser>>();
+			var fakeStore = Substitute.For<IUserStore<RoadkillIdentityUser>>();
 
-			_userManagerMock = Substitute.For<UserManager<RoadkillUser>>(
+			_userManagerMock = Substitute.For<UserManager<RoadkillIdentityUser>>(
 				fakeStore,
 				null,
 				null,
@@ -40,10 +40,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				null,
 				null,
 				null,
-				new NullLogger<UserManager<RoadkillUser>>());
+				new NullLogger<UserManager<RoadkillIdentityUser>>());
 
-			_objectConverter = new UserObjectsConverter();
-			_usersController = new UsersController(_userManagerMock, _objectConverter);
+			_objectConverterMock = Substitute.For<IUserObjectsConverter>();
+			_usersController = new UsersController(_userManagerMock, _objectConverterMock);
 		}
 
 		[Fact]
@@ -51,9 +51,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		{
 			// given
 			string email = "donny@trump.com";
+			var identityUser = new RoadkillIdentityUser() { Email = email };
+			var responseUser = new UserResponse() { Email = email };
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillUser() { Email = email });
+				.Returns(identityUser);
+
+			_objectConverterMock
+				.ConvertToUserResponse(Arg.Any<RoadkillIdentityUser>())
+				.Returns(responseUser);
 
 			// when
 			var actionResult = await _usersController.GetByEmail(email);
@@ -72,7 +78,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			var expectedError = UsersController.EmailDoesNotExistError;
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(Task.FromResult((RoadkillUser)null));
+				.Returns(Task.FromResult((RoadkillIdentityUser)null));
 
 			// when
 			ActionResult<UserResponse> actionResult = await _usersController.GetByEmail(email);
@@ -87,7 +93,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		public void FindAll_should_return_all_users_from_manager()
 		{
 			// given
-			var expectedAllUsers = _fixture.CreateMany<RoadkillUser>(5);
+			var expectedAllUsers = _fixture.CreateMany<RoadkillIdentityUser>(5);
 			_userManagerMock.Users.Returns(expectedAllUsers.AsQueryable());
 
 			// when
@@ -106,16 +112,16 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string claimName = ClaimTypes.Role;
 			string claimValue = RoleNames.Admin;
 
-			var expectedUsers = new List<RoadkillUser>()
+			var expectedUsers = new List<RoadkillIdentityUser>()
 			{
-				_fixture.Create<RoadkillUser>(),
-				_fixture.Create<RoadkillUser>()
+				_fixture.Create<RoadkillIdentityUser>(),
+				_fixture.Create<RoadkillIdentityUser>()
 			};
 
 			_userManagerMock
 				.GetUsersForClaimAsync(Arg.Is<Claim>(c =>
 					c.Type == claimName && c.Value == claimValue))
-				.Returns(Task.FromResult((IList<RoadkillUser>)expectedUsers));
+				.Returns(Task.FromResult((IList<RoadkillIdentityUser>)expectedUsers));
 
 			// when
 			var actionResult = await _usersController.FindUsersWithClaim(claimName, claimValue);
@@ -134,7 +140,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string password = "fakepassword";
 
 			_userManagerMock.CreateAsync(
-					Arg.Is<RoadkillUser>(
+					Arg.Is<RoadkillIdentityUser>(
 						u => u.Email == email &&
 							 u.EmailConfirmed &&
 							 u.UserName == email), password)
@@ -157,12 +163,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			await _userManagerMock
 				.Received(1)
 				.CreateAsync(
-					Arg.Is<RoadkillUser>(u => u.Email == email), password);
+					Arg.Is<RoadkillIdentityUser>(u => u.Email == email), password);
 
 			await _userManagerMock
 				.Received(1)
 				.AddClaimAsync(
-					Arg.Is<RoadkillUser>(u => u.Email == email),
+					Arg.Is<RoadkillIdentityUser>(u => u.Email == email),
 					Arg.Is<Claim>(c => c.Type == ClaimTypes.Role && c.Value == RoleNames.Admin));
 		}
 
@@ -174,7 +180,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string password = "fakepassword";
 
 			_userManagerMock.CreateAsync(
-					Arg.Is<RoadkillUser>(
+					Arg.Is<RoadkillIdentityUser>(
 						u => u.Email == email &&
 							 u.EmailConfirmed &&
 							 u.UserName == email), password)
@@ -197,12 +203,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			await _userManagerMock
 				.Received(1)
 				.CreateAsync(
-					Arg.Is<RoadkillUser>(u => u.Email == email), password);
+					Arg.Is<RoadkillIdentityUser>(u => u.Email == email), password);
 
 			await _userManagerMock
 				.Received(1)
 				.AddClaimAsync(
-					Arg.Is<RoadkillUser>(u => u.Email == email),
+					Arg.Is<RoadkillIdentityUser>(u => u.Email == email),
 					Arg.Is<Claim>(c => c.Type == ClaimTypes.Role && c.Value == RoleNames.Editor));
 		}
 
@@ -215,7 +221,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			var expectedError = UsersController.EmailExistsError;
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillUser() { Email = email });
+				.Returns(new RoadkillIdentityUser() { Email = email });
 
 			var requestModel = new UserRequest()
 			{
@@ -241,7 +247,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			var expectedError = UsersController.EmailExistsError;
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillUser() { Email = email });
+				.Returns(new RoadkillIdentityUser() { Email = email });
 
 			var requestModel = new UserRequest()
 			{
@@ -265,9 +271,9 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string email = "okfingers@trump.com";
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillUser() { Email = email });
+				.Returns(new RoadkillIdentityUser() { Email = email });
 
-			_userManagerMock.UpdateAsync(Arg.Is<RoadkillUser>(u => u.Email == email))
+			_userManagerMock.UpdateAsync(Arg.Is<RoadkillIdentityUser>(u => u.Email == email))
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			// when
@@ -278,7 +284,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			await _userManagerMock
 				.Received(1)
-				.UpdateAsync(Arg.Is<RoadkillUser>(
+				.UpdateAsync(Arg.Is<RoadkillIdentityUser>(
 					u => u.Email == email &&
 						 u.LockoutEnabled == true &&
 						 u.LockoutEnd == DateTime.MaxValue));
@@ -292,7 +298,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			var expectedError = UsersController.EmailDoesNotExistError;
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(Task.FromResult((RoadkillUser)null));
+				.Returns(Task.FromResult((RoadkillIdentityUser)null));
 
 			// when
 			var actionResult = await _usersController.DeleteUser(email);
@@ -311,7 +317,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			var expectedError = UsersController.UserIsLockedOutError;
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillUser()
+				.Returns(new RoadkillIdentityUser()
 				{
 					Email = email,
 					LockoutEnd = DateTime.MaxValue,

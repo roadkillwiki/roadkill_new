@@ -30,11 +30,11 @@ namespace Roadkill.Api.Controllers
 		public static readonly string EmailExistsError = "The email address already exists.";
 		public static readonly string EmailDoesNotExistError = "The email address does not exist.";
 		public static readonly string UserIsLockedOutError = "The user with the email address is already locked out.";
-		private readonly UserManager<RoadkillUser> _userManager;
+		private readonly UserManager<RoadkillIdentityUser> _userManager;
 		private readonly IUserObjectsConverter _userObjectsConverter;
 
 		public UsersController(
-			UserManager<RoadkillUser> userManager,
+			UserManager<RoadkillIdentityUser> userManager,
 				IUserObjectsConverter userObjectsConverter)
 		{
 			_userManager = userManager;
@@ -45,13 +45,13 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(GetByEmail), Name = nameof(GetByEmail))]
 		public async Task<ActionResult<UserResponse>> GetByEmail(string email)
 		{
-			RoadkillUser user = await _userManager.FindByEmailAsync(email);
-			if (user == null)
+			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(email);
+			if (identityUser == null)
 			{
 				return NotFound(EmailDoesNotExistError);
 			}
 
-			UserResponse response = _userObjectsConverter.ConvertToUserResponse(user);
+			UserResponse response = _userObjectsConverter.ConvertToUserResponse(identityUser);
 
 			return Ok(response);
 		}
@@ -60,7 +60,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(FindAll))]
 		public ActionResult<IEnumerable<UserResponse>> FindAll()
 		{
-			IEnumerable<RoadkillUser> roadkillUsers = _userManager.Users.ToList();
+			IEnumerable<RoadkillIdentityUser> roadkillUsers = _userManager.Users.ToList();
 			IEnumerable<UserResponse> responses =
 				roadkillUsers.Select(u => _userObjectsConverter.ConvertToUserResponse(u));
 
@@ -72,7 +72,7 @@ namespace Roadkill.Api.Controllers
 		public async Task<ActionResult<IEnumerable<UserResponse>>> FindUsersWithClaim(string claimType, string claimValue)
 		{
 			var claim = new Claim(claimType, claimValue);
-			IList<RoadkillUser> usersForClaim = await _userManager.GetUsersForClaimAsync(claim);
+			IList<RoadkillIdentityUser> usersForClaim = await _userManager.GetUsersForClaimAsync(claim);
 
 			IEnumerable<UserResponse> responses =
 				usersForClaim.Select(u => _userObjectsConverter.ConvertToUserResponse(u));
@@ -90,7 +90,7 @@ namespace Roadkill.Api.Controllers
 				return BadRequest(EmailExistsError);
 			}
 
-			var newUser = new RoadkillUser()
+			var newUser = new RoadkillIdentityUser()
 			{
 				UserName = userRequest.Email,
 				Email = userRequest.Email,
@@ -118,7 +118,7 @@ namespace Roadkill.Api.Controllers
 				return BadRequest(EmailExistsError);
 			}
 
-			var newUser = new RoadkillUser()
+			var newUser = new RoadkillIdentityUser()
 			{
 				UserName = userRequest.Email,
 				Email = userRequest.Email,
@@ -140,21 +140,21 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(DeleteUser))]
 		public async Task<ActionResult<string>> DeleteUser([FromBody]string email)
 		{
-			RoadkillUser user = await _userManager.FindByEmailAsync(email);
-			if (user == null)
+			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(email);
+			if (identityUser == null)
 			{
 				return NotFound(EmailDoesNotExistError);
 			}
 
-			if (user.LockoutEnabled)
+			if (identityUser.LockoutEnabled)
 			{
 				return BadRequest(UserIsLockedOutError);
 			}
 
-			user.LockoutEnd = DateTime.MaxValue;
-			user.LockoutEnabled = true;
+			identityUser.LockoutEnd = DateTime.MaxValue;
+			identityUser.LockoutEnabled = true;
 
-			IdentityResult result = await _userManager.UpdateAsync(user);
+			IdentityResult result = await _userManager.UpdateAsync(identityUser);
 			if (!result.Succeeded)
 			{
 				throw new ApiException($"Unable to delete user {email} - UserManager call failed." + string.Join("\n", result.Errors));

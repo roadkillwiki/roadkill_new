@@ -1,7 +1,11 @@
 ﻿using System;
+using AutoMapper;
+using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities;
 
 namespace Roadkill.Api.Common.Response
 {
+	[AutoMap(typeof(PageVersion))]
 	public class PageVersionResponse
 	{
 		public Guid Id { get; set; }

@@ -19,15 +19,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	public sealed class AuthorizationControllerTests
 	{
 		private AuthorizationController _authorizationController;
-		private UserManager<RoadkillUser> _userManagerMock;
-		private SignInManager<RoadkillUser> _signinManagerMock;
+		private UserManager<RoadkillIdentityUser> _userManagerMock;
+		private SignInManager<RoadkillIdentityUser> _signinManagerMock;
 		private IJwtTokenProvider _jwtTokenProvider;
 
 		public AuthorizationControllerTests()
 		{
-			var fakeStore = Substitute.For<IUserStore<RoadkillUser>>();
+			var fakeStore = Substitute.For<IUserStore<RoadkillIdentityUser>>();
 
-			_userManagerMock = Substitute.For<UserManager<RoadkillUser>>(
+			_userManagerMock = Substitute.For<UserManager<RoadkillIdentityUser>>(
 				fakeStore,
 				null,
 				null,
@@ -36,14 +36,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				null,
 				null,
 				null,
-				new NullLogger<UserManager<RoadkillUser>>());
+				new NullLogger<UserManager<RoadkillIdentityUser>>());
 
-			_signinManagerMock = Substitute.For<SignInManager<RoadkillUser>>(
+			_signinManagerMock = Substitute.For<SignInManager<RoadkillIdentityUser>>(
 				_userManagerMock,
 				Substitute.For<IHttpContextAccessor>(),
-				Substitute.For<IUserClaimsPrincipalFactory<RoadkillUser>>(),
+				Substitute.For<IUserClaimsPrincipalFactory<RoadkillIdentityUser>>(),
 				null,
-				new NullLogger<SignInManager<RoadkillUser>>(),
+				new NullLogger<SignInManager<RoadkillIdentityUser>>(),
 				null);
 
 			_jwtTokenProvider = Substitute.For<IJwtTokenProvider>();
@@ -57,7 +57,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string jwtToken = "jwt token";
 			string email = "admin@example.org";
 			string password = "Passw0rd9000!";
-			var roadkillUser = new RoadkillUser()
+			var roadkillUser = new RoadkillIdentityUser()
 			{
 				Id = "1",
 				UserName = email,
@@ -110,7 +110,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			};
 
 			_userManagerMock.FindByEmailAsync(email)
-				.Returns(Task.FromResult((RoadkillUser)null));
+				.Returns(Task.FromResult((RoadkillIdentityUser)null));
 
 			// when
 			ActionResult<string> actionResult = await _authorizationController.Authenticate(model);
@@ -126,7 +126,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// given
 			string email = "admin@example.org";
 			string password = "Passw0rd9000";
-			var roadkillUser = new RoadkillUser()
+			var roadkillUser = new RoadkillIdentityUser()
 			{
 				Id = "1",
 				UserName = email,

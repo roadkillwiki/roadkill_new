@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Roadkill.Api.JWT;
+using Serilog.Parsing;
 using Shouldly;
 using Xunit;
 
@@ -12,6 +13,32 @@ namespace Roadkill.Tests.Unit
 	[ShouldlyMethods]
 	public static class ShouldlyAttributeExtensions
 	{
+		public static void ShouldHaveSamePropertyValuesAs<TFrom, TTo>(this TFrom fromInstance, TTo toInstance)
+			where TFrom : class
+			where TTo : class
+		{
+			Type fromType = fromInstance.GetType();
+			Type toType = toInstance.GetType();
+
+			var fromProperties = fromType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			foreach (PropertyInfo fromProperty in fromProperties)
+			{
+				PropertyInfo toProperty = toType.GetProperty(fromProperty.Name);
+
+				if (toProperty != null)
+				{
+					object fromValue = fromProperty.GetValue(fromInstance);
+					object toValue = toProperty.GetValue(toInstance);
+
+					string errorMessage = $"{fromType.Name}.{fromProperty.Name} value '{fromValue}" +
+										  " does not match " +
+										  $"{toType.Name}.{toProperty.Name} value '{toValue}";
+
+					fromValue.ShouldBe(toValue, errorMessage);
+				}
+			}
+		}
+
 		public static void ShouldBeEquivalent<T>(this T actual, T expected)
 		{
 			string expectedJson = JsonConvert.SerializeObject(expected);

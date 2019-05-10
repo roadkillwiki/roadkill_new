@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -14,8 +15,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.Extensions;
 using Roadkill.Api.HealthChecks;
+using Roadkill.Core.Authorization;
 using Roadkill.Core.Extensions;
 using Roadkill.Core.Settings;
 
@@ -50,6 +53,7 @@ namespace Roadkill.Api
 
 			// API
 			services.ScanAndRegisterApi();
+			services.AddAutoMapper(typeof(RoadkillIdentityUser), typeof(UserResponse));
 			services.AddMailkit();
 			services.AddMarkdown();
 			services.AddJwtDefaults(_configuration, _logger);
