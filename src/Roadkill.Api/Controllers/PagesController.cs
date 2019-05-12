@@ -167,6 +167,8 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
+			// Need 2 request objects? AWS vs GCloud
+
 			Page newPage = await _pageRepository.UpdateExistingAsync(page);
 			return _pageObjectsConverter.ConvertToPageResponse(newPage);
 		}

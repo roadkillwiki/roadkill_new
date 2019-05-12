@@ -46,6 +46,49 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_usersController = new UsersController(_userManagerMock, _objectConverterMock);
 		}
 
+		[Theory]
+		[InlineData(nameof(UsersController.GetByEmail))]
+		[InlineData(nameof(UsersController.FindAll))]
+		[InlineData(nameof(UsersController.FindUsersWithClaim))]
+		public void Get_methods_should_be_HttpGet_with_custom_routeTemplate_and_allow_anonymous(string methodName)
+		{
+			Type attributeType = typeof(HttpGetAttribute);
+
+			_usersController.ShouldHaveAttribute(methodName, attributeType);
+			_usersController.ShouldHaveRouteAttributeWithTemplate(methodName, "");
+			_usersController.ShouldAllowAnonymous(methodName);
+		}
+
+		[Fact]
+		public void Add_should_be_HttpPost_and_allow_editors()
+		{
+			string methodName = nameof(UsersController.CreateAdmin);
+			Type attributeType = typeof(HttpPostAttribute);
+
+			_usersController.ShouldHaveAttribute(methodName, attributeType);
+			_usersController.ShouldAuthorizeEditors(methodName);
+		}
+
+		[Fact]
+		public void Update_should_be_HttpPut_and_allow_editors()
+		{
+			string methodName = nameof(UsersController.Update);
+			Type attributeType = typeof(HttpPutAttribute);
+
+			_usersController.ShouldHaveAttribute(methodName, attributeType);
+			_usersController.ShouldAuthorizeEditors(methodName);
+		}
+
+		[Fact]
+		public void Delete_should_be_HttpDelete_and_allow_admins()
+		{
+			string methodName = nameof(UsersController.Delete);
+			Type attributeType = typeof(HttpDeleteAttribute);
+
+			_usersController.ShouldHaveAttribute(methodName, attributeType);
+			_usersController.ShouldAuthorizeAdmins(methodName);
+		}
+
 		[Fact]
 		public async Task GetByEmail_should_return_user()
 		{
@@ -277,7 +320,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			// when
-			var actionResult = await _usersController.DeleteUser(email);
+			var actionResult = await _usersController.Delete(email);
 
 			// then
 			actionResult.ShouldBeNoContentResult();
@@ -301,7 +344,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult((RoadkillIdentityUser)null));
 
 			// when
-			var actionResult = await _usersController.DeleteUser(email);
+			var actionResult = await _usersController.Delete(email);
 
 			// then
 			actionResult.ShouldBeNotFoundObjectResult();
@@ -325,7 +368,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				});
 
 			// when
-			var actionResult = await _usersController.DeleteUser(email);
+			var actionResult = await _usersController.Delete(email);
 
 			// then
 			actionResult.ShouldBeBadRequestObjectResult();

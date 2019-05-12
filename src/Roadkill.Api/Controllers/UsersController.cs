@@ -35,7 +35,7 @@ namespace Roadkill.Api.Controllers
 
 		public UsersController(
 			UserManager<RoadkillIdentityUser> userManager,
-				IUserObjectsConverter userObjectsConverter)
+			IUserObjectsConverter userObjectsConverter)
 		{
 			_userManager = userManager;
 			_userObjectsConverter = userObjectsConverter;
@@ -84,7 +84,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(CreateAdmin))]
 		public async Task<ActionResult<string>> CreateAdmin(UserRequest userRequest)
 		{
-			var user = await _userManager.FindByEmailAsync(userRequest.Email);
+			RoadkillIdentityUser user = await _userManager.FindByEmailAsync(userRequest.Email);
 			if (user != null)
 			{
 				return BadRequest(EmailExistsError);
@@ -112,7 +112,7 @@ namespace Roadkill.Api.Controllers
 		[Route(nameof(CreateEditor))]
 		public async Task<ActionResult<string>> CreateEditor(UserRequest userRequest)
 		{
-			var user = await _userManager.FindByEmailAsync(userRequest.Email);
+			RoadkillIdentityUser user = await _userManager.FindByEmailAsync(userRequest.Email);
 			if (user != null)
 			{
 				return BadRequest(EmailExistsError);
@@ -136,9 +136,31 @@ namespace Roadkill.Api.Controllers
 			return CreatedAtAction(nameof(CreateEditor), userRequest.Email);
 		}
 
+		[HttpPut]
+		[Route(nameof(Delete))]
+		public async Task<ActionResult<string>> Update(UserRequest userRequest)
+		{
+			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(userRequest.Email);
+			if (identityUser == null)
+			{
+				return NotFound(EmailDoesNotExistError);
+			}
+
+			identityUser.Email = userRequest.Email;
+			identityUser.UserName = userRequest.Email;
+
+			IdentityResult result = await _userManager.UpdateAsync(identityUser);
+			if (!result.Succeeded)
+			{
+				throw new ApiException($"Unable to update user {userRequest.Email} - UserManager call failed." + string.Join("\n", result.Errors));
+			}
+
+			return NoContent();
+		}
+
 		[HttpPost]
-		[Route(nameof(DeleteUser))]
-		public async Task<ActionResult<string>> DeleteUser([FromBody]string email)
+		[Route(nameof(Delete))]
+		public async Task<ActionResult<string>> Delete([FromBody]string email)
 		{
 			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(email);
 			if (identityUser == null)
