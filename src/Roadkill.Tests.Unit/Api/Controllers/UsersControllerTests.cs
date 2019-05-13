@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -46,47 +48,58 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_usersController = new UsersController(_userManagerMock, _objectConverterMock);
 		}
 
+		[Fact]
+		public void Should_not_allow_anonymous_on_actions()
+		{
+			Type controllerType = typeof(UsersController);
+
+			foreach (MethodInfo methodInfo in controllerType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+			{
+				_usersController.ShouldNotAllowAnonymous(methodInfo.Name);
+			}
+		}
+
+		[Fact]
+		public void UserController_should_require_admin_access()
+		{
+			Type attributeType = typeof(AuthorizeAttribute);
+
+			var customAttributes = typeof(UsersController).GetCustomAttributes(attributeType, false);
+			customAttributes.Length.ShouldBeGreaterThan(0, $"No {attributeType.Name} found for UsersController");
+
+			AuthorizeAttribute authorizeAttribute = customAttributes[0] as AuthorizeAttribute;
+			authorizeAttribute?.Policy.ShouldNotBeNullOrEmpty("No AuthorizeAttribute policy string specified for UsersController");
+			authorizeAttribute?.Policy.ShouldContain(PolicyNames.Admin);
+		}
+
 		[Theory]
 		[InlineData(nameof(UsersController.GetByEmail))]
 		[InlineData(nameof(UsersController.FindAll))]
 		[InlineData(nameof(UsersController.FindUsersWithClaim))]
-		public void Get_methods_should_be_HttpGet_with_custom_routeTemplate_and_allow_anonymous(string methodName)
+		public void Get_methods_should_be_HttpGet_with_custom_routeTemplate(string methodName)
 		{
 			Type attributeType = typeof(HttpGetAttribute);
 
 			_usersController.ShouldHaveAttribute(methodName, attributeType);
-			_usersController.ShouldHaveRouteAttributeWithTemplate(methodName, "");
-			_usersController.ShouldAllowAnonymous(methodName);
+			_usersController.ShouldHaveRouteAttributeWithTemplate(methodName, methodName);
 		}
 
 		[Fact]
-		public void Add_should_be_HttpPost_and_allow_editors()
+		public void Add_should_be_HttpPost()
 		{
 			string methodName = nameof(UsersController.CreateAdmin);
 			Type attributeType = typeof(HttpPostAttribute);
 
 			_usersController.ShouldHaveAttribute(methodName, attributeType);
-			_usersController.ShouldAuthorizeEditors(methodName);
 		}
 
 		[Fact]
-		public void Update_should_be_HttpPut_and_allow_editors()
-		{
-			string methodName = nameof(UsersController.Update);
-			Type attributeType = typeof(HttpPutAttribute);
-
-			_usersController.ShouldHaveAttribute(methodName, attributeType);
-			_usersController.ShouldAuthorizeEditors(methodName);
-		}
-
-		[Fact]
-		public void Delete_should_be_HttpDelete_and_allow_admins()
+		public void Delete_should_be_HttpDelete()
 		{
 			string methodName = nameof(UsersController.Delete);
 			Type attributeType = typeof(HttpDeleteAttribute);
 
 			_usersController.ShouldHaveAttribute(methodName, attributeType);
-			_usersController.ShouldAuthorizeAdmins(methodName);
 		}
 
 		[Fact]

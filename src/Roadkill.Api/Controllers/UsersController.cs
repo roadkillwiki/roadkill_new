@@ -20,7 +20,6 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
@@ -136,29 +135,7 @@ namespace Roadkill.Api.Controllers
 			return CreatedAtAction(nameof(CreateEditor), userRequest.Email);
 		}
 
-		[HttpPut]
-		[Route(nameof(Delete))]
-		public async Task<ActionResult<string>> Update(UserRequest userRequest)
-		{
-			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(userRequest.Email);
-			if (identityUser == null)
-			{
-				return NotFound(EmailDoesNotExistError);
-			}
-
-			identityUser.Email = userRequest.Email;
-			identityUser.UserName = userRequest.Email;
-
-			IdentityResult result = await _userManager.UpdateAsync(identityUser);
-			if (!result.Succeeded)
-			{
-				throw new ApiException($"Unable to update user {userRequest.Email} - UserManager call failed." + string.Join("\n", result.Errors));
-			}
-
-			return NoContent();
-		}
-
-		[HttpPost]
+		[HttpDelete]
 		[Route(nameof(Delete))]
 		public async Task<ActionResult<string>> Delete([FromBody]string email)
 		{

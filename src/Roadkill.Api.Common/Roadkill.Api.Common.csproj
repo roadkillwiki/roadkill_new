@@ -5,9 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="AutoMapper, Version=8.1.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005">
-        <HintPath>..\..\..\..\..\.nuget\packages\automapper\8.1.0\lib\netstandard2.0\AutoMapper.dll</HintPath>
-      </Reference>
+		<PackageReference Include="AutoMapper" Version="8.1.0.0" />
     </ItemGroup>
 
     <ItemGroup>

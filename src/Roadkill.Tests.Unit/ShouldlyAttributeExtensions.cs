@@ -57,6 +57,16 @@ namespace Roadkill.Tests.Unit
 			customAttributes.Length.ShouldBeGreaterThan(0, $"No {attributeType.Name} found for {methodName}");
 		}
 
+		public static void ShouldNotHaveAttribute<T>(this T actual, string methodName, Type attributeType)
+			where T : class
+		{
+			MethodInfo methodType = actual.GetType().GetMethod(methodName);
+
+			var customAttributes = methodType.GetCustomAttributes(attributeType, false);
+
+			customAttributes.Length.ShouldBe(0, $"{attributeType.Name} was found for {methodName}");
+		}
+
 		public static void ShouldHaveRouteAttributeWithTemplate<T>(this T actual, string methodName, string routeTemplate)
 			where T : class
 		{
@@ -77,22 +87,28 @@ namespace Roadkill.Tests.Unit
 			actual.ShouldHaveAttribute(methodName, attributeType);
 		}
 
+		public static void ShouldNotAllowAnonymous<T>(this T actual, string methodName)
+			where T : class
+		{
+			Type attributeType = typeof(AllowAnonymousAttribute);
+			actual.ShouldNotHaveAttribute(methodName, attributeType);
+		}
+
 		public static void ShouldAuthorizeEditors<T>(this T actual, string methodName)
 			where T : class
 		{
-			Type attributeType = typeof(AuthorizeAttribute);
-			MethodInfo methodType = actual.GetType().GetMethod(methodName);
-
-			var customAttributes = methodType.GetCustomAttributes(attributeType, false);
-			customAttributes.Length.ShouldBeGreaterThan(0, $"No {attributeType.Name} found for {methodName}");
-
-			AuthorizeAttribute authorizeAttribute = customAttributes[0] as AuthorizeAttribute;
-			authorizeAttribute.Policy.ShouldContain(PolicyNames.Editor);
+			actual.ShouldAuthorizeRoles(methodName, PolicyNames.Editor);
 		}
 
 		public static void ShouldAuthorizeAdmins<T>(this T actual, string methodName)
 			where T : class
 		{
+			actual.ShouldAuthorizeRoles(methodName, PolicyNames.Admin);
+		}
+
+		public static void ShouldAuthorizeRoles<T>(this T actual, string methodName, string roleName)
+			where T : class
+		{
 			Type attributeType = typeof(AuthorizeAttribute);
 			MethodInfo methodType = actual.GetType().GetMethod(methodName);
 
@@ -100,7 +116,10 @@ namespace Roadkill.Tests.Unit
 			customAttributes.Length.ShouldBeGreaterThan(0, $"No {attributeType.Name} found for {methodName}");
 
 			AuthorizeAttribute authorizeAttribute = customAttributes[0] as AuthorizeAttribute;
-			authorizeAttribute.Policy.ShouldContain(PolicyNames.Admin);
+
+			authorizeAttribute.ShouldNotBeNull($"No AuthorizeAttribute policy string specified for {methodName}");
+			authorizeAttribute?.Policy.ShouldNotBeNullOrEmpty($"No AuthorizeAttribute policy string specified for {methodName}");
+			authorizeAttribute?.Policy.ShouldContain(roleName);
 		}
 	}
 }
