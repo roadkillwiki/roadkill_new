@@ -49,7 +49,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public void Should_not_allow_anonymous_on_actions()
+		public void should_not_allow_anonymous_on_actions()
 		{
 			Type controllerType = typeof(UsersController);
 
@@ -60,7 +60,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public void UserController_should_require_admin_access()
+		public void should_require_admin_access()
 		{
 			Type attributeType = typeof(AuthorizeAttribute);
 
@@ -189,7 +189,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task AddAdmin_should_create_user_with_usermanager_and_add_claim()
+		public async Task CreateAdmin_should_create_user_with_usermanager_and_add_claim()
 		{
 			// given
 			string email = "donald@trump.com";
@@ -229,7 +229,33 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task AddEditor_should_create_user_with_usermanager_and_add_claim()
+		public async Task CreateAdmin_should_return_badrequest_if_email_exists()
+		{
+			// given
+			string email = "donald@trump.com";
+			string password = "fakepassword";
+			var expectedError = UsersController.EmailExistsError;
+
+			_userManagerMock.FindByEmailAsync(email)
+				.Returns(new RoadkillIdentityUser() { Email = email });
+
+			var requestModel = new UserRequest()
+			{
+				Email = email,
+				Password = password
+			};
+
+			// when
+			var actionResult = await _usersController.CreateAdmin(requestModel);
+
+			// then
+			actionResult.ShouldBeBadRequestObjectResult();
+			string errorMessage = actionResult.GetBadRequestValue();
+			errorMessage.ShouldBe(expectedError);
+		}
+
+		[Fact]
+		public async Task CreateEditor_should_create_user_with_usermanager_and_add_claim()
 		{
 			// given
 			string email = "daffy@trump.com";
@@ -238,8 +264,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.CreateAsync(
 					Arg.Is<RoadkillIdentityUser>(
 						u => u.Email == email &&
-							 u.EmailConfirmed &&
-							 u.UserName == email), password)
+						     u.EmailConfirmed &&
+						     u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			var requestModel = new UserRequest()
@@ -269,33 +295,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task AddAdmin_should_return_badrequest_if_email_exists()
-		{
-			// given
-			string email = "donald@trump.com";
-			string password = "fakepassword";
-			var expectedError = UsersController.EmailExistsError;
-
-			_userManagerMock.FindByEmailAsync(email)
-				.Returns(new RoadkillIdentityUser() { Email = email });
-
-			var requestModel = new UserRequest()
-			{
-				Email = email,
-				Password = password
-			};
-
-			// when
-			var actionResult = await _usersController.CreateAdmin(requestModel);
-
-			// then
-			actionResult.ShouldBeBadRequestObjectResult();
-			string errorMessage = actionResult.GetBadRequestValue();
-			errorMessage.ShouldBe(expectedError);
-		}
-
-		[Fact]
-		public async Task AddEditor_should_return_badrequest_if_email_exists()
+		public async Task CreateEditor_should_return_badrequest_if_email_exists()
 		{
 			// given
 			string email = "daffy@trump.com";
