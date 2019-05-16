@@ -264,8 +264,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.CreateAsync(
 					Arg.Is<RoadkillIdentityUser>(
 						u => u.Email == email &&
-						     u.EmailConfirmed &&
-						     u.UserName == email), password)
+							 u.EmailConfirmed &&
+							 u.UserName == email), password)
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			var requestModel = new UserRequest()

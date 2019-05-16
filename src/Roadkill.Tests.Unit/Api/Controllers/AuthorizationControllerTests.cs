@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -25,10 +26,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 		public AuthorizationControllerTests()
 		{
-			var fakeStore = Substitute.For<IUserStore<RoadkillIdentityUser>>();
-
+			var userManagerLogger = new NullLogger<UserManager<RoadkillIdentityUser>>();
+			var userStoreMock = Substitute.For<IUserStore<RoadkillIdentityUser>>();
 			_userManagerMock = Substitute.For<UserManager<RoadkillIdentityUser>>(
-				fakeStore,
+				userStoreMock,
 				null,
 				null,
 				null,
@@ -36,18 +37,37 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				null,
 				null,
 				null,
-				new NullLogger<UserManager<RoadkillIdentityUser>>());
+				userManagerLogger);
 
+			var signinManagerLogger = new NullLogger<SignInManager<RoadkillIdentityUser>>();
+			var contextAccessorMock = Substitute.For<IHttpContextAccessor>();
+			var claimFactoryMock = Substitute.For<IUserClaimsPrincipalFactory<RoadkillIdentityUser>>();
 			_signinManagerMock = Substitute.For<SignInManager<RoadkillIdentityUser>>(
 				_userManagerMock,
-				Substitute.For<IHttpContextAccessor>(),
-				Substitute.For<IUserClaimsPrincipalFactory<RoadkillIdentityUser>>(),
+				contextAccessorMock,
+				claimFactoryMock,
 				null,
-				new NullLogger<SignInManager<RoadkillIdentityUser>>(),
+				signinManagerLogger,
 				null);
 
 			_jwtTokenProvider = Substitute.For<IJwtTokenProvider>();
 			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtTokenProvider);
+		}
+
+		[Fact]
+		public void Authenticate_should_be_HttpPost_and_have_route_template()
+		{
+			string methodName = nameof(AuthorizationController.Authenticate);
+			Type attributeType = typeof(HttpPostAttribute);
+
+			_authorizationController.ShouldHaveAttribute(methodName, attributeType);
+			_authorizationController.ShouldHaveRouteAttributeWithTemplate(methodName, methodName);
+		}
+
+		[Fact]
+		public void Authenticate_should_allow_anonymous()
+		{
+			_authorizationController.ShouldAllowAnonymous(nameof(AuthorizationController.Authenticate));
 		}
 
 		[Fact]
