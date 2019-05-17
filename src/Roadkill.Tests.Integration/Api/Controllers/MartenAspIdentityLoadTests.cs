@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -41,7 +42,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 		[Fact]
 		public async Task should_async_add_users_and_post_pages_and_get_pages()
 		{
-			bool failed = false;
+			int failedCount = 0;
 
 			var loginData = new
 			{
@@ -53,38 +54,39 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			string jwtToken = await jwtResponse.Content.ReadAsStringAsync();
 			_httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {jwtToken}");
 
+			// Hit marten with 50 RPS
 			var stopWatch = Stopwatch.StartNew();
-			Parallel.For(0, 55, (i, state) =>
+			Parallel.For(0, 50, (i, state) =>
 			{
 				try
 				{
 					_factory.Logger.LogInformation($"Begin thread {i}.");
-					NewMethod(i).ConfigureAwait(false).GetAwaiter().GetResult();
+					AddEditorAndAddPageCheckFor200(i).ConfigureAwait(false).GetAwaiter().GetResult();
 					_factory.Logger.LogInformation($"(Thread {i} success).");
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					failed = true;
-					_factory.Logger.LogInformation($"Failed on {i}.");
+					Interlocked.Increment(ref failedCount);
+					_factory.Logger.LogInformation($"Failed on thread {i}. {ex.Message}");
 					state.Break();
 				}
 			});
 
-			if (failed)
+			if (failedCount > 0)
 			{
-				Fail("One of the threads failed");
+				Fail($"Failed on {failedCount} threads");
 			}
 
 			stopWatch.Stop();
 			_outputHelper.WriteLine($"Took {stopWatch.ElapsedMilliseconds}ms to run.");
 		}
 
-		private async Task NewMethod(int i)
+		private async Task AddEditorAndAddPageCheckFor200(int uniqueId)
 		{
 			// Create an Editor user
 			var userData = new UserRequest
 			{
-				Email = $"{i}@localhost",
+				Email = $"{uniqueId}@localhost",
 				Password = "Passw0rd12345"
 			};
 
@@ -95,29 +97,29 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			_factory.Logger.LogInformation($"Created {userData.Email}.");
 
 			// Create a page in the API
-			var pageData = new PageResponse
+			var pageRequest = new PageRequest
 			{
-				Title = $"page {i}",
+				Title = $"page {uniqueId}",
 				CreatedBy = userData.Email,
-				TagsAsCsv = "testing"
+				Tags = "testing"
 			};
 
 			var response = await PostReturnsStatusCodeWithContent(
 				_addPagePath,
-				pageData,
+				pageRequest,
 				HttpStatusCode.Created);
 
-			// Get the page from the API
+			// Get the PageResponse from the API
 			string json = await response.Content.ReadAsStringAsync();
 			var model = JsonConvert.DeserializeObject<PageResponse>(json);
 
-			string pagePath = string.Format(_getPagePath, model.Id);
-			response = await GetReturnsStatusCode(pagePath, HttpStatusCode.OK);
+			string newPageApiUrl = string.Format(_getPagePath, model.Id);
+			response = await GetReturnsStatusCode(newPageApiUrl, HttpStatusCode.OK);
 			json = await response.Content.ReadAsStringAsync();
 			_factory.Logger.LogInformation($"Created page {model.Id}.");
 
 			// Check it returned a page model
-			json.ShouldNotBeNullOrEmpty($"Failed on iteration {i}");
+			json.ShouldNotBeNullOrEmpty($"Failed on iteration {uniqueId}");
 		}
 
 		private async Task<HttpResponseMessage> GetReturnsStatusCode(string requestUri, HttpStatusCode statusCode)
