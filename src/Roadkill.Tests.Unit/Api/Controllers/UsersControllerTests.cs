@@ -49,7 +49,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public void should_not_allow_anonymous_on_actions()
+		public void All_methods_should_disallow_anonymous()
 		{
 			Type controllerType = typeof(UsersController);
 
@@ -60,7 +60,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public void should_require_admin_access()
+		public void Controller_should_require_admin_access()
 		{
 			Type attributeType = typeof(AuthorizeAttribute);
 
@@ -73,12 +73,16 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Theory]
-		[InlineData(nameof(UsersController.GetByEmail))]
+		[InlineData(nameof(UsersController.Get), "{email}")]
 		[InlineData(nameof(UsersController.FindAll))]
 		[InlineData(nameof(UsersController.FindUsersWithClaim))]
-		public void Get_methods_should_be_HttpGet_with_custom_routeTemplate(string methodName)
+		public void Get_methods_should_be_HttpGet_with_custom_routeTemplate(string methodName, string routeTemplate = "")
 		{
 			Type attributeType = typeof(HttpGetAttribute);
+			if (string.IsNullOrEmpty(routeTemplate))
+			{
+				routeTemplate = methodName;
+			}
 
 			_usersController.ShouldHaveAttribute(methodName, attributeType);
 			_usersController.ShouldHaveRouteAttributeWithTemplate(methodName, methodName);
@@ -103,7 +107,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task GetByEmail_should_return_user()
+		public async Task Get_should_return_user()
 		{
 			// given
 			string email = "donny@trump.com";
@@ -118,7 +122,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(responseUser);
 
 			// when
-			var actionResult = await _usersController.GetByEmail(email);
+			var actionResult = await _usersController.Get(email);
 
 			// then
 			actionResult.ShouldBeOkObjectResult();
@@ -127,7 +131,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task GetByEmail_should_return_notfound_when_user_doesnt_exist()
+		public async Task Get_should_return_notfound_when_user_doesnt_exist()
 		{
 			// given
 			string email = "okfingers@trump.com";
@@ -137,7 +141,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult((RoadkillIdentityUser)null));
 
 			// when
-			ActionResult<UserResponse> actionResult = await _usersController.GetByEmail(email);
+			ActionResult<UserResponse> actionResult = await _usersController.Get(email);
 
 			// then
 			actionResult.ShouldBeNotFoundObjectResult();

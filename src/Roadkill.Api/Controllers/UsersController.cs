@@ -41,8 +41,8 @@ namespace Roadkill.Api.Controllers
 		}
 
 		[HttpGet]
-		[Route(nameof(GetByEmail), Name = nameof(GetByEmail))]
-		public async Task<ActionResult<UserResponse>> GetByEmail(string email)
+		[Route("{email}")]
+		public async Task<ActionResult<UserResponse>> Get(string email)
 		{
 			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(email);
 			if (identityUser == null)
