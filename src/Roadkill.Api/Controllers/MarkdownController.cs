@@ -7,7 +7,6 @@ using Roadkill.Text.TextMiddleware;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]

@@ -85,7 +85,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			}
 
 			_usersController.ShouldHaveAttribute(methodName, attributeType);
-			_usersController.ShouldHaveRouteAttributeWithTemplate(methodName, methodName);
+			_usersController.ShouldHaveRouteAttributeWithTemplate(methodName, routeTemplate);
 		}
 
 		[Fact]
