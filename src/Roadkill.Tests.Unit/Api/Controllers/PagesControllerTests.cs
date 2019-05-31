@@ -103,6 +103,108 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
+		public async Task Get_should_return_page()
+		{
+			// given
+			Page expectedPage = _fixture.Create<Page>();
+			int id = expectedPage.Id;
+
+			_pageRepositoryMock
+				.GetPageByIdAsync(id)
+				.Returns(expectedPage);
+
+			// when
+			ActionResult<PageResponse> actionResult = await _pagesController.Get(id);
+
+			// then
+			actionResult.Value.ShouldNotBeNull("ActionResult's ViewModel was null");
+			actionResult.Value.Id.ShouldBe(id);
+		}
+
+		[Fact]
+		public async Task AllPages_should_return_pages()
+		{
+			// given
+			IEnumerable<Page> pages = _fixture.CreateMany<Page>();
+
+			_pageRepositoryMock
+				.AllPagesAsync()
+				.Returns(pages);
+
+			// when
+			ActionResult<IEnumerable<PageResponse>> actionResult = await _pagesController.AllPages();
+
+			// then
+			actionResult.ShouldBeOkObjectResult();
+			IEnumerable<PageResponse> actualPage = actionResult.GetOkObjectResultValue();
+			actualPage.Count().ShouldBe(pages.Count());
+		}
+
+		[Fact]
+		public async Task AllPagesCreatedBy_should_return_pages_for_user()
+		{
+			// given
+			string username = "bob";
+			IEnumerable<Page> pages = _fixture.CreateMany<Page>();
+
+			_pageRepositoryMock
+				.FindPagesCreatedByAsync(username)
+				.Returns(pages);
+
+			// when
+			ActionResult<IEnumerable<PageResponse>> actionResult = await _pagesController.AllPagesCreatedBy(username);
+
+			// then
+			actionResult.ShouldBeOkObjectResult();
+			IEnumerable<PageResponse> actualPage = actionResult.GetOkObjectResultValue();
+			actualPage.Count().ShouldBe(pages.Count());
+		}
+
+		[Fact]
+		public async Task FindHomePage_should_return_first_page_with_homepage_tag()
+		{
+			// given
+			List<Page> pages = _fixture.CreateMany<Page>(10).ToList();
+			for (int i = 0; i < pages.Count; i++)
+			{
+				pages[i].Tags += ", homepage";
+				pages[i].Title = $"page {i}";
+			}
+
+			_pageRepositoryMock
+				.FindPagesContainingTagAsync("homepage")
+				.Returns(pages);
+
+			// when
+			ActionResult<PageResponse> actionResult = await _pagesController.FindHomePage();
+
+			// then
+			PageResponse actualPage = actionResult.GetOkObjectResultValue();
+			actualPage.Title.ShouldBe("page 0");
+			actualPage.Id.ShouldBe(pages[0].Id);
+		}
+
+		[Fact]
+		public async Task FindByTitle()
+		{
+			// given
+			Page expectedPage = _fixture.Create<Page>();
+			string title = expectedPage.Title;
+
+			_pageRepositoryMock
+				.GetPageByTitleAsync(title)
+				.Returns(expectedPage);
+
+			// when
+			ActionResult<PageResponse> actionResult = await _pagesController.FindByTitle(title);
+
+			// then
+			PageResponse actualPage = actionResult.GetOkObjectResultValue();
+			actualPage.Title.ShouldBe(title);
+			actualPage.Id.ShouldBe(expectedPage.Id);
+		}
+
+		[Fact]
 		public async Task Add_should_call_repository_and_return_createdAtAction()
 		{
 			// given
@@ -127,10 +229,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			ActionResult<PageResponse> actionResult = await _pagesController.Add(pageRequest);
 
 			// then
-			await _pageRepositoryMock
-				.Received(1)
-				.AddNewPageAsync(Arg.Is<Page>(p => p.Title == pageRequest.Title));
-
 			actionResult.ShouldBeCreatedAtActionResult();
 			PageResponse pageResponse = actionResult.CreatedAtActionResultValue();
 			pageResponse.ShouldNotBeNull("ActionResult's ViewModel was null");
@@ -139,7 +237,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task Update_should_update_using_repository_and_return_pageresponse()
+		public async Task Update_should_return_pageresponse()
 		{
 			// given
 			var pageRequest = new PageRequest()
@@ -166,16 +264,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			ActionResult<PageResponse> actionResult = await _pagesController.Update(pageRequest);
 
 			// then
-			await _pageRepositoryMock
-				.Received(1)
-				.UpdateExistingAsync(Arg.Is<Page>(page => page.Id == changedPage.Id));
-
-			actionResult.Value.ShouldNotBeNull("ActionResult's model was null");
-			actionResult.Value.ShouldBeEquivalent(expectedResponse);
+			actionResult.ShouldBeNoContentResult();
 		}
 
 		[Fact]
-		public async Task Delete_should_call_repository()
+		public async Task Delete_should_return_no_content()
 		{
 			// given
 			Page expectedPage = _fixture.Create<Page>();
@@ -186,155 +279,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.CompletedTask);
 
 			// when
-			await _pagesController.Delete(expectedPageId);
+			ActionResult<string> actionResult = await _pagesController.Delete(expectedPageId);
 
 			// then
-			await _pageRepositoryMock
-				.Received(1)
-				.DeletePageAsync(expectedPageId);
-		}
-
-		[Fact]
-		public async Task Get_should_return_from_repository_and_call_converter()
-		{
-			// given
-			Page expectedPage = _fixture.Create<Page>();
-			int id = expectedPage.Id;
-
-			_pageRepositoryMock
-				.GetPageByIdAsync(id)
-				.Returns(expectedPage);
-
-			// when
-			ActionResult<PageResponse> actionResult = await _pagesController.Get(id);
-
-			// then
-			actionResult.Value.ShouldNotBeNull("ActionResult's ViewModel was null");
-			actionResult.Value.Id.ShouldBe(id);
-
-			await _pageRepositoryMock
-				.Received(1)
-				.GetPageByIdAsync(id);
-
-			_viewObjectsConverterMock
-				.Received(1)
-				.ConvertToPageResponse(expectedPage);
-		}
-
-		[Fact]
-		public async Task AllPages_should_call_repository_and_converter()
-		{
-			// given
-			IEnumerable<Page> pages = _fixture.CreateMany<Page>();
-
-			_pageRepositoryMock
-				.AllPagesAsync()
-				.Returns(pages);
-
-			// when
-			ActionResult<IEnumerable<PageResponse>> actionResult = await _pagesController.AllPages();
-
-			// then
-			var model = (actionResult.Result as OkObjectResult).Value as IEnumerable<PageResponse>;
-
-			model.ShouldNotBeNull("ActionResult's ViewModel was null");
-			model.Count().ShouldBe(pages.Count());
-
-			await _pageRepositoryMock
-				.Received(1)
-				.AllPagesAsync();
-
-			_viewObjectsConverterMock
-				.Received(pages.Count())
-				.ConvertToPageResponse(Arg.Any<Page>());
-		}
-
-		[Fact]
-		public async Task AllPagesCreatedBy_should_call_repository_and_converter()
-		{
-			// given
-			string username = "bob";
-			IEnumerable<Page> pages = _fixture.CreateMany<Page>();
-
-			_pageRepositoryMock
-				.FindPagesCreatedByAsync(username)
-				.Returns(pages);
-
-			// when
-			ActionResult<IEnumerable<PageResponse>> actionResult = await _pagesController.AllPagesCreatedBy(username);
-
-			// then
-			var model = (actionResult.Result as OkObjectResult).Value as IEnumerable<PageResponse>;
-			model.ShouldNotBeNull("ActionResult's ViewModel was null");
-			model.Count().ShouldBe(pages.Count());
-
-			await _pageRepositoryMock
-				.Received(1)
-				.FindPagesCreatedByAsync(username);
-
-			_viewObjectsConverterMock
-				.Received(pages.Count())
-				.ConvertToPageResponse(Arg.Any<Page>());
-		}
-
-		[Fact]
-		public async Task FindHomePage_should_return_first_page_with_homepage_tag()
-		{
-			// given
-			List<Page> pages = _fixture.CreateMany<Page>(10).ToList();
-			for (int i = 0; i < pages.Count; i++)
-			{
-				pages[i].Tags += ", homepage";
-				pages[i].Title = $"page {i}";
-			}
-
-			_pageRepositoryMock
-				.FindPagesContainingTagAsync("homepage")
-				.Returns(pages);
-
-			// when
-			ActionResult<PageResponse> actionResult = await _pagesController.FindHomePage();
-
-			// then
-			actionResult.Value.ShouldNotBeNull("ActionResult's ViewModel was null");
-			actionResult.Value.Title.ShouldBe("page 0");
-			actionResult.Value.Id.ShouldBe(pages[0].Id);
-
-			await _pageRepositoryMock
-				.Received(1)
-				.FindPagesContainingTagAsync("homepage");
-
-			_viewObjectsConverterMock
-				.Received(1)
-				.ConvertToPageResponse(pages[0]);
-		}
-
-		[Fact]
-		public async Task FindByTitle()
-		{
-			// given
-			Page expectedPage = _fixture.Create<Page>();
-			string title = expectedPage.Title;
-
-			_pageRepositoryMock
-				.GetPageByTitleAsync(title)
-				.Returns(expectedPage);
-
-			// when
-			ActionResult<PageResponse> actionResult = await _pagesController.FindByTitle(title);
-
-			// then
-			actionResult.Value.ShouldNotBeNull("ActionResult's ViewModel was null");
-			actionResult.Value.Title.ShouldBe(title);
-			actionResult.Value.Id.ShouldBe(expectedPage.Id);
-
-			await _pageRepositoryMock
-				.Received(1)
-				.GetPageByTitleAsync(title);
-
-			_viewObjectsConverterMock
-				.Received(1)
-				.ConvertToPageResponse(expectedPage);
+			actionResult.ShouldBeNoContentResult();
 		}
 	}
 }

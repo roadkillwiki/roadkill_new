@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
+using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
@@ -42,7 +46,44 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task AllTags_should_return_all_tags_fill_count_property()
+		public void Controller_should_require_admin_access()
+		{
+			Type attributeType = typeof(AuthorizeAttribute);
+
+			var customAttributes = typeof(TagsController).GetCustomAttributes(attributeType, false);
+			customAttributes.Length.ShouldBeGreaterThan(0, $"No {attributeType.Name} found for TagsController");
+
+			AuthorizeAttribute authorizeAttribute = customAttributes[0] as AuthorizeAttribute;
+			authorizeAttribute?.Policy.ShouldNotBeNullOrEmpty("No AuthorizeAttribute policy string specified for TagsController");
+			authorizeAttribute?.Policy.ShouldContain(PolicyNames.Admin);
+		}
+
+		[Theory]
+		[InlineData(nameof(TagsController.AllTags))]
+		[InlineData(nameof(TagsController.FindPageWithTag))]
+		public void Get_methods_should_be_HttpGet_with_custom_routeTemplate_and_allow_anonymous(string methodName, string routeTemplate = "")
+		{
+			Type attributeType = typeof(HttpGetAttribute);
+			if (string.IsNullOrEmpty(routeTemplate))
+			{
+				routeTemplate = methodName;
+			}
+
+			_tagsController.ShouldHaveAttribute(methodName, attributeType);
+			_tagsController.ShouldHaveRouteAttributeWithTemplate(methodName, routeTemplate);
+		}
+
+		[Fact]
+		public void Rename_should_be_HttpPut_and_allow_editors()
+		{
+			string methodName = nameof(TagsController.Rename);
+			Type attributeType = typeof(HttpPutAttribute);
+
+			_tagsController.ShouldHaveAttribute(methodName, attributeType);
+		}
+
+		[Fact]
+		public async Task AllTags_should_return_all_tags_and_fill_count_property()
 		{
 			// given
 			List<string> tags = _fixture.CreateMany<string>().ToList();
@@ -63,10 +104,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			IEnumerable<TagResponse> tagViewModels = await _tagsController.AllTags();
 
 			// then
-			await _pageRepositoryMock
-				.Received(1)
-				.AllTagsAsync();
-
 			tagViewModels.Count().ShouldBe(expectedTagCount);
 			tagViewModels.First(x => x.Name == "duplicate-tag").Count.ShouldBe(3);
 		}
@@ -74,7 +111,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		[Theory]
 		[InlineData("tag1, typo-tag ", "tag1,fixed-tag")]
 		[InlineData("tag1, typo-tag , tag3", "tag1,fixed-tag, tag3")]
-		public async Task RenameTag_should_ignore_and_normalize_whitespace_for_tag(string existingTags, string expectedTags)
+		public async Task RenameTag_should_ignore_and_normalize_whitespace_for_tag_and_return_nocontent(string existingTags, string expectedTags)
 		{
 			// given
 			string tagToSearch = "typo-tag";
@@ -88,20 +125,19 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pagesWithTags);
 
 			// when
-			await _tagsController.Rename(tagToSearch, newTag);
+			ActionResult<string> actionResult = await _tagsController.Rename(tagToSearch, newTag);
 
 			// then
-			await _pageRepositoryMock
-				.Received(1)
-				.FindPagesContainingTagAsync(tagToSearch);
+			actionResult.ShouldBeNoContentResult();
 
-			await _pageRepositoryMock
-				.Received(pagesWithTags.Count)
-				.UpdateExistingAsync(Arg.Is<Page>(p => p.Tags == expectedTags));
+			foreach (Page page in pagesWithTags)
+			{
+				page.Tags.ShouldBe(expectedTags);
+			}
 		}
 
 		[Fact]
-		public async Task FindByTag_should_use_repository_to_find_tags()
+		public async Task FindPageWithTag_should_return_page()
 		{
 			// given
 			string tag = "gutentag";
@@ -120,10 +156,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			pageViewModelsWithTag.Count().ShouldBe(pagesWithTag.Count());
-
-			_pageViewModelConverterMock
-				.Received(pagesWithTag.Count)
-				.ConvertToPageResponse(Arg.Any<Page>());
 		}
 	}
 }

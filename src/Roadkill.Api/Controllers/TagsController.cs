@@ -12,7 +12,6 @@ using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
@@ -28,19 +27,6 @@ namespace Roadkill.Api.Controllers
 		{
 			_pageRepository = pageRepository;
 			_pageObjectsConverter = pageObjectsConverter;
-		}
-
-		[HttpPost]
-		[Route(nameof(Rename))]
-		public async Task Rename(string oldTagName, string newTagName)
-		{
-			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTagAsync(oldTagName);
-
-			foreach (Page page in pages)
-			{
-				page.Tags = Regex.Replace(page.Tags, $@"\s{oldTagName}\s", newTagName);
-				await _pageRepository.UpdateExistingAsync(page);
-			}
 		}
 
 		[HttpGet]
@@ -72,6 +58,21 @@ namespace Roadkill.Api.Controllers
 		{
 			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTagAsync(tag);
 			return pages.Select(_pageObjectsConverter.ConvertToPageResponse);
+		}
+
+		[HttpPut]
+		[Route(nameof(Rename))]
+		public async Task<ActionResult<string>> Rename(string oldTagName, string newTagName)
+		{
+			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTagAsync(oldTagName);
+
+			foreach (Page page in pages)
+			{
+				page.Tags = Regex.Replace(page.Tags, $@"\s{oldTagName}\s", newTagName);
+				await _pageRepository.UpdateExistingAsync(page);
+			}
+
+			return NoContent();
 		}
 	}
 }

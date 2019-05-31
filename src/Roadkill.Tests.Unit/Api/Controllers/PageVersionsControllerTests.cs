@@ -82,7 +82,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public void Update_should_be_HttpPut_and_allow_editors()
+		public void Update_should_be_HttpPut_and_allow_admins()
 		{
 			string methodName = nameof(PageVersionsController.Update);
 			Type attributeType = typeof(HttpPutAttribute);
@@ -118,14 +118,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			actualResponse.ShouldNotBeNull();
 			actualResponse.Id.ShouldBe(versionId);
-
-			await _pageVersionRepositoryMock
-				.Received(1)
-				.GetByIdAsync(versionId);
-
-			_objectsConverterMock
-				.Received(1)
-				.ConvertToPageVersionResponse(pageVersion);
 		}
 
 		[Fact]
@@ -146,14 +138,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			response.ShouldNotBeNull();
 			response.PageId.ShouldBe(pageId);
 			response.Text.ShouldBe(pageVersion.Text);
-
-			_pageVersionRepositoryMock
-				.Received(1)
-				.GetLatestVersionAsync(pageId);
-
-			_objectsConverterMock
-				.Received(1)
-				.ConvertToPageVersionResponse(pageVersion);
 		}
 
 		[Fact]
@@ -172,14 +156,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			actualResponses.ShouldNotBeNull();
 			actualResponses.Count().ShouldBe(pageVersions.Count);
-
-			await _pageVersionRepositoryMock
-				.Received(1)
-				.AllVersionsAsync();
-
-			_objectsConverterMock
-				.Received(pageVersions.Count)
-				.ConvertToPageVersionResponse(Arg.Any<PageVersion>());
 		}
 
 		[Fact]
@@ -200,14 +176,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			actualResponses.ShouldNotBeNull();
 			actualResponses.Count().ShouldBe(pageVersions.Count);
-
-			await _pageVersionRepositoryMock
-				.Received(1)
-				.FindPageVersionsByPageIdAsync(pageId);
-
-			_objectsConverterMock
-				.Received(pageVersions.Count)
-				.ConvertToPageVersionResponse(Arg.Any<PageVersion>());
 		}
 
 		[Fact]
@@ -228,14 +196,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			actualResponses.ShouldNotBeNull();
 			actualResponses.Count().ShouldBe(pageVersions.Count);
-
-			await _pageVersionRepositoryMock
-				.Received(1)
-				.FindPageVersionsByAuthorAsync(author);
-
-			_objectsConverterMock
-				.Received(pageVersions.Count)
-				.ConvertToPageVersionResponse(Arg.Any<PageVersion>());
 		}
 
 		[Fact]
@@ -267,10 +227,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actualResponse.Text.ShouldBe(text);
 			actualResponse.Author.ShouldBe(author);
 			actualResponse.DateTime.ShouldBe(dateTime);
-
-			await _pageVersionRepositoryMock
-				.Received(1)
-				.AddNewVersionAsync(pageId, text, author, dateTime);
 		}
 
 		[Fact]
@@ -284,12 +240,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.CompletedTask);
 
 			// when
-			await _pageVersionsController.Delete(pageVersionId);
+			ActionResult<string> actionResult = await _pageVersionsController.Delete(pageVersionId);
 
 			// then
-			await _pageVersionRepositoryMock
-				.Received(1)
-				.DeleteVersionAsync(pageVersionId);
+			actionResult.ShouldBeNoContentResult();
 		}
 
 		[Fact]
@@ -323,16 +277,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.CompletedTask);
 
 			// when
-			await _pageVersionsController.Update(request);
+			ActionResult<string> actionResult = await _pageVersionsController.Update(request);
 
 			// then
-			await _pageVersionRepositoryMock
-				.Received(1)
-				.UpdateExistingVersionAsync(pageVersion);
-
-			_objectsConverterMock
-				.Received(1)
-				.ConvertToPageVersion(request);
+			actionResult.ShouldBeNoContentResult();
 		}
 	}
 }

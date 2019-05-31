@@ -74,9 +74,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actualHtml.ShouldBe(expectedHtml);
-			_textMiddlewareMock
-				.Received(1)
-				.Execute(markdown);
 		}
 	}
 }

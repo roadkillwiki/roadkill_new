@@ -92,18 +92,21 @@ namespace Roadkill.Api.Controllers
 
 		[HttpDelete]
 		[Authorize(Policy = PolicyNames.Admin)]
-		public async Task Delete(Guid id)
+		public async Task<ActionResult<string>> Delete(Guid id)
 		{
 			await _pageVersionRepository.DeleteVersionAsync(id);
+			return NoContent();
 		}
 
 		[HttpPut]
 		[Authorize(Policy = PolicyNames.Admin)]
-		public async Task Update(PageVersionRequest pageVersionRequest)
+		public async Task<ActionResult<string>> Update(PageVersionRequest pageVersionRequest)
 		{
 			// doesn't add a new version
 			PageVersion pageVersion = _objectsConverter.ConvertToPageVersion(pageVersionRequest);
 			await _pageVersionRepository.UpdateExistingVersionAsync(pageVersion);
+
+			return NoContent();
 		}
 	}
 }

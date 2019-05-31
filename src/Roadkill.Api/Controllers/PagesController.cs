@@ -103,7 +103,7 @@ namespace Roadkill.Api.Controllers
 			}
 
 			Page firstResult = pagesWithHomePageTag.First();
-			return _pageObjectsConverter.ConvertToPageResponse(firstResult);
+			return Ok(_pageObjectsConverter.ConvertToPageResponse(firstResult));
 		}
 
 		/// <summary>
@@ -123,7 +123,7 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			return _pageObjectsConverter.ConvertToPageResponse(page);
+			return Ok(_pageObjectsConverter.ConvertToPageResponse(page));
 		}
 
 		/// <summary>
@@ -167,22 +167,23 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			// Need 2 request objects? AWS vs GCloud
-
 			Page newPage = await _pageRepository.UpdateExistingAsync(page);
-			return _pageObjectsConverter.ConvertToPageResponse(newPage);
+			_pageObjectsConverter.ConvertToPageResponse(newPage);
+
+			return NoContent();
 		}
 
 		/// <summary>
 		/// Deletes an existing page from the database. This is an administrator-only action.
 		/// </summary>
 		/// <param name="pageId">The id of the page to remove.</param>
-		/// <returns>A 200 OK if the page successfully deleted.</returns>
+		/// <returns>A 204 if the page successfully deleted.</returns>
 		[HttpDelete]
 		[Authorize(Policy = PolicyNames.Admin)]
-		public async Task Delete(int pageId)
+		public async Task<ActionResult<string>> Delete(int pageId)
 		{
 			await _pageRepository.DeletePageAsync(pageId);
+			return NoContent();
 		}
 	}
 }

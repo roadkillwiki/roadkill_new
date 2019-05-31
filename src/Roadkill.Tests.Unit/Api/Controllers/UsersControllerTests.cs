@@ -213,23 +213,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			};
 
 			// when
-			var actionResult = await _usersController.CreateAdmin(requestModel);
+			ActionResult<string> actionResult = await _usersController.CreateAdmin(requestModel);
 
 			// then
 			actionResult.ShouldBeCreatedAtActionResult();
 			string actualEmailAddress = actionResult.CreatedAtActionResultValue();
 			actualEmailAddress.ShouldBe(email);
-
-			await _userManagerMock
-				.Received(1)
-				.CreateAsync(
-					Arg.Is<RoadkillIdentityUser>(u => u.Email == email), password);
-
-			await _userManagerMock
-				.Received(1)
-				.AddClaimAsync(
-					Arg.Is<RoadkillIdentityUser>(u => u.Email == email),
-					Arg.Is<Claim>(c => c.Type == ClaimTypes.Role && c.Value == RoleNames.Admin));
 		}
 
 		[Fact]
@@ -285,17 +274,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			actionResult.ShouldBeCreatedAtActionResult();
 			string actualEmailAddress = actionResult.CreatedAtActionResultValue();
 			actualEmailAddress.ShouldBe(email);
-
-			await _userManagerMock
-				.Received(1)
-				.CreateAsync(
-					Arg.Is<RoadkillIdentityUser>(u => u.Email == email), password);
-
-			await _userManagerMock
-				.Received(1)
-				.AddClaimAsync(
-					Arg.Is<RoadkillIdentityUser>(u => u.Email == email),
-					Arg.Is<Claim>(c => c.Type == ClaimTypes.Role && c.Value == RoleNames.Editor));
 		}
 
 		[Fact]
@@ -337,17 +315,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult(IdentityResult.Success));
 
 			// when
-			var actionResult = await _usersController.Delete(email);
+			ActionResult<string> actionResult = await _usersController.Delete(email);
 
 			// then
 			actionResult.ShouldBeNoContentResult();
-
-			await _userManagerMock
-				.Received(1)
-				.UpdateAsync(Arg.Is<RoadkillIdentityUser>(
-					u => u.Email == email &&
-						 u.LockoutEnabled == true &&
-						 u.LockoutEnd == DateTime.MaxValue));
 		}
 
 		[Fact]

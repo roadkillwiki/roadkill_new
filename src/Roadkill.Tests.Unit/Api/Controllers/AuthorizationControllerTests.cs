@@ -71,7 +71,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task Authenticate_should_return_token_from_provider()
+		public async Task Authenticate_should_return_jwt_token()
 		{
 			// given
 			string jwtToken = "jwt token";
