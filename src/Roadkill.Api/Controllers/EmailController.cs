@@ -21,7 +21,7 @@ namespace Roadkill.Api.Controllers
 		}
 
 		[HttpPost]
-		public async Task Send(string from, string to, string subject, string body)
+		public async Task<ActionResult> Send(string from, string to, string subject, string body)
 		{
 			var message = new MimeMessage();
 			message.From.Add(MailboxAddress.Parse(from));
@@ -38,6 +38,8 @@ namespace Roadkill.Api.Controllers
 
 			await _mailTransport.SendAsync(message);
 			await _mailTransport.DisconnectAsync(true);
+
+			return Ok();
 		}
 	}
 }

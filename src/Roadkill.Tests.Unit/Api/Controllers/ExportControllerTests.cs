@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using AutoFixture;
+using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using Roadkill.Api.Controllers;
 using Roadkill.Core.Entities;
@@ -39,9 +40,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			XmlSerializer serializer = new XmlSerializer(typeof(List<Page>));
 
 			// when
-			string actualXml = await _exportController.ExportPagesToXml();
+			ActionResult<string> actionResult = await _exportController.ExportPagesToXml();
 
 			// then
+			actionResult.ShouldBeOkObjectResult();
+
+			string actualXml = actionResult.GetOkObjectResultValue();
 			var deserializedPages = serializer.Deserialize(new StringReader(actualXml)) as List<Page>;
 			deserializedPages.Count.ShouldBe(actualPages.Count());
 		}

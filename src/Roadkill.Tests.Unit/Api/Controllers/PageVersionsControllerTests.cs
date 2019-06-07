@@ -113,11 +113,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pageVersion);
 
 			// when
-			PageVersionResponse actualResponse = await _pageVersionsController.Get(versionId);
+			ActionResult<PageVersionResponse> actionResult = await _pageVersionsController.Get(versionId);
 
 			// then
-			actualResponse.ShouldNotBeNull();
-			actualResponse.Id.ShouldBe(versionId);
+			actionResult.ShouldBeOkObjectResult();
+
+			PageVersionResponse response = actionResult.GetOkObjectResultValue();
+			response.ShouldNotBeNull();
+			response.Id.ShouldBe(versionId);
 		}
 
 		[Fact]
@@ -132,9 +135,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pageVersion);
 
 			// when
-			PageVersionResponse response = await _pageVersionsController.GetLatestVersion(pageId);
+			ActionResult<PageVersionResponse> actionResult = await _pageVersionsController.GetLatestVersion(pageId);
 
 			// then
+			actionResult.ShouldBeOkObjectResult();
+
+			PageVersionResponse response = actionResult.GetOkObjectResultValue();
 			response.ShouldNotBeNull();
 			response.PageId.ShouldBe(pageId);
 			response.Text.ShouldBe(pageVersion.Text);
@@ -151,11 +157,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pageVersions);
 
 			// when
-			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.AllVersions();
+			ActionResult<IEnumerable<PageVersionResponse>> actionResult = await _pageVersionsController.AllVersions();
 
 			// then
-			actualResponses.ShouldNotBeNull();
-			actualResponses.Count().ShouldBe(pageVersions.Count);
+			actionResult.ShouldBeOkObjectResult();
+
+			IEnumerable<PageVersionResponse> responses = actionResult.GetOkObjectResultValue();
+			responses.ShouldNotBeNull();
+			responses.Count().ShouldBe(pageVersions.Count);
 		}
 
 		[Fact]
@@ -171,11 +180,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pageVersions);
 
 			// when
-			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.FindPageVersionsByPageId(pageId);
+			ActionResult<IEnumerable<PageVersionResponse>> actionResult = await _pageVersionsController.FindPageVersionsByPageId(pageId);
 
 			// then
-			actualResponses.ShouldNotBeNull();
-			actualResponses.Count().ShouldBe(pageVersions.Count);
+			actionResult.ShouldBeOkObjectResult();
+
+			IEnumerable<PageVersionResponse> responses = actionResult.GetOkObjectResultValue();
+			responses.ShouldNotBeNull();
+			responses.Count().ShouldBe(pageVersions.Count);
 		}
 
 		[Fact]
@@ -191,11 +203,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pageVersions);
 
 			// when
-			IEnumerable<PageVersionResponse> actualResponses = await _pageVersionsController.FindPageVersionsByAuthor(author);
+			ActionResult<IEnumerable<PageVersionResponse>> actionResult = await _pageVersionsController.FindPageVersionsByAuthor(author);
 
 			// then
-			actualResponses.ShouldNotBeNull();
-			actualResponses.Count().ShouldBe(pageVersions.Count);
+			actionResult.ShouldBeOkObjectResult();
+
+			IEnumerable<PageVersionResponse> responses = actionResult.GetOkObjectResultValue();
+			responses.ShouldNotBeNull();
+			responses.Count().ShouldBe(pageVersions.Count);
 		}
 
 		[Fact]
@@ -220,13 +235,16 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(repoPageVersion);
 
 			// when
-			PageVersionResponse actualResponse = await _pageVersionsController.Add(pageId, text, author, dateTime);
+			ActionResult<PageVersionResponse> actionResult = await _pageVersionsController.Add(pageId, text, author, dateTime);
 
 			// then
-			actualResponse.PageId.ShouldBe(pageId);
-			actualResponse.Text.ShouldBe(text);
-			actualResponse.Author.ShouldBe(author);
-			actualResponse.DateTime.ShouldBe(dateTime);
+			actionResult.ShouldBeCreatedAtActionResult();
+
+			PageVersionResponse response = actionResult.CreatedAtActionResultValue();
+			response.PageId.ShouldBe(pageId);
+			response.Text.ShouldBe(text);
+			response.Author.ShouldBe(author);
+			response.DateTime.ShouldBe(dateTime);
 		}
 
 		[Fact]

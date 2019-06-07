@@ -70,9 +70,12 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(new PageHtml(expectedHtml));
 
 			// when
-			string actualHtml = await _markdownController.ConvertToHtml(markdown);
+			ActionResult<string> actionResult = await _markdownController.ConvertToHtml(markdown);
 
 			// then
+			actionResult.ShouldBeOkObjectResult();
+
+			string actualHtml = actionResult.GetOkObjectResultValue();
 			actualHtml.ShouldBe(expectedHtml);
 		}
 	}

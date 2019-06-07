@@ -33,44 +33,51 @@ namespace Roadkill.Api.Controllers
 		[HttpGet]
 		[AllowAnonymous]
 		[Route("{id}")]
-		public async Task<PageVersionResponse> Get(Guid id)
+		public async Task<ActionResult<PageVersionResponse>> Get(Guid id)
 		{
 			PageVersion pageVersion = await _pageVersionRepository.GetByIdAsync(id);
+			PageVersionResponse responses = _objectsConverter.ConvertToPageVersionResponse(pageVersion);
 
-			return _objectsConverter.ConvertToPageVersionResponse(pageVersion);
+			return Ok(responses);
 		}
 
 		[HttpGet]
 		[AllowAnonymous]
 		[Route(nameof(AllVersions))]
-		public async Task<IEnumerable<PageVersionResponse>> AllVersions()
+		public async Task<ActionResult<IEnumerable<PageVersionResponse>>> AllVersions()
 		{
 			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.AllVersionsAsync();
-			return pageVersions.Select(_objectsConverter.ConvertToPageVersionResponse);
+			IEnumerable<PageVersionResponse> responses = pageVersions.Select(_objectsConverter.ConvertToPageVersionResponse);
+
+			return Ok(responses);
 		}
 
 		[HttpGet]
 		[AllowAnonymous]
 		[Route(nameof(FindPageVersionsByPageId))]
-		public async Task<IEnumerable<PageVersionResponse>> FindPageVersionsByPageId(int pageId)
+		public async Task<ActionResult<IEnumerable<PageVersionResponse>>> FindPageVersionsByPageId(int pageId)
 		{
 			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.FindPageVersionsByPageIdAsync(pageId);
-			return pageVersions.Select(_objectsConverter.ConvertToPageVersionResponse);
+			IEnumerable<PageVersionResponse> responses = pageVersions.Select(_objectsConverter.ConvertToPageVersionResponse);
+
+			return Ok(responses);
 		}
 
 		[HttpGet]
 		[AllowAnonymous]
 		[Route(nameof(FindPageVersionsByAuthor))]
-		public async Task<IEnumerable<PageVersionResponse>> FindPageVersionsByAuthor(string username)
+		public async Task<ActionResult<IEnumerable<PageVersionResponse>>> FindPageVersionsByAuthor(string username)
 		{
 			IEnumerable<PageVersion> pageVersions = await _pageVersionRepository.FindPageVersionsByAuthorAsync(username);
-			return pageVersions.Select(_objectsConverter.ConvertToPageVersionResponse);
+			IEnumerable<PageVersionResponse> responses = pageVersions.Select(_objectsConverter.ConvertToPageVersionResponse);
+
+			return Ok(responses);
 		}
 
 		[HttpGet]
 		[AllowAnonymous]
 		[Route(nameof(GetLatestVersion))]
-		public async Task<PageVersionResponse> GetLatestVersion(int pageId)
+		public async Task<ActionResult<PageVersionResponse>> GetLatestVersion(int pageId)
 		{
 			PageVersion latestPageVersion = await _pageVersionRepository.GetLatestVersionAsync(pageId);
 			if (latestPageVersion == null)
@@ -78,16 +85,18 @@ namespace Roadkill.Api.Controllers
 				return null;
 			}
 
-			return _objectsConverter.ConvertToPageVersionResponse(latestPageVersion);
+			PageVersionResponse response = _objectsConverter.ConvertToPageVersionResponse(latestPageVersion);
+			return Ok(response);
 		}
 
 		[HttpPost]
 		[Authorize(Policy = PolicyNames.Editor)]
-		public async Task<PageVersionResponse> Add(int pageId, string text, string author, DateTime? dateTime = null)
+		public async Task<ActionResult<PageVersionResponse>> Add(int pageId, string text, string author, DateTime? dateTime = null)
 		{
 			PageVersion pageVersion = await _pageVersionRepository.AddNewVersionAsync(pageId, text, author, dateTime);
+			PageVersionResponse response = _objectsConverter.ConvertToPageVersionResponse(pageVersion);
 
-			return _objectsConverter.ConvertToPageVersionResponse(pageVersion);
+			return CreatedAtAction(nameof(Add), response);
 		}
 
 		[HttpDelete]

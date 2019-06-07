@@ -31,33 +31,35 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(AllTags))]
-		public async Task<IEnumerable<TagResponse>> AllTags()
+		public async Task<ActionResult<IEnumerable<TagResponse>>> AllTags()
 		{
 			IEnumerable<string> allTags = await _pageRepository.AllTagsAsync();
 
-			var viewModels = new List<TagResponse>();
+			var responses = new List<TagResponse>();
 			foreach (string tag in allTags)
 			{
-				var existingModel = viewModels.FirstOrDefault(x => x.Name == tag);
+				var existingModel = responses.FirstOrDefault(x => x.Name == tag);
 				if (existingModel != null)
 				{
 					existingModel.Count += 1;
 				}
 				else
 				{
-					viewModels.Add(new TagResponse() { Name = tag, Count = 1 });
+					responses.Add(new TagResponse() { Name = tag, Count = 1 });
 				}
 			}
 
-			return viewModels;
+			return Ok(responses);
 		}
 
 		[HttpGet]
 		[Route(nameof(FindPageWithTag))]
-		public async Task<IEnumerable<PageResponse>> FindPageWithTag(string tag)
+		public async Task<ActionResult<IEnumerable<PageResponse>>> FindPageWithTag(string tag)
 		{
 			IEnumerable<Page> pages = await _pageRepository.FindPagesContainingTagAsync(tag);
-			return pages.Select(_pageObjectsConverter.ConvertToPageResponse);
+			IEnumerable<PageResponse> responses = pages.Select(_pageObjectsConverter.ConvertToPageResponse);
+
+			return Ok(responses);
 		}
 
 		[HttpPut]

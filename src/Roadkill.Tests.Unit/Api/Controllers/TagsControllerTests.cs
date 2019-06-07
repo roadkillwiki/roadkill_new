@@ -101,11 +101,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(tags);
 
 			// when
-			IEnumerable<TagResponse> tagViewModels = await _tagsController.AllTags();
+			ActionResult<IEnumerable<TagResponse>> actionResult = await _tagsController.AllTags();
 
 			// then
-			tagViewModels.Count().ShouldBe(expectedTagCount);
-			tagViewModels.First(x => x.Name == "duplicate-tag").Count.ShouldBe(3);
+			actionResult.ShouldBeOkObjectResult();
+			IEnumerable<TagResponse> response = actionResult.GetOkObjectResultValue();
+
+			response.Count().ShouldBe(expectedTagCount);
+			response.First(x => x.Name == "duplicate-tag").Count.ShouldBe(3);
 		}
 
 		[Theory]
@@ -137,7 +140,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task FindPageWithTag_should_return_page()
+		public async Task FindPageWithTag_should_return_pages()
 		{
 			// given
 			string tag = "gutentag";
@@ -152,10 +155,14 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(pagesWithTag);
 
 			// when
-			IEnumerable<PageResponse> pageViewModelsWithTag = await _tagsController.FindPageWithTag(tag);
+			ActionResult<IEnumerable<PageResponse>> actionResult = await _tagsController.FindPageWithTag(tag);
 
 			// then
-			pageViewModelsWithTag.Count().ShouldBe(pagesWithTag.Count());
+			actionResult.ShouldBeOkObjectResult();
+			IEnumerable<PageResponse> response = actionResult.GetOkObjectResultValue();
+
+			response.Count()
+					.ShouldBe(pagesWithTag.Count());
 		}
 	}
 }

@@ -27,7 +27,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpPost]
 		[Route(nameof(ExportPagesToXml))]
-		public async Task<string> ExportPagesToXml()
+		public async Task<ActionResult<string>> ExportPagesToXml()
 		{
 			IEnumerable<Page> allPages = await _pageRepository.AllPagesAsync();
 			XmlSerializer serializer = new XmlSerializer(typeof(List<Page>));
@@ -36,29 +36,35 @@ namespace Roadkill.Api.Controllers
 			using (StringWriter writer = new StringWriter(builder))
 			{
 				serializer.Serialize(writer, allPages);
-				return builder.ToString();
+				return Ok(builder.ToString());
 			}
 		}
 
 		[HttpPost]
 		[Route(nameof(ExportPagesVersionsToXml))]
-		public Task<string> ExportPagesVersionsToXml()
+		public Task<ActionResult<string>> ExportPagesVersionsToXml()
 		{
-			return Task.FromResult("");
+			ActionResult<string> result = Ok("todo");
+
+			return Task.FromResult(result);
 		}
 
 		[HttpPost]
 		[Route(nameof(ExportAsSql))]
-		public Task<string> ExportAsSql()
+		public Task<ActionResult<string>> ExportAsSql()
 		{
-			return Task.FromResult("");
+			ActionResult<string> result = Ok("todo");
+
+			return Task.FromResult(result);
 		}
 
 		[HttpPost]
 		[Route(nameof(ExportAttachments))]
-		public Task ExportAttachments()
+		public Task<ActionResult<string>> ExportAttachments()
 		{
-			return Task.CompletedTask;
+			ActionResult<string> result = Ok("todo");
+
+			return Task.FromResult(result);
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpPost]
 		[Route(nameof(CreateTestUser))]
-		public async Task<ActionResult<IdentityResult>> CreateTestUser()
+		public async Task<ActionResult<string>> CreateTestUser()
 		{
 			var newUser = new RoadkillIdentityUser()
 			{
@@ -35,7 +35,7 @@ namespace Roadkill.Api.Controllers
 			await _userManager.CreateAsync(newUser, "password");
 			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Admin));
 
-			return CreatedAtAction(nameof(InstallController.CreateTestUser), newUser.Email);
+			return CreatedAtAction(nameof(CreateTestUser), newUser.Email);
 		}
 	}
 }

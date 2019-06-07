@@ -103,7 +103,8 @@ namespace Roadkill.Api.Controllers
 			}
 
 			Page firstResult = pagesWithHomePageTag.First();
-			return Ok(_pageObjectsConverter.ConvertToPageResponse(firstResult));
+			PageResponse response = _pageObjectsConverter.ConvertToPageResponse(firstResult);
+			return Ok(response);
 		}
 
 		/// <summary>
@@ -123,7 +124,8 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			return Ok(_pageObjectsConverter.ConvertToPageResponse(page));
+			PageResponse response = _pageObjectsConverter.ConvertToPageResponse(page);
+			return Ok(response);
 		}
 
 		/// <summary>
@@ -147,9 +149,9 @@ namespace Roadkill.Api.Controllers
 			}
 
 			Page newPage = await _pageRepository.AddNewPageAsync(page);
-			PageResponse newResponse = _pageObjectsConverter.ConvertToPageResponse(newPage);
+			PageResponse response = _pageObjectsConverter.ConvertToPageResponse(newPage);
 
-			return CreatedAtAction(nameof(Add), nameof(PagesController), newResponse);
+			return CreatedAtAction(nameof(Add), nameof(PagesController), response);
 		}
 
 		/// <summary>
@@ -167,9 +169,7 @@ namespace Roadkill.Api.Controllers
 				return NotFound();
 			}
 
-			Page newPage = await _pageRepository.UpdateExistingAsync(page);
-			_pageObjectsConverter.ConvertToPageResponse(newPage);
-
+			await _pageRepository.UpdateExistingAsync(page);
 			return NoContent();
 		}
 

@@ -104,7 +104,7 @@ namespace Roadkill.Api.Controllers
 
 			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Admin));
 
-			return CreatedAtAction(nameof(CreateEditor), userRequest.Email);
+			return CreatedAtAction(nameof(CreateAdmin), userRequest.Email);
 		}
 
 		[HttpPost]
