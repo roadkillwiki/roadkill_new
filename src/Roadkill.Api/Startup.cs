@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
@@ -69,11 +70,10 @@ namespace Roadkill.Api
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory
 		public override void Configure(IApplicationBuilder app)
 		{
-			// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory
-			app.UseSwaggerUi3(settings => { settings.Path = ""; });
-			app.UseSwagger();
+			app.UseSwaggerWithReverseProxySupport();
 			app.UseAuthentication();
 			app.UseMvc();
 			app.UseJsonExceptionHandler(_hostingEnvironment);

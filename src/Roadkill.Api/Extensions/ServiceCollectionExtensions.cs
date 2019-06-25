@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
-using NSwag.SwaggerGeneration.Processors.Security;
+using NSwag.Generation.Processors.Security;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.JWT;
@@ -143,7 +143,9 @@ namespace Roadkill.Api.Extensions
 				.AddDataAnnotations()
 				.AddApiExplorer()
 				.AddJsonFormatters()
-				.SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+				.SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+			services
 				.AddVersionedApiExplorer(options =>
 				{
 					options.SubstituteApiVersionInUrl = true;
@@ -160,11 +162,11 @@ namespace Roadkill.Api.Extensions
 			{
 				// Add an authenticate button to Swagger for JWT tokens
 				document.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT"));
-				var swaggerSecurityScheme = new SwaggerSecurityScheme
+				var swaggerSecurityScheme = new OpenApiSecurityScheme()
 				{
-					Type = SwaggerSecuritySchemeType.ApiKey,
+					Type = OpenApiSecuritySchemeType.ApiKey,
 					Name = "Authorization",
-					In = SwaggerSecurityApiKeyLocation.Header,
+					In = OpenApiSecurityApiKeyLocation.Header,
 					Description = "Type into the textbox: Bearer {your JWT token}. You can get a JWT token from /Authorization/Authenticate."
 				};
 

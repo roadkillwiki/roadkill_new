@@ -7,8 +7,9 @@ using Roadkill.Core.Settings;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
-	[Route("[controller]")]
+	[ApiController]
+	[ApiVersion("3")]
+	[Route("v{version:apiVersion}/[controller]")]
 	public class EmailController : ControllerBase
 	{
 		private readonly IMailTransport _mailTransport;

@@ -49,5 +49,30 @@ namespace Roadkill.Api.Extensions
 
 			return app;
 		}
+
+		public static IApplicationBuilder UseSwaggerWithReverseProxySupport(this IApplicationBuilder app)
+		{
+			app.UseSwagger(config => config.PostProcess = (document, request) =>
+			{
+				string pathBase = request.Headers["X-Forwarded-PathBase"].FirstOrDefault();
+				document.BasePath = pathBase;
+				document.Host = request.Headers["X-Forwarded-Host"].FirstOrDefault();
+			});
+
+			app.UseSwaggerUi3(settings =>
+			{
+				settings.TransformToExternalPath = (route, request) =>
+				{
+					string pathBase = request.Headers["X-Forwarded-PathBase"].FirstOrDefault();
+
+					if (!string.IsNullOrEmpty(pathBase))
+						return $"{pathBase}{route}";
+
+					return route;
+				};
+			});
+
+			return app;
+		}
 	}
 }
