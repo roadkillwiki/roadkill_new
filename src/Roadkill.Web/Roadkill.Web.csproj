@@ -7,23 +7,24 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.App" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6"/>
-		<PackageReference Include="Serilog.AspNetCore" Version="2.1.1"/>
-		<PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" />
+		<PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+		<PackageReference Update="ReportGenerator" Version="4.2.5" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3"/>
+		<DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Models\"/>
-		<Folder Include="wwwroot\js\"/>
+		<Folder Include="Models\" />
+		<Folder Include="wwwroot\js\" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Roadkill.Api.Client\Roadkill.Api.Client.csproj"/>
-		<ProjectReference Include="..\Roadkill.Localisation\Roadkill.Localisation.csproj"/>
+		<ProjectReference Include="..\Roadkill.Api.Client\Roadkill.Api.Client.csproj" />
+		<ProjectReference Include="..\Roadkill.Localisation\Roadkill.Localisation.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -11,6 +11,7 @@
     <PackageReference Include="NEST" Version="6.4.0" />
     <PackageReference Include="Scrutor" Version="3.0.2" />
     <PackageReference Include="Sprache" Version="2.2.0" />
+    <PackageReference Update="ReportGenerator" Version="4.2.5" />
   </ItemGroup>
 
   <ItemGroup>

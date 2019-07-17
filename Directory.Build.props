@@ -23,8 +23,4 @@
   <PropertyGroup Condition=" '$(BUILD_NUMBER)' != '' ">
     <VersionPrefix>$(BUILD_NUMBER)</VersionPrefix>
   </PropertyGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
-	<Exec Command="dotnet format -v diag" />
-	</Target>
 </Project>
