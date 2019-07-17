@@ -54,7 +54,8 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			string jwtToken = await jwtResponse.Content.ReadAsStringAsync();
 			_httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {jwtToken}");
 
-			// Hit marten with 50 RPS
+			// Hit marten with 50 requests per second.
+			// You may need to lower this number for slower hardware.
 			var stopWatch = Stopwatch.StartNew();
 			Parallel.For(0, 50, (i, state) =>
 			{

@@ -17,12 +17,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using Roadkill.Api.Common.Request;
-using Roadkill.Api.Common.Response;
 using Roadkill.Api.JWT;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Authorization;
-using Roadkill.Core.Entities;
 using Roadkill.Core.Extensions;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
@@ -185,25 +182,7 @@ namespace Roadkill.Api.Extensions
 
 		public static IServiceCollection AddAutoMapperForApi(this IServiceCollection services)
 		{
-			// Automapper properties are mapped using AutoMapAttribute
-			// on the *Response* objects (but not the Request objects),
-			// as you don't map Entities to Requests, but Requests to Entities.
-			//
-			// e.g. PageRequest->Page
-			// e.g. Page->PageResponse
-			services.AddAutoMapper(
-				typeof(Page),
-				typeof(PageRequest),
-				typeof(PageResponse),
-
-				typeof(RoadkillIdentityUser),
-				typeof(UserRequest),
-				typeof(UserResponse),
-
-				typeof(PageVersion),
-				typeof(PageVersionRequest),
-				typeof(PageVersionResponse)
-			);
+			services.AddAutoMapper(typeof(Startup));
 			return services;
 		}
 	}
