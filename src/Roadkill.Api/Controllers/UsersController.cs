@@ -15,7 +15,7 @@ using Roadkill.Api.Common.Response;
 using Roadkill.Api.Exceptions;
 using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
-using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities.Authorization;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers

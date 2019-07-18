@@ -7,8 +7,8 @@ using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Extensions;
 using Roadkill.Api.ObjectConverters;
-using Roadkill.Core.Authorization;
 using Roadkill.Core.Entities;
+using Roadkill.Core.Entities.Authorization;
 using Shouldly;
 using Xunit;
 

@@ -3,22 +3,26 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using Roadkill.Api.JWT;
 using Roadkill.Api.Settings;
+using Roadkill.Core.Entities.Authorization;
+using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;
 
 namespace Roadkill.Tests.Unit.Api.JWT
 {
-	public class JwtTokenProviderTests
+	public class JwtTokenServiceTests
 	{
 		private JwtSettings _jwtSettings;
 		private SecurityTokenHandler _tokenHandler;
-		private JwtTokenProvider _provider;
+		private JwtTokenService _service;
+		private IUserRefreshTokenRepository _refreshTokenRepository;
 
-		public JwtTokenProviderTests()
+		public JwtTokenServiceTests()
 		{
 			// This token is from jwt.io, the format:
 			// token = base64urlEncoding(header) + '.' + base64urlEncoding(payload) + '.' + base64urlEncoding(signature)
@@ -40,7 +44,8 @@ namespace Roadkill.Tests.Unit.Api.JWT
 				ExpiresDays = 10
 			};
 
-			_provider = new JwtTokenProvider(_jwtSettings, _tokenHandler);
+			_refreshTokenRepository = Substitute.For<IUserRefreshTokenRepository>();
+			_service = new JwtTokenService(_jwtSettings, _tokenHandler, _refreshTokenRepository);
 		}
 
 		[Fact]
@@ -52,7 +57,7 @@ namespace Roadkill.Tests.Unit.Api.JWT
 			string email = "bob@example.com";
 
 			// when
-			string token = _provider.CreateToken(existingClaims, email);
+			string token = _service.CreateToken(existingClaims, email);
 
 			// then
 			token.ShouldNotBeNullOrEmpty();
@@ -72,13 +77,34 @@ namespace Roadkill.Tests.Unit.Api.JWT
 			var expectedExpiry = DateTime.UtcNow.AddDays(_jwtSettings.ExpiresDays);
 
 			// when
-			string token = _provider.CreateToken(existingClaims, email);
+			string token = _service.CreateToken(existingClaims, email);
 
 			// then
 			token.ShouldNotBeNullOrEmpty();
 			_tokenHandler
 				.Received()
 				.CreateToken(Arg.Is<SecurityTokenDescriptor>(x => x.Expires >= expectedExpiry));
+		}
+
+		[Fact]
+		public async Task should_save_refresh_token_and_return_repositorys_token()
+		{
+			// given
+			string expectedToken = "refresh";
+			string email = "bob@example.com";
+			string ipAddress = "127.1.2.3";
+
+			_refreshTokenRepository.AddRefreshToken(email, Arg.Any<string>(), ipAddress)
+				.Returns(new UserRefreshToken()
+				{
+					RefreshToken = expectedToken
+				});
+
+			// when
+			string token = await _service.CreateRefreshToken(email, ipAddress);
+
+			// then
+			token.ShouldBe(expectedToken);
 		}
 	}
 }

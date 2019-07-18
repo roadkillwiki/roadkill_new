@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
-using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities.Authorization;
 
 namespace Roadkill.Api.Common.Response
 {

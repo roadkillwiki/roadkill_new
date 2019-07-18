@@ -1,27 +1,12 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Net.Mime;
-using AutoMapper;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Roadkill.Api.Common.Request;
-using Roadkill.Api.Common.Response;
 using Roadkill.Api.Extensions;
 using Roadkill.Api.HealthChecks;
-using Roadkill.Core.Authorization;
-using Roadkill.Core.Entities;
 using Roadkill.Core.Extensions;
 using Roadkill.Core.Settings;
 
@@ -79,7 +64,10 @@ namespace Roadkill.Api
 			app.UseAuthentication();
 			app.UseMvc();
 			app.UseJsonExceptionHandler(_hostingEnvironment);
-			app.UseForwardedHeaders();
+			app.UseForwardedHeaders(new ForwardedHeadersOptions
+			{
+				ForwardedHeaders = ForwardedHeaders.All
+			});
 			app.UseJsonHealthChecks();
 		}
 	}

@@ -1,6 +1,5 @@
 ﻿using System;
 using AutoMapper;
-using Roadkill.Core.Authorization;
 using Roadkill.Core.Entities;
 
 namespace Roadkill.Api.Common.Response

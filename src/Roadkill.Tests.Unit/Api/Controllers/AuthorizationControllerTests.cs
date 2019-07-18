@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -8,9 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Roadkill.Api.Common.Request;
+using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.JWT;
-using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities.Authorization;
 using Shouldly;
 using Xunit;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -22,7 +24,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		private AuthorizationController _authorizationController;
 		private UserManager<RoadkillIdentityUser> _userManagerMock;
 		private SignInManager<RoadkillIdentityUser> _signinManagerMock;
-		private IJwtTokenProvider _jwtTokenProvider;
+		private IJwtTokenService _jwtTokenService;
 
 		public AuthorizationControllerTests()
 		{
@@ -50,8 +52,8 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				signinManagerLogger,
 				null);
 
-			_jwtTokenProvider = Substitute.For<IJwtTokenProvider>();
-			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtTokenProvider);
+			_jwtTokenService = Substitute.For<IJwtTokenService>();
+			_authorizationController = new AuthorizationController(_userManagerMock, _signinManagerMock, _jwtTokenService);
 		}
 
 		[Fact]
@@ -71,12 +73,15 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public async Task Authenticate_should_return_jwt_token()
+		public async Task Authenticate_should_return_jwt_and_refresh_token_logging_ip()
 		{
 			// given
+			string ipAddress = "9.8.7.6";
+			string refreshToken = "refresh token";
 			string jwtToken = "jwt token";
 			string email = "admin@example.org";
 			string password = "Passw0rd9000!";
+			
 			var roadkillUser = new RoadkillIdentityUser()
 			{
 				Id = "1",
@@ -103,17 +108,29 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_userManagerMock.GetClaimsAsync(roadkillUser)
 				.Returns(Task.FromResult(claims));
 
-			_jwtTokenProvider.CreateToken(claims, roadkillUser.Email)
+			_jwtTokenService
+				.CreateToken(claims, roadkillUser.Email)
 				.Returns(jwtToken);
 
+			var httpContext = new DefaultHttpContext();
+			httpContext.Connection.RemoteIpAddress = IPAddress.Parse(ipAddress);
+			_authorizationController.ControllerContext.HttpContext = httpContext;
+
+			_jwtTokenService
+				.CreateRefreshToken(roadkillUser.Email, ipAddress)
+				.Returns(refreshToken);
+
 			// when
-			ActionResult<string> actionResult = await _authorizationController.Authenticate(model);
+			ActionResult<AuthorizationResponse> actionResult = await _authorizationController.Authenticate(model);
 
 			// then
 			actionResult.Result.ShouldBeOfType<OkObjectResult>();
-
 			var okResult = actionResult.Result as OkObjectResult;
-			okResult.Value.ShouldBe(jwtToken);
+			var response = okResult.Value as AuthorizationResponse;
+
+			response.ShouldNotBeNull();
+			response.JwtToken.ShouldBe(jwtToken);
+			response.RefreshToken.ShouldBe(refreshToken);
 		}
 
 		[Fact]
@@ -133,7 +150,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult((RoadkillIdentityUser)null));
 
 			// when
-			ActionResult<string> actionResult = await _authorizationController.Authenticate(model);
+			ActionResult<AuthorizationResponse> actionResult = await _authorizationController.Authenticate(model);
 
 			// then
 			actionResult.ShouldNotBeNull();
@@ -168,7 +185,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult(SignInResult.Failed));
 
 			// when
-			ActionResult<string> actionResult = await _authorizationController.Authenticate(model);
+			ActionResult<AuthorizationResponse> actionResult = await _authorizationController.Authenticate(model);
 
 			// then
 			actionResult.ShouldNotBeNull();

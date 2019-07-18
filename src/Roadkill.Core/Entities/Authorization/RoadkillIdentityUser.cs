@@ -2,7 +2,7 @@
 using Marten.AspNetIdentity;
 using Microsoft.AspNetCore.Identity;
 
-namespace Roadkill.Core.Authorization
+namespace Roadkill.Core.Entities.Authorization
 {
 	public class RoadkillIdentityUser : IdentityUser, IClaimsUser
 	{

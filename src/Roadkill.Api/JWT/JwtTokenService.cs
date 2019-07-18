@@ -2,22 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
+using Roadkill.Api.Exceptions;
 using Roadkill.Api.Settings;
+using Roadkill.Core.Entities.Authorization;
+using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.JWT
 {
-	public class JwtTokenProvider : IJwtTokenProvider
+	public interface IJwtTokenService
+	{
+		string CreateToken(IList<Claim> existingClaims, string email);
+		Task<string> CreateRefreshToken(string email, string ipAddress);
+	}
+
+	public class JwtTokenService : IJwtTokenService
 	{
 		private readonly JwtSettings _jwtSettings;
 		private readonly SecurityTokenHandler _tokenHandler;
+		private readonly IUserRefreshTokenRepository _refreshTokenRepository;
 
-		public JwtTokenProvider(
+		public JwtTokenService(
 			JwtSettings jwtSettings,
-			SecurityTokenHandler tokenHandler)
+			SecurityTokenHandler tokenHandler,
+			IUserRefreshTokenRepository refreshTokenRepository)
 		{
 			_jwtSettings = jwtSettings;
 			_tokenHandler = tokenHandler;
+			_refreshTokenRepository = refreshTokenRepository;
 		}
 
 		public string CreateToken(IList<Claim> existingClaims, string email)
@@ -40,6 +53,14 @@ namespace Roadkill.Api.JWT
 
 			SecurityToken token = _tokenHandler.CreateToken(tokenDescriptor);
 			return _tokenHandler.WriteToken(token);
+		}
+
+		public async Task<string> CreateRefreshToken(string email, string ipAddress)
+		{
+			string refreshToken = Guid.NewGuid().ToString("N");
+			UserRefreshToken userRefreshToken = await _refreshTokenRepository.AddRefreshToken(email, refreshToken, ipAddress);
+
+			return userRefreshToken.RefreshToken;
 		}
 	}
 }

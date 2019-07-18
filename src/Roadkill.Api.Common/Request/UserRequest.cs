@@ -1,5 +1,4 @@
 using AutoMapper;
-using Roadkill.Core.Authorization;
 
 namespace Roadkill.Api.Common.Request
 {

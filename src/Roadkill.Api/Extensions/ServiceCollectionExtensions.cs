@@ -19,8 +19,9 @@ using NSwag;
 using NSwag.Generation.Processors.Security;
 using Roadkill.Api.JWT;
 using Roadkill.Api.Settings;
-using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Extensions;
+using Roadkill.Core.Repositories;
 using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;
@@ -78,11 +79,13 @@ namespace Roadkill.Api.Extensions
 			}
 
 			services.AddSingleton(jwtSettings);
-			services.AddScoped<IJwtTokenProvider>(provider =>
+			services.AddScoped<IJwtTokenService>(provider =>
 			{
-				var settings = provider.GetService<JwtSettings>();
+				var settings = provider.GetRequiredService<JwtSettings>();
 				var tokenHandler = new JwtSecurityTokenHandler();
-				return new JwtTokenProvider(settings, tokenHandler);
+				var repository = provider.GetRequiredService<IUserRefreshTokenRepository>();
+
+				return new JwtTokenService(settings, tokenHandler, repository);
 			});
 
 			var password = Encoding.ASCII.GetBytes(jwtSettings.Password);
@@ -91,17 +94,21 @@ namespace Roadkill.Api.Extensions
 				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 				x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 			})
-			.AddJwtBearer(x =>
+			.AddJwtBearer(options =>
 			{
-				x.RequireHttpsMetadata = false;
-				x.SaveToken = true;
-				x.TokenValidationParameters = new TokenValidationParameters
+				options.RequireHttpsMetadata = false;
+				options.SaveToken = true;
+				options.TokenValidationParameters = new TokenValidationParameters
 				{
 					ValidateIssuerSigningKey = true,
 					IssuerSigningKey = new SymmetricSecurityKey(password),
 					ValidateIssuer = false,
 					ValidateAudience = false
 				};
+				/*options.Events.OnMessageReceived += context =>
+				{
+					// header
+				};*/
 			});
 
 			void ConfigureJwtClaimsPolicies(AuthorizationOptions options)

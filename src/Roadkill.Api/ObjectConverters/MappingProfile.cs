@@ -1,8 +1,8 @@
 using AutoMapper;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
-using Roadkill.Core.Authorization;
 using Roadkill.Core.Entities;
+using Roadkill.Core.Entities.Authorization;
 
 namespace Roadkill.Api.ObjectConverters
 {

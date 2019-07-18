@@ -15,7 +15,7 @@ using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
 using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
-using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities.Authorization;
 using Shouldly;
 using Xunit;
 

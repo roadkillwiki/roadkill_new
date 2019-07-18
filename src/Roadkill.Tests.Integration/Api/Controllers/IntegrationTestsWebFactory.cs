@@ -13,8 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Roadkill.Api;
 using Roadkill.Api.JWT;
-using Roadkill.Core.Authorization;
 using Roadkill.Core.Entities;
+using Roadkill.Core.Entities.Authorization;
 using Xunit.Abstractions;
 
 namespace Roadkill.Tests.Integration.Api.Controllers

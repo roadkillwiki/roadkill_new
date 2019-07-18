@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.JWT;
-using Roadkill.Core.Authorization;
+using Roadkill.Core.Entities.Authorization;
 
 namespace Roadkill.Api.Controllers
 {
