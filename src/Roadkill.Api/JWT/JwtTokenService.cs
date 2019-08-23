@@ -15,6 +15,7 @@ namespace Roadkill.Api.JWT
 	{
 		string CreateToken(IList<Claim> existingClaims, string email);
 		Task<string> CreateRefreshToken(string email, string ipAddress);
+		Task<string> GetEmailByRefreshToken(string refreshToken, string ipAddress);
 	}
 
 	public class JwtTokenService : IJwtTokenService
@@ -61,6 +62,12 @@ namespace Roadkill.Api.JWT
 			UserRefreshToken userRefreshToken = await _refreshTokenRepository.AddRefreshToken(email, refreshToken, ipAddress);
 
 			return userRefreshToken.RefreshToken;
+		}
+
+		public async Task<string> GetEmailByRefreshToken(string refreshToken, string ipAddress)
+		{
+			UserRefreshToken userRefreshToken = await _refreshTokenRepository.GetByRefreshToken(refreshToken, ipAddress);
+			return (userRefreshToken != null) ? userRefreshToken.Email : "";
 		}
 	}
 }

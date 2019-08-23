@@ -50,9 +50,11 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 				password = _factory.AdminUserPassword
 			};
 
-			var jwtResponse = await PostReturnsStatusCodeWithContent(_authenticatePath, loginData, HttpStatusCode.OK);
-			string jwtToken = await jwtResponse.Content.ReadAsStringAsync();
-			_httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {jwtToken}");
+			var httpResponse = await PostReturnsStatusCodeWithContent(_authenticatePath, loginData, HttpStatusCode.OK);
+			string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+			AuthorizationResponse authResponse = JsonConvert.DeserializeObject<AuthorizationResponse>(jsonResponse);
+
+			_httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {authResponse.JwtToken}");
 
 			// Hit marten with 50 requests per second.
 			// You may need to lower this number for slower hardware.
@@ -91,7 +93,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 				Password = "Passw0rd12345"
 			};
 
-			var t = await PostReturnsStatusCodeWithContent(
+			var response = await PostReturnsStatusCodeWithContent(
 				_addEditorUserPath,
 				userData,
 				HttpStatusCode.Created);
@@ -105,7 +107,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 				Tags = "testing"
 			};
 
-			var response = await PostReturnsStatusCodeWithContent(
+			response = await PostReturnsStatusCodeWithContent(
 				_addPagePath,
 				pageRequest,
 				HttpStatusCode.Created);
@@ -140,9 +142,9 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 			var response = await _httpClient.PostAsync(requestUri, stringContent);
 			response.StatusCode.ShouldBe(statusCode, response.Content.ReadAsStringAsync().GetAwaiter().GetResult());
-			var content = await response.Content.ReadAsStringAsync();
+			string jsonContent = await response.Content.ReadAsStringAsync();
 
-			content.ShouldNotBeNull();
+			jsonContent.ShouldNotBeNull();
 			return response;
 		}
 
