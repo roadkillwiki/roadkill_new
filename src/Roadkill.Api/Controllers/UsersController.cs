@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Exceptions;
 using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities.Authorization;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Roadkill.Api.Controllers
 {
