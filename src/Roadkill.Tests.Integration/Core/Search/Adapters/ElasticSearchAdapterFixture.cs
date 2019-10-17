@@ -30,7 +30,7 @@ namespace Roadkill.Tests.Integration.Core.Search.Adapters
 
 		public void Dispose()
 		{
-			ElasticClient.DeleteIndex(ElasticSearchAdapter.PagesIndexName);
+			ElasticClient.LowLevel.Indices.Delete<SearchablePageResponse>(ElasticSearchAdapter.PagesIndexName);
 		}
 
 		private void AddDummyData()

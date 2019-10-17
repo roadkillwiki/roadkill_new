@@ -1,4 +1,5 @@
 ﻿using System;
+using Elasticsearch.Net;
 
 namespace Roadkill.Core.Entities
 {
@@ -17,5 +18,9 @@ namespace Roadkill.Core.Entities
 		public DateTime DateTime { get; set; }
 
 		public string Tags { get; set; }
+	}
+
+	public class SearchablePageResponse : ElasticsearchResponse<SearchablePage>
+	{
 	}
 }

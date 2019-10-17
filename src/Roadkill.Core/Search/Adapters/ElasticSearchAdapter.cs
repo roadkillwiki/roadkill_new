@@ -25,6 +25,7 @@ namespace Roadkill.Core.Search.Adapters
 
 		public async Task RecreateIndex()
 		{
+			_elasticClient.LowLevel.Indices.Delete<SearchablePageResponse>(ElasticSearchAdapter.PagesIndexName);
 			await _elasticClient.ReindexOnServerAsync(descriptor => descriptor);
 		}
 

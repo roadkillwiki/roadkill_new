@@ -4,15 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 
 namespace Roadkill.Api.Middleware
 {
 	public class JsonExceptionMiddleware
 	{
-		private readonly IHostingEnvironment _environment;
+		private readonly IWebHostEnvironment _environment;
 
-		public JsonExceptionMiddleware(IHostingEnvironment environment)
+		public JsonExceptionMiddleware(IWebHostEnvironment environment)
 		{
 			_environment = environment;
 		}
@@ -37,7 +38,7 @@ namespace Roadkill.Api.Middleware
 			}
 			else
 			{
-				error.Title = "A server error ocurred.";
+				error.Title = "A server error occurred.";
 				error.Detail = ex.Message;
 			}
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,10 @@ namespace Roadkill.Api
 	public class Startup : StartupBase
 	{
 		private readonly IConfiguration _configuration;
+		private readonly IWebHostEnvironment _hostingEnvironment;
+		private readonly ILogger<Startup> _logger;
 
-		private IHostingEnvironment _hostingEnvironment;
-
-		private ILogger<Startup> _logger;
-
-		public Startup(IHostingEnvironment env, ILogger<Startup> logger, IConfiguration configuration)
+		public Startup(IWebHostEnvironment env, ILogger<Startup> logger, IConfiguration configuration)
 		{
 			_logger = logger;
 			_hostingEnvironment = env;
@@ -61,14 +60,23 @@ namespace Roadkill.Api
 		public override void Configure(IApplicationBuilder app)
 		{
 			app.UseSwaggerWithReverseProxySupport();
+			app.UseRouting();
+
 			app.UseAuthentication();
-			app.UseMvc();
+			app.UseAuthorization();
+
+			app.UseEndpoints(endPoints =>
+			{
+				endPoints.MapControllers();
+			});
+
 			app.UseJsonExceptionHandler(_hostingEnvironment);
 			app.UseForwardedHeaders(new ForwardedHeadersOptions
 			{
 				ForwardedHeaders = ForwardedHeaders.All
 			});
 			app.UseJsonHealthChecks();
+
 		}
 	}
 }

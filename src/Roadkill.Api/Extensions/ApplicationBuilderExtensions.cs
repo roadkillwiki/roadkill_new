@@ -40,7 +40,7 @@ namespace Roadkill.Api.Extensions
 			return app;
 		}
 
-		public static IApplicationBuilder UseJsonExceptionHandler(this IApplicationBuilder app, IHostingEnvironment environment)
+		public static IApplicationBuilder UseJsonExceptionHandler(this IApplicationBuilder app, IWebHostEnvironment environment)
 		{
 			app.UseExceptionHandler(new ExceptionHandlerOptions()
 			{
