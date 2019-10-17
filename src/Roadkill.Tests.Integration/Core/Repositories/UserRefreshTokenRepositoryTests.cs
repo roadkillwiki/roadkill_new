@@ -53,17 +53,16 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			UserRefreshTokenRepository repository = CreateRepository();
 
 			// when
-			UserRefreshToken token1 = await repository.AddRefreshToken(email, firstRefreshToken, firstDeviceIpAddress);
-			UserRefreshToken token2 = await repository.AddRefreshToken(email, secondRefreshToken, secondDeviceIpAddress);
-
-			UserRefreshToken firstToken = await repository.GetByRefreshToken(token1.RefreshToken, firstDeviceIpAddress);
+			await repository.AddRefreshToken(email, firstRefreshToken, firstDeviceIpAddress);
+			await repository.AddRefreshToken(email, secondRefreshToken, secondDeviceIpAddress);
+			UserRefreshToken token = await repository.GetRefreshToken(email, firstDeviceIpAddress);
 
 			// then
-			firstToken.ShouldNotBeNull();
-			firstToken.Email.ShouldBe(email);
-			firstToken.RefreshToken.ShouldBe(firstRefreshToken);
-			firstToken.CreationDate.ShouldBeGreaterThanOrEqualTo(now);
-			firstToken.IpAddress.ShouldBe(firstDeviceIpAddress);
+			token.ShouldNotBeNull();
+			token.Email.ShouldBe(email);
+			token.RefreshToken.ShouldBe(firstRefreshToken);
+			token.CreationDate.ShouldBeGreaterThanOrEqualTo(now);
+			token.IpAddress.ShouldBe(firstDeviceIpAddress);
 		}
 
 		[Fact]
@@ -82,14 +81,13 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			UserRefreshTokenRepository repository = CreateRepository();
 
 			// when
-			var userToken1 = await repository.AddRefreshToken(email, firstRefreshToken, firstDeviceIpAddress);
-			var userToken2 = await repository.AddRefreshToken(email, secondRefreshToken, secondDeviceIpAddress);
-
+			await repository.AddRefreshToken(email, firstRefreshToken, firstDeviceIpAddress);
+			await repository.AddRefreshToken(email, secondRefreshToken, secondDeviceIpAddress);
 			await repository.DeleteRefreshTokens(email, firstDeviceIpAddress);
 
 			// then
-			UserRefreshToken token1 = await repository.GetByRefreshToken(userToken1.RefreshToken, firstDeviceIpAddress);
-			UserRefreshToken token2 = await repository.GetByRefreshToken(userToken2.RefreshToken, secondDeviceIpAddress);
+			UserRefreshToken token1 = await repository.GetRefreshToken(email, firstDeviceIpAddress);
+			UserRefreshToken token2 = await repository.GetRefreshToken(email, secondDeviceIpAddress);
 
 			token1.ShouldBeNull();
 			token2.ShouldNotBeNull();

@@ -105,6 +105,10 @@ namespace Roadkill.Api.Extensions
 					ValidateIssuer = false,
 					ValidateAudience = false
 				};
+				/*options.Events.OnMessageReceived += context =>
+				{
+					// header
+				};*/
 			});
 
 			void ConfigureJwtClaimsPolicies(AuthorizationOptions options)

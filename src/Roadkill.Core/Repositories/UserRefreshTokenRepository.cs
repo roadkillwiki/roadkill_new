@@ -7,7 +7,7 @@ namespace Roadkill.Core.Repositories
 {
 	public interface IUserRefreshTokenRepository
 	{
-		Task<UserRefreshToken> GetByRefreshToken(string refreshToken, string ipAddress);
+		Task<UserRefreshToken> GetRefreshToken(string email, string ipAddress);
 		Task<UserRefreshToken> AddRefreshToken(string email, string refreshToken, string ipAddress);
 		Task DeleteRefreshTokens(string email, string ipAddress);
 	}
@@ -21,15 +21,14 @@ namespace Roadkill.Core.Repositories
 			_store = store ?? throw new ArgumentNullException(nameof(store));
 		}
 
-		public async Task<UserRefreshToken> GetByRefreshToken(string refreshToken, string ipAddress)
+		public async Task<UserRefreshToken> GetRefreshToken(string email, string ipAddress)
 		{
 			using (var session = _store.QuerySession())
 			{
 				return await session
 					.Query<UserRefreshToken>()
-					.FirstOrDefaultAsync(x => x.RefreshToken.Equals(refreshToken, StringComparison.OrdinalIgnoreCase) &&
-					                          x.IpAddress == ipAddress)
-					.ConfigureAwait(false);
+					.FirstOrDefaultAsync(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
+					                          x.IpAddress == ipAddress);
 			}
 		}
 
@@ -46,7 +45,7 @@ namespace Roadkill.Core.Repositories
 					IpAddress = ipAddress
 				};
 				session.Store(token);
-				await session.SaveChangesAsync().ConfigureAwait(false);
+				await session.SaveChangesAsync();
 
 				return token;
 			}
@@ -58,7 +57,7 @@ namespace Roadkill.Core.Repositories
 			{
 				session.DeleteWhere<UserRefreshToken>(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
 				                                           x.IpAddress == ipAddress);
-				await session.SaveChangesAsync().ConfigureAwait(false);
+				await session.SaveChangesAsync();
 			}
 		}
 	}

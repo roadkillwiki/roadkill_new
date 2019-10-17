@@ -81,7 +81,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string jwtToken = "jwt token";
 			string email = "admin@example.org";
 			string password = "Passw0rd9000!";
-
+			
 			var roadkillUser = new RoadkillIdentityUser()
 			{
 				Id = "1",
@@ -112,13 +112,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.CreateToken(claims, roadkillUser.Email)
 				.Returns(jwtToken);
 
-			_jwtTokenService
-				.CreateRefreshToken(roadkillUser.Email, ipAddress)
-				.Returns(refreshToken);
-
 			var httpContext = new DefaultHttpContext();
 			httpContext.Connection.RemoteIpAddress = IPAddress.Parse(ipAddress);
 			_authorizationController.ControllerContext.HttpContext = httpContext;
+
+			_jwtTokenService
+				.CreateRefreshToken(roadkillUser.Email, ipAddress)
+				.Returns(refreshToken);
 
 			// when
 			ActionResult<AuthorizationResponse> actionResult = await _authorizationController.Authenticate(model);
@@ -190,63 +190,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			// then
 			actionResult.ShouldNotBeNull();
 			actionResult.Result.ShouldBeOfType<ForbidResult>();
-		}
-
-		[Fact]
-		public async Task RefreshToken_should_find_user_and_return_new_tokens()
-		{
-			// given
-			string existingRefreshToken = "my fresh refresh token";
-			string email = "admin@example.org";
-			string ipAddress = "9.8.7.6";
-			string newRefreshToken = "refresh token";
-			string newJwtToken = "jwt token";
-
-			var roadkillUser = new RoadkillIdentityUser()
-			{
-				Id = "1",
-				UserName = email,
-				NormalizedUserName = email.ToUpperInvariant(),
-				Email = email,
-				NormalizedEmail = email.ToUpperInvariant(),
-				RoleClaims = new List<string>()
-			};
-
-			_userManagerMock.FindByEmailAsync(email)
-				.Returns(Task.FromResult(roadkillUser));
-
-
-			var claims = new List<Claim>() { new Claim("any", "thing") } as IList<Claim>;
-			_userManagerMock.GetClaimsAsync(roadkillUser)
-				.Returns(Task.FromResult(claims));
-
-			_jwtTokenService
-				.GetEmailByRefreshToken(existingRefreshToken, ipAddress)
-				.Returns(roadkillUser.Email);
-
-			_jwtTokenService
-				.CreateToken(claims, roadkillUser.Email)
-				.Returns(newJwtToken);
-
-			_jwtTokenService
-				.CreateRefreshToken(roadkillUser.Email, ipAddress)
-				.Returns(newRefreshToken);
-
-			var httpContext = new DefaultHttpContext();
-			httpContext.Connection.RemoteIpAddress = IPAddress.Parse(ipAddress);
-			_authorizationController.ControllerContext.HttpContext = httpContext;
-
-			// when
-			ActionResult<AuthorizationResponse> actionResult = await _authorizationController.RefreshToken(existingRefreshToken);
-
-			// then
-			actionResult.Result.ShouldBeOfType<OkObjectResult>();
-			var okResult = actionResult.Result as OkObjectResult;
-			var response = okResult.Value as AuthorizationResponse;
-
-			response.ShouldNotBeNull();
-			response.JwtToken.ShouldBe(newJwtToken);
-			response.RefreshToken.ShouldBe(newRefreshToken);
 		}
 	}
 }

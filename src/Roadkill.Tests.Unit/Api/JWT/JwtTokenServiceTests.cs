@@ -106,26 +106,5 @@ namespace Roadkill.Tests.Unit.Api.JWT
 			// then
 			token.ShouldBe(expectedToken);
 		}
-
-		[Fact]
-		public async Task GetEmailByRefreshToken_should_find_email_by_token_and_ip()
-		{
-			// given
-			string refreshToken = "old refresh token";
-			string ipAddress = "127.1.2.3";
-			string expectedEmail = "bob@example.com";
-
-			_refreshTokenRepository.GetByRefreshToken(refreshToken, ipAddress)
-				.Returns(new UserRefreshToken()
-				{
-					Email = expectedEmail
-				});
-
-			// when
-			string email = await _service.GetEmailByRefreshToken(refreshToken, ipAddress);
-
-			// then
-			email.ShouldBe(expectedEmail);
-		}
 	}
 }
