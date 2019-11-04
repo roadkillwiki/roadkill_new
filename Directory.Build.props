@@ -1,9 +1,9 @@
 <Project>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.6.2" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.6.2" PrivateAssets="All" />
-    <PackageReference Include="OpenCover" Version="4.6.519" PrivateAssets="All" />
-    <PackageReference Include="ReportGenerator" Version="4.0.4" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.9.7" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.9.7" PrivateAssets="All" />
+    <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="All" />
+    <PackageReference Include="ReportGenerator" Version="4.3.5" PrivateAssets="All" />
   </ItemGroup>
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

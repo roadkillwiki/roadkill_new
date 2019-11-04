@@ -13,7 +13,6 @@
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.1.0" />
-	<PackageReference Include="Microsoft.AspNetCore.App" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />

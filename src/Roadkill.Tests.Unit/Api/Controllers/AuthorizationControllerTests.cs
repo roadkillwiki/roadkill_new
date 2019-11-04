@@ -50,6 +50,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				claimFactoryMock,
 				null,
 				signinManagerLogger,
+				null,
 				null);
 
 			_jwtTokenService = Substitute.For<IJwtTokenService>();
@@ -81,7 +82,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			string jwtToken = "jwt token";
 			string email = "admin@example.org";
 			string password = "Passw0rd9000!";
-			
+
 			var roadkillUser = new RoadkillIdentityUser()
 			{
 				Id = "1",

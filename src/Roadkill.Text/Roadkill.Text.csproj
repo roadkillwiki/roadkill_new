@@ -5,10 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.13.0" />
-    <PackageReference Include="HtmlSanitizer" Version="4.0.217" />
-    <PackageReference Include="MailKit" Version="2.3.2" />
-    <PackageReference Include="Markdig" Version="0.17.1" />
+    <PackageReference Include="HtmlSanitizer" Version="5.0.274-beta" />
+    <PackageReference Include="MailKit" Version="2.4.0" />
+    <PackageReference Include="Markdig" Version="0.18.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
