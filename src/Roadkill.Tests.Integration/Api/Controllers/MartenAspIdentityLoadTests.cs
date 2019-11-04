@@ -51,8 +51,9 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			};
 
 			var jwtResponse = await PostReturnsStatusCodeWithContent(_authenticatePath, loginData, HttpStatusCode.OK);
-			string jwtToken = await jwtResponse.Content.ReadAsStringAsync();
-			_httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {jwtToken}");
+			string json = await jwtResponse.Content.ReadAsStringAsync();
+			var response = JsonConvert.DeserializeObject<AuthorizationResponse>(json);
+			_httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {response.JwtToken}");
 
 			// Hit marten with 50 requests per second.
 			// You may need to lower this number for slower hardware.

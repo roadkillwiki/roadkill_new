@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using AutoMapper;
 using MailKit;
 using MailKit.Net.Smtp;
@@ -93,6 +94,8 @@ namespace Roadkill.Api.Extensions
 			{
 				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 				x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+				x.DefaultScheme  = JwtBearerDefaults.AuthenticationScheme;
+				x.DefaultSignInScheme  = JwtBearerDefaults.AuthenticationScheme;
 			})
 			.AddJwtBearer(options =>
 			{
@@ -113,8 +116,16 @@ namespace Roadkill.Api.Extensions
 
 			void ConfigureJwtClaimsPolicies(AuthorizationOptions options)
 			{
-				options.AddPolicy(PolicyNames.Admin, policy => policy.RequireClaim(ClaimTypes.Role, RoleNames.Admin));
-				options.AddPolicy(PolicyNames.Editor, policy => policy.RequireClaim(ClaimTypes.Role, RoleNames.Editor));
+				options.AddPolicy(PolicyNames.Admin, policy =>
+				{
+					policy.AddAuthenticationSchemes("Identity.Application", JwtBearerDefaults.AuthenticationScheme);
+					policy.RequireClaim(ClaimTypes.Role, RoleNames.Admin);
+				});
+				options.AddPolicy(PolicyNames.Editor, policy =>
+				{
+					policy.AddAuthenticationSchemes("Identity.Application", JwtBearerDefaults.AuthenticationScheme);
+					policy.RequireClaim(ClaimTypes.Role, RoleNames.Editor);
+				});
 			}
 
 			services.AddAuthorization(ConfigureJwtClaimsPolicies);
