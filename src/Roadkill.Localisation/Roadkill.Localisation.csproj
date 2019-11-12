@@ -4,8 +4,4 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Update="ReportGenerator" Version="4.2.5" />
-  </ItemGroup>
-
 </Project>

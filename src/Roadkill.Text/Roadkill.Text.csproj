@@ -6,13 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlSanitizer" Version="5.0.274-beta" />
-    <PackageReference Include="MailKit" Version="2.4.0" />
+    <PackageReference Include="MailKit" Version="2.4.1" />
     <PackageReference Include="Markdig" Version="0.18.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0" />
-    <PackageReference Update="ReportGenerator" Version="4.2.5" />
    </ItemGroup>
 
   <ItemGroup>

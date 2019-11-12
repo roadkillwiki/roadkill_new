@@ -5,8 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-		<PackageReference Include="AutoMapper" Version="9.0.0" />
-		<PackageReference Update="ReportGenerator" Version="4.2.5" />
+  		<PackageReference Include="AutoMapper" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
