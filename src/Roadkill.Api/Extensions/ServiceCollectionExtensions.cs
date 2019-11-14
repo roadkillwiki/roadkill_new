@@ -118,16 +118,17 @@ namespace Roadkill.Api.Extensions
 			{
 				options.AddPolicy(PolicyNames.Admin, policy =>
 				{
-					policy.AddAuthenticationSchemes("Identity.Application", JwtBearerDefaults.AuthenticationScheme);
-					policy.RequireClaim(ClaimTypes.Role, RoleNames.Admin);
+					policy.Requirements.Add(new RoadkillUserRequirement(PolicyNames.Admin));
+					//policy.RequireClaim(ClaimTypes.Role, RoleNames.Admin);
 				});
 				options.AddPolicy(PolicyNames.Editor, policy =>
 				{
-					policy.AddAuthenticationSchemes("Identity.Application", JwtBearerDefaults.AuthenticationScheme);
-					policy.RequireClaim(ClaimTypes.Role, RoleNames.Editor);
+					policy.Requirements.Add(new RoadkillUserRequirement(PolicyNames.Editor));
+					//policy.RequireClaim(ClaimTypes.Role, RoleNames.Editor);
 				});
 			}
 
+			services.AddSingleton<IAuthorizationHandler, RoadkillAuthorizer>();
 			services.AddAuthorization(ConfigureJwtClaimsPolicies);
 
 			return services;
@@ -201,6 +202,31 @@ namespace Roadkill.Api.Extensions
 		{
 			services.AddAutoMapper(typeof(Startup));
 			return services;
+		}
+	}
+
+	public class RoadkillUserRequirement : IAuthorizationRequirement
+	{
+		public string GroupName { get; set; }
+		public RoadkillUserRequirement(string groupName)
+		{
+			GroupName = groupName;
+		}
+	}
+
+	public class RoadkillAuthorizer : AuthorizationHandler<RoadkillUserRequirement>
+	{
+		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RoadkillUserRequirement requirement)
+		{
+			Claim claim = context.User.FindFirst(ClaimTypes.Role);
+			if (claim != null)
+			{
+				// Hack: Editor policy required by the controller, but logged in Admin
+				// TODO: inheritence
+				if (claim.Value == requirement.GroupName || claim.Value == RoleNames.Admin)
+					context.Succeed(requirement);
+			}
+			return Task.CompletedTask;
 		}
 	}
 }

@@ -132,7 +132,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 				throw new Exception("Failed to create editor user - " + errors);
 			}
 
-			manager.AddClaimAsync(AdminUser, new Claim(ClaimTypes.Role, RoleNames.Editor)).GetAwaiter()
+			manager.AddClaimAsync(EditorUser, new Claim(ClaimTypes.Role, RoleNames.Editor)).GetAwaiter()
 				.GetResult();
 		}
 	}

@@ -59,11 +59,11 @@ namespace Roadkill.Api
 		// You can add these parameters to this method: IHostingEnvironment env, ILoggerFactory loggerFactory
 		public override void Configure(IApplicationBuilder app)
 		{
+			app.UseRouting();
 			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.UseSwaggerWithReverseProxySupport();
-			app.UseRouting();
 
 			app.UseEndpoints(endPoints =>
 			{
