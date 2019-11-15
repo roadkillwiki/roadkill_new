@@ -7,15 +7,15 @@ namespace Roadkill.Api.Authorization
 		public const string Name = "editor";
 		string IUserRoleDefinition.Name => Name;
 
-		private readonly List<string> _availableClaims = new List<string>()
+		private readonly List<string> _availablePolicies = new List<string>()
 		{
 			PolicyNames.AddPage,
 			PolicyNames.UpdatePage
 		};
 
-		public bool ContainsClaim(string claimName)
+		public bool ContainsPolicy(string policyName)
 		{
-			return _availableClaims.Contains(claimName);
+			return _availablePolicies.Contains(policyName);
 		}
 	}
 }

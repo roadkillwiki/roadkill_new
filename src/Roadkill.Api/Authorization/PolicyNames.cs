@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Roadkill.Api.Authorization
 {
 	public static class PolicyNames
@@ -21,5 +24,26 @@ namespace Roadkill.Api.Authorization
 		public const string RenameTag = nameof(RenameTag);
 
 		public const string MarkdownUpdateLinks = nameof(MarkdownUpdateLinks);
+
+		public static IEnumerable<string> AllPolicies => new List<string>()
+		{
+			FindUsers,
+			GetUser,
+			CreateEditorUser,
+			CreateAdminUser,
+			DeleteUser,
+
+			AddPage,
+			UpdatePage,
+			DeletePage,
+
+			AddPageVersion,
+			UpdatePageVersion,
+			DeletePageVersion,
+
+			RenameTag,
+
+			MarkdownUpdateLinks
+		};
 	}
 }

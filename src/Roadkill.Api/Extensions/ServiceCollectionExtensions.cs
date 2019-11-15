@@ -116,17 +116,13 @@ namespace Roadkill.Api.Extensions
 
 			void ConfigureJwtClaimsPolicies(AuthorizationOptions options)
 			{
-				string adminRoleName = RoadkillClaims.AdminClaim.Value;
-				string editorRoleName = RoadkillClaims.EditorClaim.Value;
-
-				options.AddPolicy(adminRoleName, policy =>
+				foreach (string policyName in PolicyNames.AllPolicies)
 				{
-					policy.Requirements.Add(new RoadkillUserRequirement(adminRoleName));
-				});
-				options.AddPolicy(editorRoleName, policy =>
-				{
-					policy.Requirements.Add(new RoadkillUserRequirement(editorRoleName));
-				});
+					options.AddPolicy(policyName, policy =>
+					{
+						policy.Requirements.Add(new RoadkillPolicyRequirement(policyName));
+					});
+				}
 			}
 			services.AddAuthorization(ConfigureJwtClaimsPolicies);
 

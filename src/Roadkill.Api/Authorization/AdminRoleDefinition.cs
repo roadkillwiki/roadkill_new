@@ -5,7 +5,7 @@ namespace Roadkill.Api.Authorization
 		public const string Name = "admin";
 		string IUserRoleDefinition.Name => Name;
 
-		public bool ContainsClaim(string claimName)
+		public bool ContainsPolicy(string policyName)
 		{
 			return true;
 		}
