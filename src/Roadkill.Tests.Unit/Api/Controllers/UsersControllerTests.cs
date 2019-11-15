@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
-using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities.Authorization;
 using Shouldly;
@@ -59,24 +59,11 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			}
 		}
 
-		[Fact]
-		public void Controller_should_require_admin_access()
-		{
-			Type attributeType = typeof(AuthorizeAttribute);
-
-			var customAttributes = typeof(UsersController).GetCustomAttributes(attributeType, false);
-			customAttributes.Length.ShouldBeGreaterThan(0, $"No {attributeType.Name} found for UsersController");
-
-			AuthorizeAttribute authorizeAttribute = customAttributes[0] as AuthorizeAttribute;
-			authorizeAttribute?.Policy.ShouldNotBeNullOrEmpty("No AuthorizeAttribute policy string specified for UsersController");
-			authorizeAttribute?.Policy.ShouldContain(PolicyNames.Admin);
-		}
-
 		[Theory]
-		[InlineData(nameof(UsersController.Get), "{email}")]
-		[InlineData(nameof(UsersController.FindAll))]
-		[InlineData(nameof(UsersController.FindUsersWithClaim))]
-		public void Get_methods_should_be_HttpGet_with_custom_routeTemplate(string methodName, string routeTemplate = "")
+		[InlineData(nameof(UsersController.Get), PolicyNames.GetUser, "{email}")]
+		[InlineData(nameof(UsersController.FindAll), PolicyNames.FindUsers)]
+		[InlineData(nameof(UsersController.FindUsersWithClaim), PolicyNames.FindUsers)]
+		public void FindAndGet_methods_should_be_HttpGet_with_custom_routeTemplate_and_authorize_policy(string methodName, string policyName, string routeTemplate = "")
 		{
 			Type attributeType = typeof(HttpGetAttribute);
 			if (string.IsNullOrEmpty(routeTemplate))
@@ -86,6 +73,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			_usersController.ShouldHaveAttribute(methodName, attributeType);
 			_usersController.ShouldHaveRouteAttributeWithTemplate(methodName, routeTemplate);
+			_usersController.ShouldAuthorizePolicy(methodName, policyName);
 		}
 
 		[Fact]
@@ -170,7 +158,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		{
 			// given
 			string claimName = ClaimTypes.Role;
-			string claimValue = RoleNames.Admin;
+			string claimValue = RoadkillClaims.AdminClaim.Value;
 
 			var expectedUsers = new List<RoadkillIdentityUser>()
 			{

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Roadkill.Api;
-using Roadkill.Api.JWT;
+using Roadkill.Api.Authorization;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Entities.Authorization;
 using Xunit.Abstractions;
@@ -111,7 +111,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 				throw new Exception("Failed to create admin user - " + errors);
 			}
 
-			manager.AddClaimAsync(AdminUser, new Claim(ClaimTypes.Role, RoleNames.Admin)).GetAwaiter()
+			manager.AddClaimAsync(AdminUser, RoadkillClaims.AdminClaim).GetAwaiter()
 				.GetResult();
 		}
 
@@ -132,7 +132,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 				throw new Exception("Failed to create editor user - " + errors);
 			}
 
-			manager.AddClaimAsync(EditorUser, new Claim(ClaimTypes.Role, RoleNames.Editor)).GetAwaiter()
+			manager.AddClaimAsync(EditorUser, RoadkillClaims.EditorClaim).GetAwaiter()
 				.GetResult();
 		}
 	}

@@ -6,9 +6,9 @@ using AutoFixture;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
-using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
@@ -45,19 +45,6 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_tagsController = new TagsController(_pageRepositoryMock, _pageViewModelConverterMock);
 		}
 
-		[Fact]
-		public void Controller_should_require_admin_access()
-		{
-			Type attributeType = typeof(AuthorizeAttribute);
-
-			var customAttributes = typeof(TagsController).GetCustomAttributes(attributeType, false);
-			customAttributes.Length.ShouldBeGreaterThan(0, $"No {attributeType.Name} found for TagsController");
-
-			AuthorizeAttribute authorizeAttribute = customAttributes[0] as AuthorizeAttribute;
-			authorizeAttribute?.Policy.ShouldNotBeNullOrEmpty("No AuthorizeAttribute policy string specified for TagsController");
-			authorizeAttribute?.Policy.ShouldContain(PolicyNames.Admin);
-		}
-
 		[Theory]
 		[InlineData(nameof(TagsController.AllTags))]
 		[InlineData(nameof(TagsController.FindPageWithTag))]
@@ -74,12 +61,13 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public void Rename_should_be_HttpPut_and_allow_editors()
+		public void Rename_should_be_HttpPut_and_authorize_policy()
 		{
 			string methodName = nameof(TagsController.Rename);
 			Type attributeType = typeof(HttpPutAttribute);
 
 			_tagsController.ShouldHaveAttribute(methodName, attributeType);
+			_tagsController.ShouldAuthorizePolicy(methodName, PolicyNames.RenameTag);
 		}
 
 		[Fact]

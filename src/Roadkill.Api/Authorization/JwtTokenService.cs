@@ -4,12 +4,11 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
-using Roadkill.Api.Exceptions;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Repositories;
 
-namespace Roadkill.Api.JWT
+namespace Roadkill.Api.Authorization
 {
 	public interface IJwtTokenService
 	{

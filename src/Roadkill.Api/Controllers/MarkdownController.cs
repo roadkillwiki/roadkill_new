@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.JWT;
+using Roadkill.Api.Authorization;
 using Roadkill.Text.Models;
 using Roadkill.Text.TextMiddleware;
 
@@ -10,7 +10,6 @@ namespace Roadkill.Api.Controllers
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
-	[Authorize(Policy = PolicyNames.Editor)]
 	public class MarkdownController : ControllerBase
 	{
 		private readonly ITextMiddlewareBuilder _textMiddlewareBuilder;
@@ -33,6 +32,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpPost]
 		[Route(nameof(UpdateLinksToPage))]
+		[Authorize(Policy = PolicyNames.MarkdownUpdateLinks)]
 		public Task UpdateLinksToPage(string oldTitle, string newTitle)
 		{
 			throw new System.NotImplementedException();

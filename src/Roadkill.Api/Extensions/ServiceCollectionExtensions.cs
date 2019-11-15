@@ -1,8 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using MailKit;
 using MailKit.Net.Smtp;
@@ -18,7 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using Roadkill.Api.JWT;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Extensions;
@@ -27,6 +25,8 @@ using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;
 using Scrutor;
+using AdminRoleDefinition = Roadkill.Api.Authorization.AdminRoleDefinition;
+using EditorRoleDefinition = Roadkill.Api.Authorization.EditorRoleDefinition;
 
 namespace Roadkill.Api.Extensions
 {
@@ -108,27 +108,26 @@ namespace Roadkill.Api.Extensions
 					ValidateIssuer = false,
 					ValidateAudience = false
 				};
-				/*options.Events.OnMessageReceived += context =>
-				{
-					// header
-				};*/
 			});
+
+			services.AddSingleton<IUserRoleDefinition, AdminRoleDefinition>();
+			services.AddSingleton<IUserRoleDefinition, EditorRoleDefinition>();
+			services.AddSingleton<IAuthorizationHandler, RoadkillAuthorizer>();
 
 			void ConfigureJwtClaimsPolicies(AuthorizationOptions options)
 			{
-				options.AddPolicy(PolicyNames.Admin, policy =>
+				string adminRoleName = RoadkillClaims.AdminClaim.Value;
+				string editorRoleName = RoadkillClaims.EditorClaim.Value;
+
+				options.AddPolicy(adminRoleName, policy =>
 				{
-					policy.Requirements.Add(new RoadkillUserRequirement(PolicyNames.Admin));
-					//policy.RequireClaim(ClaimTypes.Role, RoleNames.Admin);
+					policy.Requirements.Add(new RoadkillUserRequirement(adminRoleName));
 				});
-				options.AddPolicy(PolicyNames.Editor, policy =>
+				options.AddPolicy(editorRoleName, policy =>
 				{
-					policy.Requirements.Add(new RoadkillUserRequirement(PolicyNames.Editor));
-					//policy.RequireClaim(ClaimTypes.Role, RoleNames.Editor);
+					policy.Requirements.Add(new RoadkillUserRequirement(editorRoleName));
 				});
 			}
-
-			services.AddSingleton<IAuthorizationHandler, RoadkillAuthorizer>();
 			services.AddAuthorization(ConfigureJwtClaimsPolicies);
 
 			return services;
@@ -202,31 +201,6 @@ namespace Roadkill.Api.Extensions
 		{
 			services.AddAutoMapper(typeof(Startup));
 			return services;
-		}
-	}
-
-	public class RoadkillUserRequirement : IAuthorizationRequirement
-	{
-		public string GroupName { get; set; }
-		public RoadkillUserRequirement(string groupName)
-		{
-			GroupName = groupName;
-		}
-	}
-
-	public class RoadkillAuthorizer : AuthorizationHandler<RoadkillUserRequirement>
-	{
-		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RoadkillUserRequirement requirement)
-		{
-			Claim claim = context.User.FindFirst(ClaimTypes.Role);
-			if (claim != null)
-			{
-				// Hack: Editor policy required by the controller, but logged in Admin
-				// TODO: inheritence
-				if (claim.Value == requirement.GroupName || claim.Value == RoleNames.Admin)
-					context.Succeed(requirement);
-			}
-			return Task.CompletedTask;
 		}
 	}
 }

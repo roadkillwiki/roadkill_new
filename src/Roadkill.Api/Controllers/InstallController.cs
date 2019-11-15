@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Roadkill.Api.JWT;
+using Roadkill.Api.Authorization;
 using Roadkill.Core.Entities.Authorization;
 
 namespace Roadkill.Api.Controllers
@@ -33,7 +33,7 @@ namespace Roadkill.Api.Controllers
 			};
 
 			await _userManager.CreateAsync(newUser, "password");
-			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Admin));
+			await _userManager.AddClaimAsync(newUser, RoadkillClaims.AdminClaim);
 
 			return CreatedAtAction(nameof(CreateTestUser), newUser.Email);
 		}

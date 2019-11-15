@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Exceptions;
-using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities.Authorization;
 
@@ -18,7 +18,7 @@ namespace Roadkill.Api.Controllers
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
-	[Authorize(Policy = PolicyNames.Admin)]
+	[Authorize]
 	public class UsersController : ControllerBase
 	{
 		public static readonly string EmailExistsError = "The email address already exists.";
@@ -37,6 +37,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route("{email}")]
+		[Authorize(Policy = PolicyNames.GetUser)]
 		public async Task<ActionResult<UserResponse>> Get(string email)
 		{
 			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(email);
@@ -52,6 +53,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(FindAll))]
+		[Authorize(Policy = PolicyNames.FindUsers)]
 		public ActionResult<IEnumerable<UserResponse>> FindAll()
 		{
 			IEnumerable<RoadkillIdentityUser> roadkillUsers = _userManager.Users.ToList();
@@ -63,6 +65,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpGet]
 		[Route(nameof(FindUsersWithClaim))]
+		[Authorize(Policy = PolicyNames.FindUsers)]
 		public async Task<ActionResult<IEnumerable<UserResponse>>> FindUsersWithClaim(string claimType, string claimValue)
 		{
 			var claim = new Claim(claimType, claimValue);
@@ -76,6 +79,7 @@ namespace Roadkill.Api.Controllers
 
 		[HttpPost]
 		[Route(nameof(CreateAdmin))]
+		[Authorize(Policy = PolicyNames.CreateAdminUser)]
 		public async Task<ActionResult<string>> CreateAdmin(UserRequest userRequest)
 		{
 			RoadkillIdentityUser user = await _userManager.FindByEmailAsync(userRequest.Email);
@@ -97,13 +101,14 @@ namespace Roadkill.Api.Controllers
 				throw new ApiException($"Unable to create admin user {userRequest.Email} - UserManager call failed." + string.Join("\n", result.Errors));
 			}
 
-			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Admin));
+			await _userManager.AddClaimAsync(newUser, RoadkillClaims.AdminClaim);
 
 			return CreatedAtAction(nameof(CreateAdmin), userRequest.Email);
 		}
 
 		[HttpPost]
 		[Route(nameof(CreateEditor))]
+		[Authorize(Policy = PolicyNames.CreateEditorUser)]
 		public async Task<ActionResult<string>> CreateEditor(UserRequest userRequest)
 		{
 			RoadkillIdentityUser user = await _userManager.FindByEmailAsync(userRequest.Email);
@@ -125,13 +130,14 @@ namespace Roadkill.Api.Controllers
 				throw new ApiException($"Unable to create editor user {userRequest.Email} - UserManager call failed." + string.Join("\n", result.Errors));
 			}
 
-			await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.Role, RoleNames.Editor));
+			await _userManager.AddClaimAsync(newUser, RoadkillClaims.EditorClaim);
 
 			return CreatedAtAction(nameof(CreateEditor), userRequest.Email);
 		}
 
 		[HttpDelete]
 		[Route(nameof(Delete))]
+		[Authorize(Policy = PolicyNames.DeleteUser)]
 		public async Task<ActionResult<string>> Delete([FromBody]string email)
 		{
 			RoadkillIdentityUser identityUser = await _userManager.FindByEmailAsync(email);

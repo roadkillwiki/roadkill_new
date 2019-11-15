@@ -6,14 +6,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
-using Roadkill.Api.JWT;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Repositories;
 using Shouldly;
 using Xunit;
 
-namespace Roadkill.Tests.Unit.Api.JWT
+namespace Roadkill.Tests.Unit.Api.Authorization
 {
 	public class JwtTokenServiceTests
 	{
@@ -52,7 +52,7 @@ namespace Roadkill.Tests.Unit.Api.JWT
 		public void should_add_email_to_existing_claims_stored_in_token()
 		{
 			// given
-			var roleClaim = new Claim(ClaimTypes.Role, "Admin");
+			var roleClaim = RoadkillClaims.AdminClaim;
 			var existingClaims = new List<Claim>() { roleClaim };
 			string email = "bob@example.com";
 
@@ -72,7 +72,7 @@ namespace Roadkill.Tests.Unit.Api.JWT
 		public void should_set_expiry_time_stored_in_token()
 		{
 			// given
-			var existingClaims = new List<Claim>() { new Claim(ClaimTypes.Role, "Admin") };
+			var existingClaims = new List<Claim>() { RoadkillClaims.AdminClaim };
 			string email = "bob@example.com";
 			var expectedExpiry = DateTime.UtcNow.AddDays(_jwtSettings.ExpiresDays);
 

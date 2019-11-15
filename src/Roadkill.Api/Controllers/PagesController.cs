@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
-using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
@@ -135,7 +135,7 @@ namespace Roadkill.Api.Controllers
 		/// <param name="pageRequest">The page information to add.</param>
 		/// <returns>A 202 HTTP status with the newly created page, with its generated ID populated.</returns>
 		[HttpPost]
-		[Authorize(Policy = PolicyNames.Editor)]
+		[Authorize(Policy = PolicyNames.AddPage)]
 		public async Task<ActionResult<PageResponse>> Add([FromBody] PageRequest pageRequest)
 		{
 			// TODO: add base62 ID, as Id in Marten is Hilo and starts at 1000 as the lo
@@ -160,7 +160,7 @@ namespace Roadkill.Api.Controllers
 		/// <param name="pageRequest">The page details to update, which should include the page id.</param>
 		/// <returns>The update page details, or a 404 not found if the existing page cannot be found</returns>
 		[HttpPut]
-		[Authorize(Policy = PolicyNames.Editor)]
+		[Authorize(Policy = PolicyNames.UpdatePage)]
 		public async Task<ActionResult<PageResponse>> Update(PageRequest pageRequest)
 		{
 			Page page = _pageObjectsConverter.ConvertToPage(pageRequest);
@@ -179,7 +179,7 @@ namespace Roadkill.Api.Controllers
 		/// <param name="pageId">The id of the page to remove.</param>
 		/// <returns>A 204 if the page successfully deleted.</returns>
 		[HttpDelete]
-		[Authorize(Policy = PolicyNames.Admin)]
+		[Authorize(Policy = PolicyNames.DeletePage)]
 		public async Task<ActionResult<string>> Delete(int pageId)
 		{
 			await _pageRepository.DeletePageAsync(pageId);

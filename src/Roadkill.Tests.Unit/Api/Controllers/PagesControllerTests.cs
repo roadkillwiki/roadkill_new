@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
@@ -73,33 +74,33 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 		}
 
 		[Fact]
-		public void Add_should_be_HttpPost_and_allow_editors()
+		public void Add_should_be_HttpPost_and_authorize_policy()
 		{
 			string methodName = nameof(PagesController.Add);
 			Type attributeType = typeof(HttpPostAttribute);
 
 			_pagesController.ShouldHaveAttribute(methodName, attributeType);
-			_pagesController.ShouldAuthorizeEditors(methodName);
+			_pagesController.ShouldAuthorizePolicy(methodName, PolicyNames.AddPage);
 		}
 
 		[Fact]
-		public void Update_should_be_HttpPut_and_allow_editors()
+		public void Update_should_be_HttpPut_and_authorize_policy()
 		{
 			string methodName = nameof(PagesController.Update);
 			Type attributeType = typeof(HttpPutAttribute);
 
 			_pagesController.ShouldHaveAttribute(methodName, attributeType);
-			_pagesController.ShouldAuthorizeEditors(methodName);
+			_pagesController.ShouldAuthorizePolicy(methodName, PolicyNames.UpdatePage);
 		}
 
 		[Fact]
-		public void Delete_should_be_HttpDelete_and_allow_admins()
+		public void Delete_should_be_HttpDelete_and_authorize_policy()
 		{
 			string methodName = nameof(PagesController.Delete);
 			Type attributeType = typeof(HttpDeleteAttribute);
 
 			_pagesController.ShouldHaveAttribute(methodName, attributeType);
-			_pagesController.ShouldAuthorizeAdmins(methodName);
+			_pagesController.ShouldAuthorizePolicy(methodName, PolicyNames.DeletePage);
 		}
 
 		[Fact]

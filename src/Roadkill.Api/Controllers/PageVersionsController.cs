@@ -4,16 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
-using Roadkill.Api.JWT;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
@@ -90,7 +89,7 @@ namespace Roadkill.Api.Controllers
 		}
 
 		[HttpPost]
-		[Authorize(Policy = PolicyNames.Editor)]
+		[Authorize(Policy = PolicyNames.AddPageVersion)]
 		public async Task<ActionResult<PageVersionResponse>> Add(int pageId, string text, string author, DateTime? dateTime = null)
 		{
 			PageVersion pageVersion = await _pageVersionRepository.AddNewVersionAsync(pageId, text, author, dateTime);
@@ -100,7 +99,7 @@ namespace Roadkill.Api.Controllers
 		}
 
 		[HttpDelete]
-		[Authorize(Policy = PolicyNames.Admin)]
+		[Authorize(Policy = PolicyNames.DeletePageVersion)]
 		public async Task<ActionResult<string>> Delete(Guid id)
 		{
 			await _pageVersionRepository.DeleteVersionAsync(id);
@@ -108,7 +107,7 @@ namespace Roadkill.Api.Controllers
 		}
 
 		[HttpPut]
-		[Authorize(Policy = PolicyNames.Admin)]
+		[Authorize(Policy = PolicyNames.UpdatePageVersion)]
 		public async Task<ActionResult<string>> Update(PageVersionRequest pageVersionRequest)
 		{
 			// doesn't add a new version

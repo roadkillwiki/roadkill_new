@@ -3,7 +3,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Roadkill.Api.JWT;
+using Roadkill.Api.Authorization;
 using Serilog.Parsing;
 using Shouldly;
 using Xunit;
@@ -94,19 +94,7 @@ namespace Roadkill.Tests.Unit
 			actual.ShouldNotHaveAttribute(methodName, attributeType);
 		}
 
-		public static void ShouldAuthorizeEditors<T>(this T actual, string methodName)
-			where T : class
-		{
-			actual.ShouldAuthorizeRoles(methodName, PolicyNames.Editor);
-		}
-
-		public static void ShouldAuthorizeAdmins<T>(this T actual, string methodName)
-			where T : class
-		{
-			actual.ShouldAuthorizeRoles(methodName, PolicyNames.Admin);
-		}
-
-		public static void ShouldAuthorizeRoles<T>(this T actual, string methodName, string roleName)
+		public static void ShouldAuthorizePolicy<T>(this T actual, string methodName, string policyName)
 			where T : class
 		{
 			Type attributeType = typeof(AuthorizeAttribute);
@@ -119,7 +107,7 @@ namespace Roadkill.Tests.Unit
 
 			authorizeAttribute.ShouldNotBeNull($"No AuthorizeAttribute policy string specified for {methodName}");
 			authorizeAttribute?.Policy.ShouldNotBeNullOrEmpty($"No AuthorizeAttribute policy string specified for {methodName}");
-			authorizeAttribute?.Policy.ShouldContain(roleName);
+			authorizeAttribute?.Policy.ShouldContain(policyName);
 		}
 	}
 }
