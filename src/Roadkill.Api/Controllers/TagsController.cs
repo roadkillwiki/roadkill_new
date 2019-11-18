@@ -15,6 +15,7 @@ namespace Roadkill.Api.Controllers
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
+	[AuthorizeWithBearer]
 	public class TagsController : ControllerBase
 	{
 		private readonly IPageRepository _pageRepository;

@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Roadkill.Api.Authorization;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Core.Search.Adapters;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
 	[Route("[controller]")]
+	[AuthorizeWithBearer]
 	public class SearchController : ControllerBase
 	{
 		private readonly ISearchAdapter _searchAdapter;

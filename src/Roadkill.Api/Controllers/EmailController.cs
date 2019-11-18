@@ -3,6 +3,7 @@ using MailKit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
+using Roadkill.Api.Authorization;
 using Roadkill.Core.Settings;
 
 namespace Roadkill.Api.Controllers
@@ -10,6 +11,7 @@ namespace Roadkill.Api.Controllers
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
+	[AuthorizeWithBearer]
 	public class EmailController : ControllerBase
 	{
 		private readonly IMailTransport _mailTransport;

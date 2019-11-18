@@ -10,6 +10,7 @@ namespace Roadkill.Api.Controllers
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
+	[AuthorizeWithBearer]
 	public class MarkdownController : ControllerBase
 	{
 		private readonly ITextMiddlewareBuilder _textMiddlewareBuilder;

@@ -15,10 +15,10 @@ namespace Roadkill.Api.Controllers
 	/// <summary>
 	/// Actions related to pages in the wiki, such as creation and retrieval.
 	/// </summary>
-	[Authorize]
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
+	[AuthorizeWithBearer]
 	public class PagesController : ControllerBase
 	{
 		// [ApiController] adds [FromBody] by default and model validation

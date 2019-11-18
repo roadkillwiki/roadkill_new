@@ -18,7 +18,7 @@ namespace Roadkill.Api.Controllers
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
-	[Authorize(AuthenticationSchemes = "Bearer")]
+	[AuthorizeWithBearer]
 	public class UsersController : ControllerBase
 	{
 		public static readonly string EmailExistsError = "The email address already exists.";

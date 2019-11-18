@@ -16,7 +16,7 @@ namespace Roadkill.Api.Controllers
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
-	[Authorize]
+	[AuthorizeWithBearer]
 	public class PageVersionsController : ControllerBase
 	{
 		private readonly IPageVersionRepository _pageVersionRepository;

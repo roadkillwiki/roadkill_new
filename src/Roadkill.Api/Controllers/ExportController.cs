@@ -5,15 +5,16 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Roadkill.Api.Authorization;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 
 namespace Roadkill.Api.Controllers
 {
-	[Authorize]
 	[ApiController]
 	[ApiVersion("3")]
 	[Route("v{version:apiVersion}/[controller]")]
+	[AuthorizeWithBearer]
 	public class ExportController : ControllerBase
 	{
 		private readonly IPageRepository _pageRepository;
