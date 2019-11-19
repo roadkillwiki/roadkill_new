@@ -37,7 +37,25 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 		}
 
 		[Fact]
-		public async Task should_deny_editor_for_policy_she_doesnt_have()
+		public async Task should_deny_anonymous()
+		{
+			// given
+			string createEditorPath = "/v3/Users/CreateEditor";
+			var userData = new UserRequest
+			{
+				Email = $"{Guid.NewGuid()}@localhost",
+				Password = "Passw0rd12345"
+			};
+
+			// when
+			HttpResponseMessage responseMessage = await Post(createEditorPath, userData);
+
+			// then
+			responseMessage.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+		}
+
+		[Fact]
+		public async Task should_deny_editor_for_policy_they_dont_have()
 		{
 			// given
 			string createEditorPath = "/v3/Users/CreateEditor";
@@ -54,6 +72,26 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 			// then
 			responseMessage.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+		}
+
+		[Fact]
+		public async Task should_allow_admin_for_policy_they_have()
+		{
+			// given
+			string createEditorPath = "/v3/Users/CreateEditor";
+			var userData = new UserRequest
+			{
+				Email = $"{Guid.NewGuid()}@localhost",
+				Password = "Passw0rd12345"
+			};
+
+			await Authenticate(_factory.AdminUser.Email, _factory.AdminUserPassword);
+
+			// when
+			HttpResponseMessage responseMessage = await Post(createEditorPath, userData);
+
+			// then
+			responseMessage.StatusCode.ShouldBe(HttpStatusCode.Created);
 		}
 
 		private async Task Authenticate(string email, string password)

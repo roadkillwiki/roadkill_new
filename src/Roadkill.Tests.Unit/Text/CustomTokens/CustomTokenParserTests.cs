@@ -36,7 +36,7 @@ namespace Roadkill.Tests.Unit.Text.CustomTokens
 			string actualHtml = parser.ReplaceTokensAfterParse("@@warningbox:ENTER YOUR CONTENT HERE {{some link}}@@");
 
 			// Assert
-			expectedHtml.ShouldBe(actualHtml);
+			actualHtml.ShouldBe(expectedHtml);
 		}
 
 		[Fact]
@@ -52,7 +52,7 @@ namespace Roadkill.Tests.Unit.Text.CustomTokens
 			string actualHtml = parser.ReplaceTokensAfterParse("@@warningbox:ENTER YOUR CONTENT HERE {{some link}}@@");
 
 			// Assert
-			expectedHtml.ShouldBe(actualHtml);
+			actualHtml.ShouldBe(expectedHtml);
 		}
 
 		[Fact]
@@ -69,7 +69,7 @@ namespace Roadkill.Tests.Unit.Text.CustomTokens
 			string actualHtml = parser.ReplaceTokensAfterParse("@@warningbox:ENTER YOUR CONTENT HERE {{some link}}@@");
 
 			// Assert
-			expectedHtml.ShouldBe(actualHtml);
+			actualHtml.ShouldBe(expectedHtml);
 		}
 	}
 }
