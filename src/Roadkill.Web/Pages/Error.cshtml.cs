@@ -9,22 +9,22 @@ using Microsoft.Extensions.Logging;
 
 namespace Roadkill.Web.Pages
 {
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public class ErrorModel : PageModel
-    {
-        private readonly ILogger<ErrorModel> logger;
+	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+	public class ErrorModel : PageModel
+	{
+		private readonly ILogger<ErrorModel> logger;
 
-        public ErrorModel(ILogger<ErrorModel> _logger)
-        {
-            logger = _logger;
-        }
-        public string RequestId { get; set; }
+		public ErrorModel(ILogger<ErrorModel> _logger)
+		{
+			logger = _logger;
+		}
+		public string RequestId { get; set; }
 
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+		public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
-        public void OnGet()
-        {
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-        }
-    }
+		public void OnGet()
+		{
+			RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+		}
+	}
 }

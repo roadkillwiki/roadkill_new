@@ -94,8 +94,8 @@ namespace Roadkill.Api.Extensions
 			{
 				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 				x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				x.DefaultScheme  = JwtBearerDefaults.AuthenticationScheme;
-				x.DefaultSignInScheme  = JwtBearerDefaults.AuthenticationScheme;
+				x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+				x.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
 			})
 			.AddJwtBearer(options =>
 			{

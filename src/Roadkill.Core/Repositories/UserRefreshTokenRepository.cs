@@ -28,7 +28,7 @@ namespace Roadkill.Core.Repositories
 				return await session
 					.Query<UserRefreshToken>()
 					.FirstOrDefaultAsync(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
-					                          x.IpAddress == ipAddress);
+											  x.IpAddress == ipAddress);
 			}
 		}
 
@@ -56,7 +56,7 @@ namespace Roadkill.Core.Repositories
 			using (var session = _store.LightweightSession())
 			{
 				session.DeleteWhere<UserRefreshToken>(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
-				                                           x.IpAddress == ipAddress);
+														   x.IpAddress == ipAddress);
 				await session.SaveChangesAsync();
 			}
 		}
