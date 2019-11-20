@@ -25,9 +25,9 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 		{
 			// given
 			string roleName = "mega.user";
-			string policyName = "DeletePage";
+			string policyInRole = "DeletePage";
 
-			List<IAuthorizationRequirement> requirements = CreateRequirements(roleName, policyName);
+			List<IAuthorizationRequirement> requirements = CreateRequirements(roleName, policyInRole);
 			ClaimsPrincipal user = CreateClaimsPrincipal(roleName);
 
 			var context = new AuthorizationHandlerContext(requirements, user, null);
@@ -37,6 +37,26 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 
 			// then
 			context.HasSucceeded.ShouldBeTrue();
+		}
+
+		[Fact]
+		public async Task should_fail_for_role_without_policy_in_it()
+		{
+			// given
+			string roleName = "basic.user";
+			string policyInRole = "AddPage";
+			string policyNotInRole = "DeletePage";
+
+			List<IAuthorizationRequirement> requirements = CreateRequirements(roleName, policyInRole);
+			ClaimsPrincipal user = CreateClaimsPrincipal(policyNotInRole);
+
+			var context = new AuthorizationHandlerContext(requirements, user, null);
+
+			// when
+			await _rolesAuthorizationHandler.HandleAsync(context);
+
+			// then
+			context.HasSucceeded.ShouldBeFalse();
 		}
 
 		private List<IAuthorizationRequirement> CreateRequirements(string roleName, string policyName)
