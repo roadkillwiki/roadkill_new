@@ -24,11 +24,14 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 		public async Task should_succeed_for_role_with_policy_in_it()
 		{
 			// given
-			string roleName = "mega.user";
+			string authorizedRoleName = "mega.user";
 			string policyInRole = "DeletePage";
 
-			List<IAuthorizationRequirement> requirements = CreateRequirements(roleName, policyInRole);
-			ClaimsPrincipal user = CreateClaimsPrincipal(roleName);
+			IAuthorizationRequirement requirement = AddMockRoleAndCreateRequirement(authorizedRoleName, policyInRole);
+			var requirements = new List<IAuthorizationRequirement>();
+			requirements.Add(requirement);
+
+			ClaimsPrincipal user = CreateClaimsPrincipal(authorizedRoleName);
 
 			var context = new AuthorizationHandlerContext(requirements, user, null);
 
@@ -43,12 +46,19 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 		public async Task should_fail_for_role_without_policy_in_it()
 		{
 			// given
-			string roleName = "basic.user";
+			string authorizedRoleName = "basic.user";
 			string policyInRole = "AddPage";
-			string policyNotInRole = "DeletePage";
+			IAuthorizationRequirement basicUserRequirement = AddMockRoleAndCreateRequirement(authorizedRoleName, policyInRole);
 
-			List<IAuthorizationRequirement> requirements = CreateRequirements(roleName, policyInRole);
-			ClaimsPrincipal user = CreateClaimsPrincipal(policyNotInRole);
+			string adminRoleName = "admin.rooty";
+			string policyInAdminRole = "DeletePage";
+			IAuthorizationRequirement adminUserRequirement = AddMockRoleAndCreateRequirement(adminRoleName, policyInAdminRole);
+
+			var requirements = new List<IAuthorizationRequirement>();
+			requirements.Add(basicUserRequirement);
+			requirements.Add(adminUserRequirement);
+
+			ClaimsPrincipal user = CreateClaimsPrincipal(authorizedRoleName);
 
 			var context = new AuthorizationHandlerContext(requirements, user, null);
 
@@ -59,17 +69,14 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 			context.HasSucceeded.ShouldBeFalse();
 		}
 
-		private List<IAuthorizationRequirement> CreateRequirements(string roleName, string policyName)
+		private IAuthorizationRequirement AddMockRoleAndCreateRequirement(string roleName, string policyName)
 		{
 			var mockRoleDefinition = Substitute.For<IUserRoleDefinition>();
 			mockRoleDefinition.Name.Returns(roleName);
 			mockRoleDefinition.ContainsPolicy(policyName).Returns(true);
 			_userRoleDefinitions.Add(mockRoleDefinition);
 
-			var requirements = new List<IAuthorizationRequirement>();
-			requirements.Add(new RoadkillPolicyRequirement(policyName));
-
-			return requirements;
+			return new RoadkillPolicyRequirement(policyName);
 		}
 
 		private ClaimsPrincipal CreateClaimsPrincipal(string roleName)
