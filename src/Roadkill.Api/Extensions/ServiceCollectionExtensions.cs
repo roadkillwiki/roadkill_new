@@ -112,7 +112,7 @@ namespace Roadkill.Api.Extensions
 
 			services.AddSingleton<IUserRoleDefinition, AdminRoleDefinition>();
 			services.AddSingleton<IUserRoleDefinition, EditorRoleDefinition>();
-			services.AddSingleton<IAuthorizationHandler, RoadkillAuthorizer>();
+			services.AddSingleton<IAuthorizationHandler, RolesAuthorizationHandler>();
 
 			void ConfigureJwtClaimsPolicies(AuthorizationOptions options)
 			{

@@ -8,13 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Roadkill.Api.Authorization
 {
-	public class RoadkillAuthorizer : AuthorizationHandler<RoadkillPolicyRequirement>
+	public class RolesAuthorizationHandler : AuthorizationHandler<RoadkillPolicyRequirement>
 	{
 		private readonly IEnumerable<IUserRoleDefinition> _userRoles;
 
-		public RoadkillAuthorizer(IServiceProvider serviceProvider)
+		public RolesAuthorizationHandler(IEnumerable<IUserRoleDefinition> userRoles)
 		{
-			_userRoles = serviceProvider.GetServices<IUserRoleDefinition>();
+			_userRoles = userRoles;
 		}
 
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RoadkillPolicyRequirement requirement)
