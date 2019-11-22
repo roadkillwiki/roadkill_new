@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Roadkill.Api.Authorization
+namespace Roadkill.Api.Authorization.Policies
 {
 	public class RoadkillPolicyRequirement : IAuthorizationRequirement
 	{

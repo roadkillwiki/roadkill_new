@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
+using Roadkill.Api.Authorization.Policies;
 
-namespace Roadkill.Api.Authorization
+namespace Roadkill.Api.Authorization.Roles
 {
 	public class RolesAuthorizationHandler : AuthorizationHandler<RoadkillPolicyRequirement>
 	{

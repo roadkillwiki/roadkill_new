@@ -1,4 +1,4 @@
-namespace Roadkill.Api.Authorization
+namespace Roadkill.Api.Authorization.Roles
 {
 	public class AdminRoleDefinition : IUserRoleDefinition
 	{

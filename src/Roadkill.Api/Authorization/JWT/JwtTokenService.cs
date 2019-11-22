@@ -8,7 +8,7 @@ using Roadkill.Api.Settings;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Repositories;
 
-namespace Roadkill.Api.Authorization
+namespace Roadkill.Api.Authorization.JWT
 {
 	public interface IJwtTokenService
 	{

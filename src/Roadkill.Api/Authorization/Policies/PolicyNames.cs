@@ -1,7 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 
-namespace Roadkill.Api.Authorization
+namespace Roadkill.Api.Authorization.Policies
 {
 	public static class PolicyNames
 	{

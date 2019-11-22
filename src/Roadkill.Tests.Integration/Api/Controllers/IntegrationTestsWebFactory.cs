@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Roadkill.Api;
 using Roadkill.Api.Authorization;
+using Roadkill.Api.Authorization.JWT;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Entities.Authorization;
 using Xunit.Abstractions;

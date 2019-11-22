@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using Roadkill.Api.Authorization;
+using Roadkill.Api.Authorization.JWT;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Repositories;

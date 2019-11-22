@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Authorization;
+using Roadkill.Api.Authorization.Roles;
 using Roadkill.Core.Entities;
 using Roadkill.Core.Repositories;
 

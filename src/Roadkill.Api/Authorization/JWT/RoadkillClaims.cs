@@ -1,6 +1,7 @@
 using System.Security.Claims;
+using Roadkill.Api.Authorization.Roles;
 
-namespace Roadkill.Api.Authorization
+namespace Roadkill.Api.Authorization.JWT
 {
 	public static class RoadkillClaims
 	{

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Authorization;
+using Roadkill.Api.Authorization.Policies;
+using Roadkill.Api.Authorization.Roles;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.ObjectConverters;
 using Roadkill.Core.Entities;

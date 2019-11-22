@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using NSubstitute;
 using Roadkill.Api.Authorization;
+using Roadkill.Api.Authorization.Policies;
+using Roadkill.Api.Authorization.Roles;
 using Shouldly;
 using Xunit;
 

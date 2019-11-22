@@ -17,6 +17,9 @@ using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using Roadkill.Api.Authorization;
+using Roadkill.Api.Authorization.JWT;
+using Roadkill.Api.Authorization.Policies;
+using Roadkill.Api.Authorization.Roles;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Extensions;
@@ -25,8 +28,8 @@ using Roadkill.Text;
 using Roadkill.Text.Sanitizer;
 using Roadkill.Text.TextMiddleware;
 using Scrutor;
-using AdminRoleDefinition = Roadkill.Api.Authorization.AdminRoleDefinition;
-using EditorRoleDefinition = Roadkill.Api.Authorization.EditorRoleDefinition;
+using AdminRoleDefinition = Roadkill.Api.Authorization.Roles.AdminRoleDefinition;
+using EditorRoleDefinition = Roadkill.Api.Authorization.Roles.EditorRoleDefinition;
 
 namespace Roadkill.Api.Extensions
 {

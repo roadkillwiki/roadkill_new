@@ -6,6 +6,7 @@ using AutoFixture;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using Roadkill.Api.Authorization;
+using Roadkill.Api.Authorization.Policies;
 using Roadkill.Api.Common.Request;
 using Roadkill.Api.Common.Response;
 using Roadkill.Api.Controllers;
