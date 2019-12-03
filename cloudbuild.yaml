@@ -37,3 +37,6 @@ steps:
     args: ['test']
     dir:  'src/Roadkill.Tests.Integration'
     waitFor: ['dotnet-build']
+
+  - name: gcr.io/cloud-builders/docker
+    args: ['rm', '--force', 'postgres']
