@@ -23,18 +23,18 @@ steps:
     waitFor: ['psql-create-user']
 
   - id: 'dotnet-build'
-    name: gcr.io/cloud-builders/dotnet
-    args: ['build', '-c', 'Release']
+    name: mcr.microsoft.com/dotnet/core/sdk:3.1
+    args: ['dotnet', 'build', '-c', 'Release']
 
   - id: 'dotnet-test-unit'
-    name: gcr.io/cloud-builders/dotnet
-    args: ['test']
+    name: mcr.microsoft.com/dotnet/core/sdk:3.1
+    args: ['dotnet', 'test']
     dir:  'src/Roadkill.Tests.Unit'
     waitFor: ['dotnet-build']
 
   - id: 'dotnet-test-integration'
-    name: gcr.io/cloud-builders/dotnet
-    args: ['test']
+    name: mcr.microsoft.com/dotnet/core/sdk:3.1
+    args: ['dotnet', 'test']
     dir:  'src/Roadkill.Tests.Integration'
     waitFor: ['dotnet-build']
 
