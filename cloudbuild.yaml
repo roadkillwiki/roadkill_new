@@ -3,7 +3,8 @@ steps:
     name: gcr.io/cloud-builders/docker
     args: ['run', '-d', '-p=5432:5432', '--name=roadkill-postgres', '--network=cloudbuild', 'postgres']
 
-  - name: jwilder/dockerize:0.6.1
+  - id: 'sleep'
+    name: jwilder/dockerize:0.6.1
     args: ['dockerize', '-timeout=60s', '-wait=tcp://postgres:5432']
 
   - id: 'psql-create-db'
