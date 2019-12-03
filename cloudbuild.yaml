@@ -13,12 +13,12 @@ steps:
     waitFor: ['sleep']
 
   - id: 'psql-create-user'
-    name: gcr.io/cloud-builders/docker
+    name: postgres
     args: ['psql', '--host=roadkill-postgres', '--user=postgres', '--command', 'CREATE USER roadkill WITH PASSWORD ''roadkill'';']
     waitFor: ['psql-create-db']
 
   - id: 'psql-assign-role'
-    name: gcr.io/cloud-builders/docker
+    name: postgres
     args: ['psql', '--host=roadkill-postgres', '--user=postgres', '--command', 'ALTER USER roadkill WITH SUPERUSER;']
     waitFor: ['psql-create-user']
 
