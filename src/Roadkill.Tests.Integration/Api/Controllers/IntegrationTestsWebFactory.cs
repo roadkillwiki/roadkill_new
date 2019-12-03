@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Roadkill.Api;
 using Roadkill.Api.Authorization;
 using Roadkill.Api.Authorization.JWT;
@@ -54,6 +55,12 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 		{
 			var server = base.CreateServer(builder);
 			var provider = server.Host.Services;
+
+			TestOutputHelper.WriteLine("Directory: " + Directory.GetCurrentDirectory());
+			if (Directory.GetCurrentDirectory().Contains("workspace/") )
+			{
+				_testConfigValues["Postgres:ConnectionString"] = "host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
+			}
 
 			Logger = provider.GetService<ILogger<IDocumentStore>>();
 
