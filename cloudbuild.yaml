@@ -5,7 +5,7 @@ steps:
 
   - id: 'sleep'
     name: jwilder/dockerize:0.6.1
-    args: ['dockerize', '-timeout=60s', '-wait=tcp://postgres:5432']
+    args: ['dockerize', '-timeout=60s', '-wait=tcp://roadkill-postgres:5432']
 
   - id: 'psql-create-db'
     name: postgres
