@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 using Marten;
 using Roadkill.Core.Entities;
 using Xunit.Abstractions;
@@ -10,10 +11,20 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 	{
 		private static readonly ConcurrentDictionary<string, IDocumentStore> _documentStores = new ConcurrentDictionary<string, IDocumentStore>();
 
-		public static string ConnectionString => "host=localhost;port=5432;database=roadkill;username=roadkill;password=roadkill;";
+		public static string ConnectionString = "host=localhost;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
+
+		private static void UpdateConnectionForGoogleCloudBuild()
+		{
+			if (Directory.GetCurrentDirectory().Contains("/workspace/"))
+			{
+				ConnectionString = "host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
+			}
+		}
 
 		public static IDocumentStore GetMartenDocumentStore(Type testClassType, ITestOutputHelper outputHelper)
 		{
+			UpdateConnectionForGoogleCloudBuild();
+
 			string documentStoreSchemaName = "";
 
 			// Use a different schema for each test class, so their data is isolated
