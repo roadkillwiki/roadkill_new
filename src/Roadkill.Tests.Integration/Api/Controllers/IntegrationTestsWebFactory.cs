@@ -53,14 +53,15 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 		protected override TestServer CreateServer(IWebHostBuilder builder)
 		{
-			var server = base.CreateServer(builder);
-			var provider = server.Host.Services;
-
+			// Google Cloud Docker usage
 			TestOutputHelper.WriteLine("Directory: " + Directory.GetCurrentDirectory());
 			if (Directory.GetCurrentDirectory().Contains("workspace/") )
 			{
 				_testConfigValues["Postgres:ConnectionString"] = "host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
 			}
+
+			var server = base.CreateServer(builder);
+			var provider = server.Host.Services;
 
 			Logger = provider.GetService<ILogger<IDocumentStore>>();
 
