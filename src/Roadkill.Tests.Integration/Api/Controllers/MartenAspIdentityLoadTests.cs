@@ -59,7 +59,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			// Hit marten with 50 requests per second.
 			// You may need to lower this number for slower hardware.
 			var stopWatch = Stopwatch.StartNew();
-			Parallel.For(0, 2, (i, state) =>
+			Parallel.For(0, 50, (i, state) =>
 			{
 				try
 				{
