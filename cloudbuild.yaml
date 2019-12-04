@@ -28,13 +28,13 @@ steps:
 
   - id: 'dotnet-test-unit'
     name: mcr.microsoft.com/dotnet/core/sdk:3.1
-    args: ['dotnet', 'test']
+    args: ['dotnet', 'test', '-c', 'Release', '--logger:"console;verbosity=detailed"']
     dir:  'src/Roadkill.Tests.Unit'
     waitFor: ['dotnet-build']
 
   - id: 'dotnet-test-integration'
     name: mcr.microsoft.com/dotnet/core/sdk:3.1
-    args: ['dotnet', 'test']
+    args: ['dotnet', 'test', '-c', 'Release', '--logger:"console;verbosity=detailed"']
     dir:  'src/Roadkill.Tests.Integration'
     waitFor: ['dotnet-test-unit']
 

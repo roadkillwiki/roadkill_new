@@ -23,7 +23,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 {
 	public class IntegrationTestsWebFactory : WebApplicationFactory<Startup>
 	{
-		private static Dictionary<string, string> _testConfigValues = new Dictionary<string, string>
+		public static Dictionary<string, string> TestConfigValues = new Dictionary<string, string>
 		{
 			{ "Postgres:ConnectionString", "host=localhost;port=5432;database=roadkilltests;username=roadkill;password=roadkill;" },
 			{ "Smtp:Host", "smtp.gmail.com" },
@@ -57,7 +57,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			UpdateConfigForGoogleCloudBuild();
 
 			var configBuilder = new ConfigurationBuilder();
-			configBuilder.AddInMemoryCollection(_testConfigValues);
+			configBuilder.AddInMemoryCollection(TestConfigValues);
 			var config = configBuilder.Build();
 
 			var builder = new WebHostBuilder()
@@ -73,7 +73,6 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 		// 2.
 		protected override TestServer CreateServer(IWebHostBuilder builder)
 		{
-			UpdateConfigForGoogleCloudBuild();
 			var server = base.CreateServer(builder);
 			var provider = server.Host.Services;
 
@@ -103,15 +102,14 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 		private void UpdateConfigForGoogleCloudBuild()
 		{
-			TestOutputHelper.WriteLine($"Directory: {Directory.GetCurrentDirectory()}");
-
 			if (Directory.GetCurrentDirectory().Contains("/workspace/"))
 			{
-				_testConfigValues["Postgres:ConnectionString"] =
+				TestConfigValues["Postgres:ConnectionString"] =
 					"host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
 			}
 
-			TestOutputHelper.WriteLine($"Connection: {_testConfigValues["Postgres:ConnectionString"]}");
+			TestOutputHelper.WriteLine($"Directory: {Directory.GetCurrentDirectory()}");
+			TestOutputHelper.WriteLine($"Connection: {IntegrationTestsWebFactory.TestConfigValues["Postgres:ConnectionString"]}");
 		}
 
 		private void CreateAdminUser(UserManager<RoadkillIdentityUser> manager)
