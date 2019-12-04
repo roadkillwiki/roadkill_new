@@ -32,9 +32,15 @@ steps:
     dir:  'src/Roadkill.Tests.Unit'
     waitFor: ['dotnet-build']
 
+  - id: 'dotnet-test-unit'
+	name: mcr.microsoft.com/dotnet/core/sdk:3.1
+	args: ['ping', 'roadkill-postgres', '-c', '1']
+	dir:  'src/Roadkill.Tests.Unit'
+	waitFor: ['dotnet-test-unit']
+
   - id: 'dotnet-test-integration'
     name: mcr.microsoft.com/dotnet/core/sdk:3.1
-    args: ['--network=cloudbuild', 'dotnet', 'test', '-c', 'Release', '--logger:"console;verbosity=detailed"']
+    args: ['dotnet', 'test', '-c', 'Release', '--logger:"console;verbosity=detailed"']
     dir:  'src/Roadkill.Tests.Integration'
     waitFor: ['dotnet-test-unit']
 
