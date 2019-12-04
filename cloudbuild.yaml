@@ -36,7 +36,7 @@ steps:
     name: mcr.microsoft.com/dotnet/core/sdk:3.1
     args: ['dotnet', 'test']
     dir:  'src/Roadkill.Tests.Integration'
-    waitFor: ['dotnet-build']
+    waitFor: ['dotnet-test-unit']
 
   - name: gcr.io/cloud-builders/docker
     args: ['rm', '--force', 'postgres']
