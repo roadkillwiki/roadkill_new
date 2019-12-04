@@ -53,6 +53,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 		protected override TestServer CreateServer(IWebHostBuilder builder)
 		{
+			UpdateConfigForGoogleCloudBuild();
 			var server = base.CreateServer(builder);
 			var provider = server.Host.Services;
 
