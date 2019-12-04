@@ -25,7 +25,8 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 	{
 		public static Dictionary<string, string> TestConfigValues = new Dictionary<string, string>
 		{
-			{ "Postgres:ConnectionString", "host=localhost;port=5432;database=roadkilltests;username=roadkill;password=roadkill;" },
+			//{ "Postgres:ConnectionString", "host=localhost;port=5432;database=roadkilltests;username=roadkill;password=roadkill;" },
+			{ "Postgres:ConnectionString", "host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;"},
 			{ "Smtp:Host", "smtp.gmail.com" },
 			{ "Smtp:Port", "587" },
 			{ "Smtp:UseSsl", "true" },
@@ -74,7 +75,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 		protected override TestServer CreateServer(IWebHostBuilder builder)
 		{
 			UpdateConfigForGoogleCloudBuild();
-			
+
 			var server = base.CreateServer(builder);
 			var provider = server.Host.Services;
 
