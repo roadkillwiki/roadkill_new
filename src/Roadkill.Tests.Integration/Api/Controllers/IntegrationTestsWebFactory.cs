@@ -53,13 +53,6 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 		protected override TestServer CreateServer(IWebHostBuilder builder)
 		{
-			// Google Cloud Docker usage
-			TestOutputHelper.WriteLine("Directory: " + Directory.GetCurrentDirectory());
-			if (Directory.GetCurrentDirectory().Contains("workspace/") )
-			{
-				_testConfigValues["Postgres:ConnectionString"] = "host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
-			}
-
 			var server = base.CreateServer(builder);
 			var provider = server.Host.Services;
 
@@ -87,8 +80,23 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			return server;
 		}
 
+		private void UpdateConfigForGoogleCloudBuild()
+		{
+			TestOutputHelper.WriteLine($"Directory: {Directory.GetCurrentDirectory()}");
+
+			if (Directory.GetCurrentDirectory().Contains("/workspace/"))
+			{
+				_testConfigValues["Postgres:ConnectionString"] =
+					"host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
+			}
+
+			TestOutputHelper.WriteLine($"Connection: {_testConfigValues["Postgres:ConnectionString"]}");
+		}
+
 		protected override IWebHostBuilder CreateWebHostBuilder()
 		{
+			UpdateConfigForGoogleCloudBuild();
+
 			var configBuilder = new ConfigurationBuilder();
 			configBuilder.AddInMemoryCollection(_testConfigValues);
 			var config = configBuilder.Build();

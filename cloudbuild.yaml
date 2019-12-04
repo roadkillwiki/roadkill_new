@@ -9,7 +9,7 @@ steps:
 
   - id: 'psql-create-db'
     name: postgres
-    args: ['psql', '--host=roadkill-postgres', '--user=postgres', '--command', 'CREATE DATABASE roadkill;']
+    args: ['psql', '--host=roadkill-postgres', '--user=postgres', '--command', 'CREATE DATABASE roadkilltests;']
     waitFor: ['sleep']
 
   - id: 'psql-create-user'
