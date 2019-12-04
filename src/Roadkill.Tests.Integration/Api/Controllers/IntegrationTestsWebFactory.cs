@@ -51,6 +51,26 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 
 		public string EditorUserPassword { get; set; }
 
+		// 1.
+		protected override IWebHostBuilder CreateWebHostBuilder()
+		{
+			UpdateConfigForGoogleCloudBuild();
+
+			var configBuilder = new ConfigurationBuilder();
+			configBuilder.AddInMemoryCollection(_testConfigValues);
+			var config = configBuilder.Build();
+
+			var builder = new WebHostBuilder()
+				.UseKestrel()
+				.UseContentRoot(Directory.GetCurrentDirectory())
+				.ConfigureLogging(loggingBuilder => loggingBuilder.AddXUnit(TestOutputHelper))
+				.UseConfiguration(config)
+				.UseStartup<Startup>();
+
+			return builder;
+		}
+
+		// 2.
 		protected override TestServer CreateServer(IWebHostBuilder builder)
 		{
 			UpdateConfigForGoogleCloudBuild();
@@ -92,24 +112,6 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			}
 
 			TestOutputHelper.WriteLine($"Connection: {_testConfigValues["Postgres:ConnectionString"]}");
-		}
-
-		protected override IWebHostBuilder CreateWebHostBuilder()
-		{
-			UpdateConfigForGoogleCloudBuild();
-
-			var configBuilder = new ConfigurationBuilder();
-			configBuilder.AddInMemoryCollection(_testConfigValues);
-			var config = configBuilder.Build();
-
-			var builder = new WebHostBuilder()
-				.UseKestrel()
-				.UseContentRoot(Directory.GetCurrentDirectory())
-				.ConfigureLogging(loggingBuilder => loggingBuilder.AddXUnit(TestOutputHelper))
-				.UseConfiguration(config)
-				.UseStartup<Startup>();
-
-			return builder;
 		}
 
 		private void CreateAdminUser(UserManager<RoadkillIdentityUser> manager)
