@@ -32,6 +32,12 @@ steps:
     dir:  'src/Roadkill.Tests.Unit'
     waitFor: ['dotnet-build']
 
+  - id: 'docker-run'
+	name: gcr.io/cloud-builders/docker
+  	dir:  'src/Roadkill.Tests.Integration'
+	args: ['run', '-p=5432:5432', '--network=cloudbuild', 'mcr.microsoft.com/dotnet/core/sdk:3.1', 'dotnet test -c Release --logger:"console;verbosity=detailed"']
+  	waitFor: ['dotnet-test-unit']
+
   - id: 'dotnet-test-integration'
     name: mcr.microsoft.com/dotnet/core/sdk:3.1
     args: ['dotnet', 'test', '-c', 'Release', '--logger:"console;verbosity=detailed"']
