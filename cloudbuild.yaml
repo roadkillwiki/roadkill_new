@@ -39,4 +39,4 @@ steps:
     waitFor: ['dotnet-test-unit']
 
   - name: gcr.io/cloud-builders/docker
-    args: ['rm', '--force', 'postgres']
+    args: ['rm', '--force', 'roadkill-postgres']
