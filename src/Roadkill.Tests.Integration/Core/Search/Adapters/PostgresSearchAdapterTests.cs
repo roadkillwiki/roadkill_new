@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -31,8 +32,7 @@ namespace Roadkill.Tests.Integration.Core.Search.Adapters
 			_testPages = _fixture.CreateMany<SearchablePage>().ToList();
 			_outputHelper = outputHelper;
 
-			string connectionString =
-				"host=localhost;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
+			string connectionString = GetConnectionString();
 
 			var services = new ServiceCollection();
 			services.AddLogging(builder => builder.AddXUnit(outputHelper));
@@ -50,6 +50,16 @@ namespace Roadkill.Tests.Integration.Core.Search.Adapters
 			{
 				_searchAdapter.Add(page).GetAwaiter().GetResult();
 			}
+		}
+
+		private static string GetConnectionString()
+		{
+			if (Directory.GetCurrentDirectory().Contains("/workspace/"))
+			{
+				return "host=roadkill-postgres;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";
+			}
+
+			return "host=localhost;port=5432;database=roadkilltests;username=roadkill;password=roadkill;";;
 		}
 
 		[Fact]
