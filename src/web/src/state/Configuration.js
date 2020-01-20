@@ -1,0 +1,3 @@
+const configuration = {
+    "key" : "value"
+}
