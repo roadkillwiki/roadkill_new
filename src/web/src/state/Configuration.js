@@ -1,3 +1,5 @@
 const configuration = {
-    "key" : "value"
+    "baseUrl" : "http://localhost:5001/v3"
 }
+
+export default { configuration }

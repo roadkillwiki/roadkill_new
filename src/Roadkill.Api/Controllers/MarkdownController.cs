@@ -25,7 +25,7 @@ namespace Roadkill.Api.Controllers
 		[HttpPost]
 		[Route(nameof(ConvertToHtml))]
 		[AllowAnonymous]
-		public Task<ActionResult<string>> ConvertToHtml(string markDown)
+		public Task<ActionResult<string>> ConvertToHtml([FromBody] string markDown)
 		{
 			PageHtml result = _textMiddlewareBuilder.Execute(markDown);
 			ActionResult<string> actionResult = Ok(result.Html);

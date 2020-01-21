@@ -1,7 +1,8 @@
-import React from 'react';
+import React from "react";
 
-import ComponentExample from '../components/ComponentExample';
-import FunctionalComponent from '../components/FunctionalComponent';
+import ComponentExample from "../components/ComponentExample";
+import FunctionalComponent from "../components/FunctionalComponent";
+import PageComponent from "../components/PageComponent";
 
 import './App.css';
 
@@ -9,8 +10,10 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        No much here for now. Some components:
+        Not much here for now. Some components:
 
+      <PageComponent />
+      <hr />
       <ComponentExample />
       <FunctionalComponent />
 

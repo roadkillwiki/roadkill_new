@@ -40,13 +40,24 @@ namespace Roadkill.Api
 
 			// API
 			services.ScanAndRegisterApi();
+			services.AddCors(options =>
+			{
+					options.AddPolicy("localhost",
+					builder =>
+					{
+						builder.WithOrigins("http://localhost:3000")
+							.AllowAnyHeader()
+							.AllowAnyMethod();
+					});
+			});
 			services.AddAutoMapperForApi();
 			services.AddMailkit();
 			services.AddMarkdown();
 			services.AddJwtDefaults(_configuration, _logger);
 			services.AddIdentityDefaults();
 			services.AddMvcAndVersionedSwagger();
-			services.AddHealthChecks()
+			services
+				.AddHealthChecks()
 				.AddCheck<MartenHealthCheck>("marten");
 		}
 
@@ -62,6 +73,7 @@ namespace Roadkill.Api
 			app.UseRouting();
 			app.UseAuthentication();
 			app.UseAuthorization();
+			app.UseCors("localhost");
 
 			app.UseSwaggerWithReverseProxySupport();
 
