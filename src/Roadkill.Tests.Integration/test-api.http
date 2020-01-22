@@ -1,5 +1,5 @@
 ### Editor authenticate. Use the token from this as the bearer token below
-POST http://localhost:5000/users/Authenticate
+POST http://localhost:5001/v3/Authorization/Authenticate
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### Admin authenticate
-POST http://localhost:5000/users/Authenticate
+POST http://localhost:5001/v3/Authorization/Authenticate
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### This request requires the Editors policy
-POST http://localhost:5000/pages/Add
+POST http://localhost:5001/v3/pages/Add
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImVkaXRvckBleGFtcGxlLm9yZyIsInJvbGUiOiJFZGl0b3IiLCJuYmYiOjE1NDM4NTI5MjgsImV4cCI6MTU0NDQ1NzcyOCwiaWF0IjoxNTQzODUyOTI4fQ.qMUR6DsLp17WBPqYn6S2hqrpOXPDKF8mI-2RRV6z7VI
 
@@ -28,17 +28,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6I
 }
 
 ### This request requires the Admins policy
-GET http://localhost:5000/users/GetAll
+GET http://localhost:5001/v3/users/GetAll
 Accept: */*
 Cache-Control: no-cache
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImFkbWluQGV4YW1wbGUub3JnIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNTQzODU1MTQ5LCJleHAiOjE1NDQ0NTk5NDksImlhdCI6MTU0Mzg1NTE0OX0.DNDjVxtVsFSaEhaUF6jB7rZ0vuXtt1fz8dR6aUddLYY
 
 ### These requests needs no authentication
-GET http://localhost:5000/pages/Get?id=1
+GET http://localhost:5001/v3/pages/Get?id=1
 Accept: */*
 
 ###
-GET http://localhost:5000/pages/AllPages
+GET http://localhost:5001/v3/pages/AllPages
 Accept: */*
 
-###
+
+### Body payload should be valid JSON, so newlines needs to be as \n
+POST http://localhost:5001/v3/Markdown/ConvertToHtml
+Content-Type: application/json
+Accept: text/plain
+
+"## This is some markdown\nAnd some **bold** text"
