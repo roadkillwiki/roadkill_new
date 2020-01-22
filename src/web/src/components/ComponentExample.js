@@ -4,7 +4,7 @@ class ComponentExample extends Component
 {
     render()
     {
-        return (<p>Here is a class based component</p>)
+        return (<p style={{border: "1px solid #ccc"}}>Here is a class based component</p>)
     }
 }
 

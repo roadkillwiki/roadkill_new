@@ -9,15 +9,10 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
         Not much here for now. Some components:
-
-      <PageComponent />
-      <hr />
-      <ComponentExample />
-      <FunctionalComponent />
-
-      </header>
+        <PageComponent />
+        <ComponentExample />
+        <FunctionalComponent />
     </div>
   );
 }

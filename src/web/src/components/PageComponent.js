@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import PageService from "../services/PageService";
 import MarkdownService from "../services/MarkdownService";
 
 class PageComponent extends Component
@@ -12,13 +13,14 @@ class PageComponent extends Component
 
     componentDidMount()
     {
-        var service = new MarkdownService();
-        service
-            .convertToHtml("**hello**")
-            .then(html =>
-            {
-                this.setState({ html: html });
-            });
+        var pageService = new PageService();
+        var markdownService = new MarkdownService();
+
+        pageService
+            .getHomePage()
+            .then(page => pageService.getMarkdown(page.id))
+            .then(text => markdownService.convertToHtml(text))
+            .then(html => this.setState({ html: html }));
     }
 
     render()
@@ -30,7 +32,7 @@ class PageComponent extends Component
             };
 
             return (
-                <div dangerouslySetInnerHTML={ unsafeHtml } />
+                <div style={{border: "1px solid #ccc"}} dangerouslySetInnerHTML={ unsafeHtml } />
             );
         }
 
