@@ -171,7 +171,7 @@ namespace Roadkill.Api.Extensions
 				options.AssumeDefaultVersionWhenUnspecified = true;
 			});
 
-			services.AddSwaggerDocument(document =>
+			services.AddOpenApiDocument(document =>
 			{
 				// Add an authenticate button to Swagger for JWT tokens
 				document.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT"));
