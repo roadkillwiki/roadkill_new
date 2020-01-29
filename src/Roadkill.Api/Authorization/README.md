@@ -40,3 +40,16 @@ is correct.
 JWT is built into ASP.NET Core via its inbuilt Dependency Injection package, and `AddJwtBearer`. This ties into 
 `IApplicationBuilder.UseAuthentication()` - the token is read using a Middleware implementation inside ASP.NET Core. 
 
+### Policy-based authorization
+
+A lot of time was spent building a scalable policy-based role system into Roadkill. It uses [policy-based authorization](https://docs.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-3.1#authorization-handlers) that's built into .NET Core 3.x
+
+Here's a brief explanation:
+
+- A set of JWT roles, or policies are [declared](https://github.com/roadkillwiki/roadkill_new/blob/master/src/Roadkill.Api/Extensions/ServiceCollectionExtensions.cs#L120)
+- These policies all use a [RoadkillRequirement](https://github.com/roadkillwiki/roadkill_new/blob/master/src/Roadkill.Api/Authorization/Policies/RoadkillPolicyRequirement.cs)
+- ASP.NET will use Roadkill's [custom AuthorizationHandler](https://github.com/roadkillwiki/roadkill_new/blob/master/src/Roadkill.Api/Authorization/Roles/RolesAuthorizationHandler.cs) to handle the RoadkillRequirement that each policy uses.
+  - This handler has all `IUserRoleDefinition` injected into it. It goes through each of these definitions, to see if the incoming role name, such as "admin" has the claim, or policy name in the IUserRoleDefinition. It succeeds if it does.
+- Each controller action is decorated with an `[Authorize]` attribute, or to be exact a [custom attribute](https://github.com/roadkillwiki/roadkill_new/blob/master/src/Roadkill.Api/Authorization/Roles/AuthorizeWithBearerAttribute.cs) that sets the scheme to be Bearer otherwise ASP.NET uses "Basic". For example to create an admin use: `[Authorize(Policy = PolicyNames.CreateAdminUser)]`
+
+There are only Editor and Admin role definitions for now, but it is trivial to create more in future. Definitions could even be retrieved from the database, however PolicyNames will always be part of the C# code.
