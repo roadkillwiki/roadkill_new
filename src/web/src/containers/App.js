@@ -15,7 +15,7 @@ function App() {
   let apiInstance = new RoadkillApi.AuthorizationApi(defaultClient);
   let authorizationRequest = new RoadkillApi.AuthorizationRequest();
   authorizationRequest.email = "admin@example.org";
-  authorizationRequest.password = "Password12345678901";
+  authorizationRequest.password = "Password1234567890";
   apiInstance.authorizationAuthenticate(authorizationRequest, (error, data, response) => {
   if (error) {
     console.error(error);
