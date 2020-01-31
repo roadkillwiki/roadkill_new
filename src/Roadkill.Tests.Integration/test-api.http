@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "Email" : "editor@example.org",
-  "Password" : "password"
+  "Password" : "Password1234567890"
 }
 
 ### Admin authenticate
@@ -13,13 +13,13 @@ Content-Type: application/json
 
 {
   "Email" : "admin@example.org",
-  "Password" : "password"
+  "Password" : "Password1234567890"
 }
 
 ### This request requires the Editors policy
 POST http://localhost:5001/v3/pages/Add
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImVkaXRvckBleGFtcGxlLm9yZyIsInJvbGUiOiJFZGl0b3IiLCJuYmYiOjE1NDM4NTI5MjgsImV4cCI6MTU0NDQ1NzcyOCwiaWF0IjoxNTQzODUyOTI4fQ.qMUR6DsLp17WBPqYn6S2hqrpOXPDKF8mI-2RRV6z7VI
+Authorization: Bearer TODO: REPLACE THIS WITH THE jwtToken value from Above
 
 {
   "title": "my new page",
