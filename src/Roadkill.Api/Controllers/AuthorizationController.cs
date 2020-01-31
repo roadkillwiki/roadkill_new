@@ -3,6 +3,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Roadkill.Api.Authorization;
@@ -50,7 +51,7 @@ namespace Roadkill.Api.Controllers
 				IList<Claim> existingClaims = await _userManager.GetClaimsAsync(identityUser);
 				if (existingClaims.Count == 0)
 				{
-					return Forbid();
+					return StatusCode(StatusCodes.Status403Forbidden);
 				}
 
 				// When testing on localhost, RemoteIpAddress is null.
@@ -65,7 +66,8 @@ namespace Roadkill.Api.Controllers
 				return Ok(token);
 			}
 
-			return Forbid();
+			// don't use Forbid() as it goes through ASP.NET Core's authentication middleware
+			return StatusCode(StatusCodes.Status403Forbidden);
 		}
 	}
 }

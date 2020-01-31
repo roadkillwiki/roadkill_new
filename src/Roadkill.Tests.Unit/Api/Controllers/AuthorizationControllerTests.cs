@@ -191,7 +191,10 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 
 			// then
 			actionResult.ShouldNotBeNull();
-			actionResult.Result.ShouldBeOfType<ForbidResult>();
+
+			var statusCodeResult = actionResult.Result as StatusCodeResult;
+			statusCodeResult.ShouldNotBeNull();
+			statusCodeResult.StatusCode.ShouldBe(StatusCodes.Status403Forbidden);
 		}
 	}
 }
