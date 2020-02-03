@@ -109,7 +109,9 @@ namespace Roadkill.Api.Extensions
 					ValidateIssuerSigningKey = true,
 					IssuerSigningKey = new SymmetricSecurityKey(password),
 					ValidateIssuer = false,
-					ValidateAudience = false
+					ValidateAudience = false,
+					RequireExpirationTime = false,
+					ValidateLifetime = true
 				};
 			});
 
