@@ -14,7 +14,7 @@ namespace Roadkill.Api.Common.Response
 	public class PageResponse
 	{
 		/// <summary>
-		/// The unique Id of the page. This is generated on the server.
+		/// The unique JwtToken of the page. This is generated on the server.
 		/// </summary>
 		public int Id { get; set; }
 

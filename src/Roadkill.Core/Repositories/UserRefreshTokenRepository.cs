@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Marten;
 using Roadkill.Core.Entities.Authorization;
@@ -7,9 +9,10 @@ namespace Roadkill.Core.Repositories
 {
 	public interface IUserRefreshTokenRepository
 	{
-		Task<UserRefreshToken> GetRefreshToken(string email, string ipAddress);
-		Task<UserRefreshToken> AddRefreshToken(string email, string refreshToken, string ipAddress);
-		Task DeleteRefreshTokens(string email, string ipAddress);
+		Task<UserRefreshToken> GetRefreshToken(string refreshToken);
+		Task<UserRefreshToken> AddRefreshToken(string jwtId, string refreshToken, string email, string ipAddress);
+		Task DeleteRefreshToken(string refreshToken);
+		Task DeleteRefreshTokens(string email);
 	}
 
 	public class UserRefreshTokenRepository : IUserRefreshTokenRepository
@@ -21,28 +24,27 @@ namespace Roadkill.Core.Repositories
 			_store = store ?? throw new ArgumentNullException(nameof(store));
 		}
 
-		public async Task<UserRefreshToken> GetRefreshToken(string email, string ipAddress)
+		public async Task<UserRefreshToken> GetRefreshToken(string refreshToken)
 		{
 			using (var session = _store.QuerySession())
 			{
 				return await session
 					.Query<UserRefreshToken>()
-					.FirstOrDefaultAsync(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
-											  x.IpAddress == ipAddress);
+					.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
 			}
 		}
 
-		public async Task<UserRefreshToken> AddRefreshToken(string email, string refreshToken, string ipAddress)
+		public async Task<UserRefreshToken> AddRefreshToken(string jwtId, string refreshToken, string email, string ipAddress)
 		{
 			using (var session = _store.LightweightSession())
 			{
 				var token = new UserRefreshToken()
 				{
-					Id = Guid.NewGuid().ToString(),
-					Email = email,
-					CreationDate = DateTime.UtcNow,
+					JwtToken = jwtId,
 					RefreshToken = refreshToken,
-					IpAddress = ipAddress
+					CreationDate = DateTime.UtcNow,
+					IpAddress = ipAddress,
+					Email = email
 				};
 				session.Store(token);
 				await session.SaveChangesAsync();
@@ -51,12 +53,20 @@ namespace Roadkill.Core.Repositories
 			}
 		}
 
-		public async Task DeleteRefreshTokens(string email, string ipAddress)
+		public async Task DeleteRefreshToken(string refreshToken)
 		{
 			using (var session = _store.LightweightSession())
 			{
-				session.DeleteWhere<UserRefreshToken>(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
-														   x.IpAddress == ipAddress);
+				session.DeleteWhere<UserRefreshToken>(x => x.RefreshToken == refreshToken);
+				await session.SaveChangesAsync();
+			}
+		}
+
+		public async Task DeleteRefreshTokens(string email)
+		{
+			using (var session = _store.LightweightSession())
+			{
+				session.DeleteWhere<UserRefreshToken>(x => x.Email== email);
 				await session.SaveChangesAsync();
 			}
 		}

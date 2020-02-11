@@ -20,7 +20,8 @@ function App() {
   if (error) {
     console.error(error);
   } else {
-    console.log('API called successfully. Returned data: ' + data);
+    console.log('API called successfully. Returned data: ');
+    console.log(data);
   }
   });
 

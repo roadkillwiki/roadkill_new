@@ -76,10 +76,16 @@ namespace Roadkill.Api.Extensions
 				throw new InvalidOperationException("The JWT.Password setting is under 20 characters in length.");
 			}
 
-			if (jwtSettings.ExpiresDays < 1)
+			if (jwtSettings.JwtExpiresMinutes < 1)
 			{
-				logger.LogError($"The JWT.ExpiresDays is {jwtSettings.ExpiresDays}.");
-				throw new InvalidOperationException("The JWT.ExpiresDays is setting should be 1 or greater.");
+				logger.LogError($"The JWT.JwtExpiresMinutes is {jwtSettings.JwtExpiresMinutes}.");
+				throw new InvalidOperationException("The JWT.JwtExpiresMinutes is setting should be 1 or greater.");
+			}
+
+			if (jwtSettings.RefreshTokenExpiresDays < 1)
+			{
+				logger.LogError($"The JWT.RefreshTokenExpiresDays is {jwtSettings.RefreshTokenExpiresDays}.");
+				throw new InvalidOperationException("The JWT.RefreshTokenExpiresDays is setting should be 1 or greater.");
 			}
 
 			services.AddSingleton(jwtSettings);
@@ -88,11 +94,22 @@ namespace Roadkill.Api.Extensions
 				var settings = provider.GetRequiredService<JwtSettings>();
 				var tokenHandler = new JwtSecurityTokenHandler();
 				var repository = provider.GetRequiredService<IUserRefreshTokenRepository>();
+				var tokenValidationParams = provider.GetRequiredService<TokenValidationParameters>();
 
-				return new JwtTokenService(settings, tokenHandler, repository);
+				return new JwtTokenService(settings, tokenHandler, repository, tokenValidationParams);
 			});
 
-			var password = Encoding.ASCII.GetBytes(jwtSettings.Password);
+			byte[] password = Encoding.ASCII.GetBytes(jwtSettings.Password);
+			var jwtTokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateIssuerSigningKey = true,
+				IssuerSigningKey = new SymmetricSecurityKey(password),
+				ValidateIssuer = false,
+				ValidateAudience = false,
+				RequireExpirationTime = false,
+				ValidateLifetime = true
+			};
+
 			services.AddAuthentication(x =>
 			{
 				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -104,17 +121,10 @@ namespace Roadkill.Api.Extensions
 			{
 				options.RequireHttpsMetadata = false;
 				options.SaveToken = true;
-				options.TokenValidationParameters = new TokenValidationParameters
-				{
-					ValidateIssuerSigningKey = true,
-					IssuerSigningKey = new SymmetricSecurityKey(password),
-					ValidateIssuer = false,
-					ValidateAudience = false,
-					RequireExpirationTime = false,
-					ValidateLifetime = true
-				};
+				options.TokenValidationParameters = jwtTokenValidationParameters;
 			});
 
+			services.AddSingleton<TokenValidationParameters>(jwtTokenValidationParameters);
 			services.AddSingleton<IUserRoleDefinition, AdminRoleDefinition>();
 			services.AddSingleton<IUserRoleDefinition, EditorRoleDefinition>();
 			services.AddSingleton<IAuthorizationHandler, RolesAuthorizationHandler>();

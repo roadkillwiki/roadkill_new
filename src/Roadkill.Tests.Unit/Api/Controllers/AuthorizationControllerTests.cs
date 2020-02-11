@@ -111,7 +111,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 				.Returns(Task.FromResult(claims));
 
 			_jwtTokenService
-				.CreateToken(claims, roadkillUser.Email)
+				.CreateJwtToken(claims, roadkillUser.Email)
 				.Returns(jwtToken);
 
 			var httpContext = new DefaultHttpContext();
@@ -119,7 +119,7 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 			_authorizationController.ControllerContext.HttpContext = httpContext;
 
 			_jwtTokenService
-				.CreateRefreshToken(roadkillUser.Email, ipAddress)
+				.StoreRefreshToken("TODO jwttoken", "TODO refresh token", email, ipAddress)
 				.Returns(refreshToken);
 
 			// when

@@ -140,7 +140,7 @@ namespace Roadkill.Api.Controllers
 		[Authorize(Policy = PolicyNames.AddPage)]
 		public async Task<ActionResult<PageResponse>> Add([FromBody] PageRequest pageRequest)
 		{
-			// TODO: add base62 ID, as Id in Marten is Hilo and starts at 1000 as the lo
+			// TODO: add base62 ID, as JwtToken in Marten is Hilo and starts at 1000 as the lo
 			// TODO: fill createdon property
 			// TODO: validate
 			// http://www.anotherchris.net/csharp/friendly-unique-id-generation-part-2/

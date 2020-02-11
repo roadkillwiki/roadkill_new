@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture;
+using Baseline;
 using Marten;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Repositories;
@@ -12,12 +15,10 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 {
 	public class UserRefreshTokenRepositoryTests
 	{
-		private readonly Fixture _fixture;
 		private readonly ITestOutputHelper _outputHelper;
 
 		public UserRefreshTokenRepositoryTests(ITestOutputHelper outputHelper)
 		{
-			_fixture = new Fixture();
 			_outputHelper = outputHelper;
 			IDocumentStore documentStore = DocumentStoreManager.GetMartenDocumentStore(typeof(UserRefreshTokenRepositoryTests), outputHelper);
 
@@ -38,59 +39,76 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 		}
 
 		[Fact]
-		public async Task Should_add_and_get_token_per_device()
+		public async Task Should_add_token_and_fill_properties()
 		{
 			// given
 			var now = DateTime.UtcNow;
+			string jwtToken = "jwt";
 			string email = "stuart@minions.com";
-
-			string firstRefreshToken = "F5 F5";
-			string firstDeviceIpAddress = "8.8.8.8";
-
-			string secondRefreshToken = "F6 F6";
-			string secondDeviceIpAddress = "8.8.8.9";
+			string refreshToken = "token stuart 1";
+			string ip = "ip1";
 
 			UserRefreshTokenRepository repository = CreateRepository();
 
 			// when
-			await repository.AddRefreshToken(email, firstRefreshToken, firstDeviceIpAddress);
-			await repository.AddRefreshToken(email, secondRefreshToken, secondDeviceIpAddress);
-			UserRefreshToken token = await repository.GetRefreshToken(email, firstDeviceIpAddress);
+			await repository.AddRefreshToken(jwtToken, refreshToken, email, ip);
 
 			// then
+			UserRefreshToken token = await repository.GetRefreshToken(refreshToken);
 			token.ShouldNotBeNull();
-			token.Email.ShouldBe(email);
-			token.RefreshToken.ShouldBe(firstRefreshToken);
+			token.JwtToken.ShouldBe(jwtToken);
+			token.RefreshToken.ShouldBe(refreshToken);
 			token.CreationDate.ShouldBeGreaterThanOrEqualTo(now);
-			token.IpAddress.ShouldBe(firstDeviceIpAddress);
+			token.IpAddress.ShouldBe(ip);
+			token.Email.ShouldBe(email);
 		}
 
 		[Fact]
-		public async Task Should_remove_token_per_device()
+		public async Task Should_remove_token()
 		{
 			// given
-			var now = DateTime.UtcNow;
-			string email = "stuart@minions.com";
-
-			string firstRefreshToken = "F5 F5";
-			string firstDeviceIpAddress = "8.8.8.8";
-
-			string secondRefreshToken = "F6 F6";
-			string secondDeviceIpAddress = "8.8.8.9";
+			string email1 = "stuart@minions.com";
+			string refreshToken = "token stuart 1";
 
 			UserRefreshTokenRepository repository = CreateRepository();
+			await repository.AddRefreshToken("jwt1", refreshToken, email1, "ip1");
 
 			// when
-			await repository.AddRefreshToken(email, firstRefreshToken, firstDeviceIpAddress);
-			await repository.AddRefreshToken(email, secondRefreshToken, secondDeviceIpAddress);
-			await repository.DeleteRefreshTokens(email, firstDeviceIpAddress);
+			await repository.DeleteRefreshToken(refreshToken);
 
 			// then
-			UserRefreshToken token1 = await repository.GetRefreshToken(email, firstDeviceIpAddress);
-			UserRefreshToken token2 = await repository.GetRefreshToken(email, secondDeviceIpAddress);
+			UserRefreshToken deletedToken = await repository.GetRefreshToken(refreshToken);
+			deletedToken.ShouldBeNull();
+		}
 
-			token1.ShouldBeNull();
-			token2.ShouldNotBeNull();
+		[Fact]
+		public async Task Should_remove_tokens_for_user_email()
+		{
+			// given
+			string email1 = "stuart@minions.com";
+			string tokenForUser1 = "token stuart 1";
+			string tokenForUser1_b = "token stuart 2";
+
+			string email2 = "bob@minions.com";
+			string tokenForUser2 = "token for bob";
+
+			UserRefreshTokenRepository repository = CreateRepository();
+			await repository.AddRefreshToken("jwt1", tokenForUser1, email1, "ip1");
+			await repository.AddRefreshToken("jwt2", tokenForUser1_b, email1, "ip2");
+			await repository.AddRefreshToken("jwt3", tokenForUser2, email2, "ip3");
+
+			// when
+			await repository.DeleteRefreshTokens(email1);
+
+			// then
+			UserRefreshToken deletedToken1 = await repository.GetRefreshToken(tokenForUser1);
+			UserRefreshToken deletedToken2 = await repository.GetRefreshToken(tokenForUser1_b);
+			UserRefreshToken activeToken = await repository.GetRefreshToken(tokenForUser2);
+
+			deletedToken1.ShouldBeNull();
+			deletedToken2.ShouldBeNull();
+
+			activeToken.ShouldNotBeNull();
 		}
 	}
 }

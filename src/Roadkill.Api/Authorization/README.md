@@ -45,7 +45,7 @@ Roadkill uses a refresh token to avoid the client from having to continually log
 - 10 minutes elapse.
 - The client tries to perform an action with a now expired JWT token. The server returns an error with a specific message (so as not to confuse it with a missing token).
     - The client then calls `/Authentication/refresh` with their stored refresh token. This refresh token hasn't expired and is valid, so the server creates new JWT
-    token that lasts 15 minutes again and a new refresh token. It deletes/expires the old token pair and saves the new pair. They are sent back to the client.
+    token that lasts 15 minutes again and refreshes the expiry date of the refresh token. It deletes/expires the old token pair and saves the new pair. They are sent back to the client.
     - The client stores both tokens in local storage again.
     - The client then tries to perform an action with the new JWT token which is now valid.
 

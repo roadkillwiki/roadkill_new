@@ -43,7 +43,7 @@ namespace Roadkill.Tests.Integration.Core.Repositories
 			{ "Smtp:Username", "bob" },
 			{ "Smtp:Password", "mypassword" },
 			{ "Jwt:Password", "12345678901234567890" },
-			{ "Jwt:ExpiresDays", "7" }
+			{ "Jwt:JwtExpiresMinutes", "7" }
 		};
 
 		[Fact(Skip = "This is just a data setup test.")]

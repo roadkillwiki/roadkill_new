@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
@@ -22,6 +23,7 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 		private SecurityTokenHandler _tokenHandler;
 		private JwtTokenService _service;
 		private IUserRefreshTokenRepository _refreshTokenRepository;
+		private TokenValidationParameters _jwtTokenValidationParameters;
 
 		public JwtTokenServiceTests()
 		{
@@ -42,11 +44,22 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 			_jwtSettings = new JwtSettings()
 			{
 				Password = "a-very-secure-password-18-characters",
-				ExpiresDays = 10
+				JwtExpiresMinutes = 5,
+				RefreshTokenExpiresDays = 7
+			};
+
+			_jwtTokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateIssuerSigningKey = true,
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Password)),
+				ValidateIssuer = false,
+				ValidateAudience = false,
+				RequireExpirationTime = false,
+				ValidateLifetime = true
 			};
 
 			_refreshTokenRepository = Substitute.For<IUserRefreshTokenRepository>();
-			_service = new JwtTokenService(_jwtSettings, _tokenHandler, _refreshTokenRepository);
+			_service = new JwtTokenService(_jwtSettings, _tokenHandler, _refreshTokenRepository, _jwtTokenValidationParameters);
 		}
 
 		[Fact]
@@ -58,7 +71,7 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 			string email = "bob@example.com";
 
 			// when
-			string token = _service.CreateToken(existingClaims, email);
+			string token = _service.CreateJwtToken(existingClaims, email);
 
 			// then
 			token.ShouldNotBeNullOrEmpty();
@@ -75,10 +88,10 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 			// given
 			var existingClaims = new List<Claim>() { RoadkillClaims.AdminClaim };
 			string email = "bob@example.com";
-			var expectedExpiry = DateTime.UtcNow.AddDays(_jwtSettings.ExpiresDays);
+			var expectedExpiry = DateTime.UtcNow.AddDays(_jwtSettings.JwtExpiresMinutes);
 
 			// when
-			string token = _service.CreateToken(existingClaims, email);
+			string token = _service.CreateJwtToken(existingClaims, email);
 
 			// then
 			token.ShouldNotBeNullOrEmpty();
@@ -88,24 +101,28 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 		}
 
 		[Fact]
-		public async Task should_save_refresh_token_and_return_repositorys_token()
+		public async Task should_save_refresh_token_and_return_repository_token()
 		{
 			// given
-			string expectedToken = "refresh";
+			string jwtToken = "jwt";
+			string refreshToken = "refresh";
 			string email = "bob@example.com";
 			string ipAddress = "127.1.2.3";
 
-			_refreshTokenRepository.AddRefreshToken(email, Arg.Any<string>(), ipAddress)
+			_refreshTokenRepository.AddRefreshToken(jwtToken, refreshToken, email, ipAddress)
 				.Returns(new UserRefreshToken()
 				{
-					RefreshToken = expectedToken
+					RefreshToken = jwtToken
 				});
 
 			// when
-			string token = await _service.CreateRefreshToken(email, ipAddress);
+			string token = await _service.StoreRefreshToken(jwtToken, refreshToken, email, ipAddress);
 
 			// then
-			token.ShouldBe(expectedToken);
+			token.ShouldBe(jwtToken);
 		}
+
+		// should GetJwtSecurityToken
+		// should GetExistingRefreshToken
 	}
 }

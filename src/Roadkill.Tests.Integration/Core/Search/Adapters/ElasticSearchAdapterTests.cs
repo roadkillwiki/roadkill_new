@@ -108,7 +108,7 @@ namespace Roadkill.Tests.Integration.Core.Search.Adapters
 		}
 
 		[Theory(Skip = "Currently flakey")]
-		[InlineData("Id", "id:{0}")]
+		[InlineData("JwtToken", "id:{0}")]
 		[InlineData("Title", "title:{0}")]
 		[InlineData("Text", "text:{0}")]
 		[InlineData("Tags", "tags:{0}")]

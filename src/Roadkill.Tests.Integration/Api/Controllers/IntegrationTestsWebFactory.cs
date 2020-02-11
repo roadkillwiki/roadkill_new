@@ -32,7 +32,7 @@ namespace Roadkill.Tests.Integration.Api.Controllers
 			{ "Smtp:Username", "bob" },
 			{ "Smtp:Password", "mypassword" },
 			{ "Jwt:Password", "12345678901234567890" },
-			{ "Jwt:ExpiresDays", "7" }
+			{ "Jwt:JwtExpiresMinutes", "7" }
 		};
 
 		public ILogger<IDocumentStore> Logger { get; set; }

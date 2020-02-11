@@ -1,0 +1,14 @@
+'C#':
+  beautifiers:
+    - Pretty Diff
+  align_assignments: true
+  break_chained_methods: true
+  end_with_comma: !<tag:yaml.org,2002:js/undefined> ''
+  indent_comments: true
+  indent_size: 1
+  indent_style: tab
+  max_preserve_newlines: 1
+  multiline_ternary: always-multiline
+  quotes: double
+  space_after_anon_function: !<tag:yaml.org,2002:js/undefined> ''
+  wrap_line_length: 80
