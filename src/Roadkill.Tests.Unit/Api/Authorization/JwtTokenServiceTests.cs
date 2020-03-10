@@ -7,8 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
-using Roadkill.Api.Authorization;
 using Roadkill.Api.Authorization.JWT;
+using Roadkill.Api.Authorization.Roles;
 using Roadkill.Api.Settings;
 using Roadkill.Core.Entities.Authorization;
 using Roadkill.Core.Repositories;
@@ -19,11 +19,14 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 {
 	public class JwtTokenServiceTests
 	{
-		private JwtSettings _jwtSettings;
-		private SecurityTokenHandler _tokenHandler;
-		private JwtTokenService _service;
-		private IUserRefreshTokenRepository _refreshTokenRepository;
-		private TokenValidationParameters _jwtTokenValidationParameters;
+		private readonly JwtSettings _jwtSettings;
+		private readonly SecurityTokenHandler _tokenHandler;
+		private readonly JwtTokenService _service;
+		private readonly IUserRefreshTokenRepository _refreshTokenRepository;
+		private readonly TokenValidationParameters _jwtTokenValidationParameters;
+
+		private readonly string _fakeJwtToken = "the jwt token";
+		private readonly int _refreshTokenExpiresDays = 7;
 
 		public JwtTokenServiceTests()
 		{
@@ -39,13 +42,13 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 				.Returns(securityToken);
 			_tokenHandler
 				.WriteToken(securityToken)
-				.Returns("the jwt token");
+				.Returns(_fakeJwtToken);
 
 			_jwtSettings = new JwtSettings()
 			{
 				Password = "a-very-secure-password-18-characters",
 				JwtExpiresMinutes = 5,
-				RefreshTokenExpiresDays = 7
+				RefreshTokenExpiresDays = _refreshTokenExpiresDays
 			};
 
 			_jwtTokenValidationParameters = new TokenValidationParameters
@@ -88,7 +91,7 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 			// given
 			var existingClaims = new List<Claim>() { RoadkillClaims.AdminClaim };
 			string email = "bob@example.com";
-			var expectedExpiry = DateTime.UtcNow.AddDays(_jwtSettings.JwtExpiresMinutes);
+			var expectedExpiry = DateTime.UtcNow.AddMinutes(_jwtSettings.JwtExpiresMinutes);
 
 			// when
 			string token = _service.CreateJwtToken(existingClaims, email);
@@ -122,7 +125,96 @@ namespace Roadkill.Tests.Unit.Api.Authorization
 			token.ShouldBe(jwtToken);
 		}
 
-		// should GetJwtSecurityToken
-		// should GetExistingRefreshToken
+		[Fact]
+		public async Task should_get_jwt_token()
+		{
+			// given
+			string currentJwtToken = "jwt token";
+			var adminClaim = new Claim(ClaimTypes.Role, AdminRoleDefinition.Name);
+			var claimsList = new List<Claim>() { adminClaim };
+			var fakeJwtSecurityToken = new JwtSecurityToken(claims: claimsList);
+
+			_tokenHandler
+				.ValidateToken(currentJwtToken, _jwtTokenValidationParameters, out Arg.Any<SecurityToken>())
+				.Returns(x =>
+				{
+					x[2] = fakeJwtSecurityToken; // set the out (3rd parameter) of ValidateToken()
+					return new ClaimsPrincipal();
+				});
+
+			// when
+			JwtSecurityToken jwtSecurityToken = _service.GetJwtSecurityToken(currentJwtToken);
+
+			// then
+			jwtSecurityToken.ShouldNotBeNull();
+
+			var actualClaim = jwtSecurityToken.Claims.FirstOrDefault();
+			actualClaim.ShouldNotBeNull();
+			actualClaim.Type.ShouldBe(adminClaim.Type);
+			actualClaim.Value.ShouldBe(adminClaim.Value);
+		}
+
+		[Fact]
+		public async Task GetRefreshToken_should_get_from_existing_jwt_token()
+		{
+			// given
+			string existingRefreshToken = "a fake GUID";
+			var expectedToken = new UserRefreshToken()
+			{
+				Email = "test@localhost",
+				CreationDate = DateTime.UtcNow.AddDays(-1),
+				IpAddress = "1.0.0.0",
+				JwtToken = "jwt token",
+				RefreshToken = existingRefreshToken
+			};
+
+			_refreshTokenRepository
+				.GetRefreshToken(existingRefreshToken)
+				.Returns(expectedToken);
+
+			_tokenHandler
+				.ValidateToken(expectedToken.JwtToken, _jwtTokenValidationParameters, out Arg.Any<SecurityToken>())
+				.Returns(x =>
+				{
+					var adminClaim = new Claim(ClaimTypes.Role, AdminRoleDefinition.Name);
+					var claimsList = new List<Claim>() { adminClaim };
+					var fakeJwtSecurityToken = new JwtSecurityToken(claims: claimsList);
+
+					x[2] = fakeJwtSecurityToken; // set the out (3rd parameter) of ValidateToken()
+					return new ClaimsPrincipal();
+				});
+
+			// when
+			var userRefreshToken = await _service.GetExistingRefreshToken(existingRefreshToken);
+
+			// then
+			userRefreshToken.ShouldNotBeNull();
+			userRefreshToken.Email.ShouldBe(expectedToken.Email);
+		}
+
+		[Fact]
+		public async Task GetRefreshToken_should_ignore_expired_tokens()
+		{
+			// given
+			string existingRefreshToken = "a fake GUID";
+			var expectedToken = new UserRefreshToken()
+			{
+				Email = "test@localhost",
+				CreationDate = DateTime.UtcNow.AddDays(_refreshTokenExpiresDays +1),
+				IpAddress = "1.0.0.0",
+				JwtToken = "jwt token",
+				RefreshToken = existingRefreshToken
+			};
+
+			_refreshTokenRepository
+				.GetRefreshToken(existingRefreshToken)
+				.Returns(expectedToken);
+
+			// when
+			var userRefreshToken = await _service.GetExistingRefreshToken(existingRefreshToken);
+
+			// then
+			userRefreshToken.ShouldBeNull();
+		}
 	}
 }

@@ -26,9 +26,9 @@ namespace Roadkill.Tests.Unit.Api.Controllers
 	public sealed class UsersControllerTests
 	{
 		private readonly Fixture _fixture;
-		private UsersController _usersController;
-		private UserManager<RoadkillIdentityUser> _userManagerMock;
-		private IUserObjectsConverter _objectConverterMock;
+		private readonly UsersController _usersController;
+		private readonly UserManager<RoadkillIdentityUser> _userManagerMock;
+		private readonly IUserObjectsConverter _objectConverterMock;
 
 		public UsersControllerTests()
 		{

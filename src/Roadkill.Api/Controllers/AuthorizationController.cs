@@ -59,7 +59,7 @@ namespace Roadkill.Api.Controllers
 				string refreshToken = Guid.NewGuid().ToString("N");
 				string email = identityUser.Email;
 
-				AuthorizationResponse response = await GetAuthorizationResponse(refreshToken, email, existingClaims.ToList());
+				AuthorizationResponse response = await CreateNewJwtAndStoreWithRefreshToken(refreshToken, email, existingClaims.ToList());
 				return Ok(response);
 			}
 
@@ -80,14 +80,14 @@ namespace Roadkill.Api.Controllers
 				string email = existingClaims.First(x => x.Type == ClaimTypes.Name).Value;
 
 				string refreshToken = userRefreshToken.RefreshToken;
-				AuthorizationResponse response = await GetAuthorizationResponse(refreshToken, email, existingClaims);
+				AuthorizationResponse response = await CreateNewJwtAndStoreWithRefreshToken(refreshToken, email, existingClaims);
 				return Ok(response);
 			}
 
 			return StatusCode(StatusCodes.Status404NotFound);
 		}
 
-		private async Task<AuthorizationResponse> GetAuthorizationResponse(string refreshToken, string email, List<Claim> existingClaims)
+		private async Task<AuthorizationResponse> CreateNewJwtAndStoreWithRefreshToken(string refreshToken, string email, List<Claim> existingClaims)
 		{
 			string ip = GetIpAddress();
 			string jwtToken = _jwtTokenService.CreateJwtToken(existingClaims, email);
