@@ -28,5 +28,6 @@
 			<Rule Id="CA2234" Action="None" /> <!-- Use a Uri not string -->
 			<Rule Id="CA1305" Action="None" /> <!-- Use a culture with String.format -->
 			<Rule Id="CA1801" Action="None" /> <!-- Parameter is never used (even if DI might use it) -->
+			<Rule Id="SA1303" Action="None" /> <!-- Localisation -->
   	</Rules>
 </RuleSet>
