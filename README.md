@@ -1,10 +1,8 @@
-[![Build Status](https://travis-ci.org/roadkillwiki/roadkill_new.svg?branch=master)](https://travis-ci.org/roadkillwiki/roadkill_new)
-
 # roadkill_new
-.NET Core Roadkill (v3). A new repository to make the size of the Git repository smaller, and eventually will be the main Roadkill repository.
+.NET Core Roadkill (v3). 
 
-You will need .NET Core 2.1 `dotnet format` in order to build the solution:
+This was a new repository to make the size of the Git repository smaller, and eventually move the main Roadkill repository here. It was a greenfield upgrade of Roadkill to .NET Core.
 
-```
-dotnet tool install dotnet-format -g --version 3.0.4-prerelease.19178.2 --add-source https://dotnet.myget.org/F/format/api/v3/index.json
-```
+**While this project is 99% functionally complete, it stopped at .NET 5. It hasn't been continued because of the large amount of work involved with integrating an OAuth 2 solution, and rewriting the front-end as a SPA with React or similar.**
+
+Feel free to fork and roll your own front end!
